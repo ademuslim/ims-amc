@@ -1,0 +1,90 @@
+/* FONT */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  box-sizing: border-box; /* Optional: Menghindari masalah padding/border memperbesar elemen */
+}
+
+/* Optional: Menangani beberapa elemen yang perlu mendapatkan gaya khusus */
+html {
+  font-size: 16px;
+}
+html,
+body,
+div,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+img,
+ul,
+ol,
+li,
+table,
+tr,
+th,
+td,
+form,
+input,
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+
+/* Reset untuk ul, li, dan a */
+ul,
+ol,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* COLOR */
+:root {
+  --primary-color: #2ecc71; /* Warna utama hijau */
+  --primary-color-2: rgba(0, 255, 21, 0.1); /* Warna utama hijau */
+  --secondary-color: #27ae60; /* Warna hijau sekunder */
+  --accent-color: #3498db; /* Warna aksen, misalnya untuk tombol atau elemen yang menonjol */
+  --background-color: #ebe9e9; /* Warna latar belakang umum */
+  --light-text-color: #ebe9e9; /* Warna latar belakang umum */
+  --text-color: #333; /* Warna teks umum */
+  --link-color: #2980b9; /* Warna untuk tautan/hyperlink */
+  --success-color: #16a085; /* Warna untuk pesan keberhasilan atau indikator positif */
+  --error-color: #e74c3c; /* Warna untuk pesan kesalahan atau indikator negatif */
+  --warning-color: #ff4500; /* Warna untuk pesan kesalahan atau indikator negatif */
+}
+
+body {
+  background-color: grey;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+.menu {
+  display: flex;
+  gap: 2rem;
+}

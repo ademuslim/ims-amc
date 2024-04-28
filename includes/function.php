@@ -1,0 +1,366 @@
+<?php
+session_start();
+require_once 'config.php';
+
+// Fungsi untuk mendapatkan base URL
+function base_url($url = null) {
+  // Mengambil base URL dari variabel lingkungan jika tersedia, jika tidak, gunakan base URL default
+  $base_url = getenv('BASE_URL') ? getenv('BASE_URL') : "http://ims-amc.test";
+  if ($url != null) {
+      return rtrim($base_url, '/') . '/' . ltrim($url, '/');
+  } else {
+      return $base_url;
+  }
+}
+
+// Fungsi conversi tanggal
+function tanggalIndonesia() {
+  // Set timezone ke Asia/Jakarta agar sesuai dengan waktu Indonesia Barat
+  date_default_timezone_set('Asia/Jakarta');
+
+  // Array untuk nama bulan dalam bahasa Indonesia
+  $bulanIndonesia = array(
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  );
+
+  // Mendapatkan indeks bulan saat ini (0-11)
+  $indexBulan = date('n') - 1;
+
+  // Format tanggal dengan nama bulan dalam bahasa Indonesia
+  $tanggal = date('j') . ' ' . $bulanIndonesia[$indexBulan] . ' ' . date('Y');
+
+  // Kembalikan tanggal yang telah diformat
+  return $tanggal;
+}
+
+// Fungsi aktif link
+function setActivePage($page) {
+  $current_page = $_SERVER['REQUEST_URI'];
+  $active_class = '';
+
+  // Periksa apakah halaman saat ini mengandung string yang sesuai dengan halaman yang ditentukan
+  if (str_contains($current_page, $page)) {
+      $active_class = 'class="active"';
+  }
+
+  return $active_class;
+}
+
+// Fungsi mengarahkan pengguna
+function redirectUser($role) {
+  if ($role === 'superadmin' || $role === 'staff') {
+      // Arahkan superadmin dan staff ke dashboard
+      header("Location: " . base_url('pages/dashboard'));
+      exit();
+  } elseif ($role === 'kepala_perusahaan') {
+      // Arahkan kepala_perusahaan ke dashboard_kepala_perusahaan
+      header("Location: " . base_url('pages/dashboard-views'));
+      exit();
+  } else {
+      // Jika role tidak valid, arahkan pengguna ke halaman login
+      header("Location: " . base_url('auth/login.php'));
+      exit();
+  }
+}
+
+// Fungsi memeriksa pengguna sudah login
+function checkLoginStatus() {
+  // Periksa apakah ada sesi peran_pengguna
+  if (isset($_SESSION['peran_pengguna'])) {
+      return true; // Pengguna sudah login
+  } else {
+      return false; // Pengguna belum login
+  }
+}
+
+// Fungsi sanitasi input
+function sanitizeInput($input) {
+  // Cek apakah $input adalah array
+  if (is_array($input)) {
+      // Jika $input adalah array, iterasi melalui setiap elemen array dan rekursif bersihkan
+      foreach ($input as $key => $value) {
+          $input[$key] = sanitizeInput($value);
+      }
+      return $input;
+  }
+
+  // Gunakan htmlspecialchars untuk membersihkan input dari karakter berbahaya
+  $clean_input = htmlspecialchars($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+  
+  // Hapus karakter yang berlebihan
+  $clean_input = preg_replace('/\s+/', ' ', $clean_input);
+
+  return $clean_input;
+}
+
+// Fungsi mendapatkan peran pengguna berdasarkan ID pengguna
+function getUserRoleById($user_id) {
+  global $conn;
+  $query = "SELECT tipe_pengguna FROM pengguna WHERE id_pengguna = ?";
+  $stmt = mysqli_prepare($conn, $query);
+  
+  mysqli_stmt_bind_param($stmt, "i", $user_id);
+  mysqli_stmt_execute($stmt);
+  mysqli_stmt_store_result($stmt);
+  mysqli_stmt_bind_result($stmt, $tipe_pengguna);
+  mysqli_stmt_fetch($stmt);
+  mysqli_stmt_close($stmt);
+
+  return $tipe_pengguna;
+}
+
+// Fungsi otentikasi pengguna berdasarkan email dan password
+function authenticateUser($email, $password) {
+  global $conn; // Gunakan koneksi database dari objek global
+
+  // Ambil haquotationsh password dari database berdasarkan email
+  $query = "SELECT id_pengguna, tipe_pengguna, password FROM pengguna WHERE email = ?";
+  $stmt = mysqli_prepare($conn, $query);
+  mysqli_stmt_bind_param($stmt, "s", $email);
+  mysqli_stmt_execute($stmt);
+  mysqli_stmt_store_result($stmt);
+
+  // Bind result variables
+  mysqli_stmt_bind_result($stmt, $user_id, $user_role, $hashed_password);
+
+  // Fetch value
+  mysqli_stmt_fetch($stmt);
+
+  // Periksa apakah ada baris yang cocok dengan email yang diberikan
+  if (mysqli_stmt_num_rows($stmt) > 0) {
+      // Verifikasi password
+      if (password_verify($password, $hashed_password)) {
+          // Jika password cocok, kembalikan informasi pengguna
+          return array(
+              'id_pengguna' => $user_id,
+              'tipe_pengguna' => $user_role
+          );
+      } else {
+          // Jika password tidak cocok, kembalikan null
+          return null;
+      }
+  } else {
+      // Jika tidak ada baris yang cocok dengan email yang diberikan, kembalikan null
+      return null;
+  }
+}
+
+// Fungsi otentikasi berdasarkan ID pengguna
+function authenticateByUserId($user_id) {
+  global $conn;
+  
+  // Query untuk mengambil pengguna berdasarkan ID pengguna
+  $query = "SELECT * FROM pengguna WHERE id_pengguna = ?";
+  $stmt = mysqli_prepare($conn, $query);
+  mysqli_stmt_bind_param($stmt, "i", $user_id);
+  mysqli_stmt_execute($stmt);
+  mysqli_stmt_store_result($stmt);
+  
+  // Periksa apakah ada pengguna dengan ID yang diberikan
+  if (mysqli_stmt_num_rows($stmt) > 0) {
+      return true; // Otentikasi berhasil
+  } else {
+      return false; // Otentikasi gagal
+  }
+}
+
+
+// Fungsi tambah pengguna
+function register($id_pengguna, $nama_pengguna, $email, $password, $tipe_pengguna) {
+  global $conn;
+
+  $id_pengguna = $id_pengguna;
+  $nama_pengguna = $nama_pengguna;
+  $email = $email;
+  $tipe_pengguna = $tipe_pengguna;
+
+  // Hash password
+  $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+  // Insert user data into database
+  $query = "INSERT INTO pengguna (id_pengguna, nama_pengguna, email, password, tipe_pengguna) VALUES (?, ?, ?, ?, ?)";
+  $stmt = mysqli_prepare($conn, $query);
+  
+  // Bind parameters
+  mysqli_stmt_bind_param($stmt, "sssss", $id_pengguna, $nama_pengguna, $email, $hashed_password, $tipe_pengguna);
+  
+  // Execute statement
+  $result = mysqli_stmt_execute($stmt);
+
+  // Check if registration was successful
+  if ($result) {
+      return true; // Registration successful
+  } else {
+      return false; // Registration failed
+  }
+}
+
+// Fungsi tambah data
+function insertData($table, $data) {
+  global $conn;
+
+  // Sanitasi data sebelum dimasukkan ke dalam database
+  $sanitized_data = sanitizeInput($data);
+
+  // Bangun pernyataan SQL
+  $columns = implode(", ", array_keys($sanitized_data));
+  $placeholders = implode(", ", array_fill(0, count($sanitized_data), "?"));
+  $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
+
+  // Persiapkan statement
+  $stmt = mysqli_prepare($conn, $sql);
+
+  // Bind parameter
+  $types = str_repeat("s", count($sanitized_data));
+  mysqli_stmt_bind_param($stmt, $types, ...array_values($sanitized_data));
+
+  // Eksekusi statement
+  mysqli_stmt_execute($stmt);
+
+  // Ambil hasil
+  $result = mysqli_stmt_affected_rows($stmt);
+
+  // Tutup statement
+  mysqli_stmt_close($stmt);
+
+  return $result;
+}
+
+
+// Fungsi tampil data
+function selectData($table, $conditions = "") {
+  global $conn;
+  // Bangun pernyataan SQL
+  $sql = "SELECT * FROM $table";
+  if (!empty($conditions)) {
+      $sql .= " WHERE $conditions";
+  }
+  // Eksekusi query
+  $result = mysqli_query($conn, $sql);
+  // Ambil hasil
+  $rows = [];
+  while ($row = mysqli_fetch_assoc($result)) {
+      $rows[] = $row;
+  }
+  // Bebaskan hasil
+  mysqli_free_result($result);
+  return $rows;
+}
+
+// Fungsi ubah data
+function updateData($table, $data, $conditions) {
+  global $conn;
+  // Bangun pernyataan SQL
+  $set = [];
+  $params = [];
+  foreach ($data as $key => $value) {
+      $set[] = "$key = ?";
+      $params[] = $value;
+  }
+  $setClause = implode(", ", $set);
+  $sql = "UPDATE $table SET $setClause WHERE $conditions";
+  // Persiapkan statement
+  $stmt = mysqli_prepare($conn, $sql);
+  // Bind parameter
+  mysqli_stmt_bind_param($stmt, str_repeat("s", count($data)), ...$params);
+  // Eksekusi statement
+  mysqli_stmt_execute($stmt);
+  // Ambil hasil
+  $result = mysqli_stmt_affected_rows($stmt);
+  // Tutup statement
+  mysqli_stmt_close($stmt);
+  return $result;
+}
+
+// Fungsi hapus data
+function deleteData($table, $conditions) {
+  global $conn;
+  // Bangun pernyataan SQL
+  $sql = "DELETE FROM $table WHERE $conditions";
+  // Persiapkan statement
+  $stmt = mysqli_prepare($conn, $sql);
+  // Eksekusi statement
+  mysqli_stmt_execute($stmt);
+  // Ambil hasil
+  $result = mysqli_stmt_affected_rows($stmt);
+  // Tutup statement
+  mysqli_stmt_close($stmt);
+  return $result;
+}
+
+// Fungsi untuk memeriksa apakah nilai sudah ada dalam tabel dan kolom tertentu
+function isValueExists($table, $column, $value, $excludeId = null, $idColumn = 'id') {
+  global $conn;
+
+  // Persiapkan query SQL
+  $sql = "SELECT COUNT(*) as count FROM $table WHERE $column = ?";
+  
+  // Jika excludeId diberikan, tambahkan kondisi untuk mengecualikan id tertentu
+  if ($excludeId !== null) {
+      $sql .= " AND $idColumn != ?";
+  }
+
+  // Persiapkan statement
+  $stmt = mysqli_prepare($conn, $sql);
+
+  // Bind parameter
+  if ($excludeId !== null) {
+      mysqli_stmt_bind_param($stmt, "ss", $value, $excludeId);
+  } else {
+      mysqli_stmt_bind_param($stmt, "s", $value);
+  }
+
+  // Eksekusi statement
+  mysqli_stmt_execute($stmt);
+
+  // Ambil hasil
+  mysqli_stmt_bind_result($stmt, $count);
+  mysqli_stmt_fetch($stmt);
+
+  // Tutup statement
+  mysqli_stmt_close($stmt);
+
+  // Return true jika jumlah baris lebih dari 0 (nilai sudah ada), false jika tidak
+  return $count > 0;
+}
+
+// Fungsi untuk memeriksa apakah data yang akan dihapus sedang digunakan dalam tabel lain sebagai relasi
+function isDataInUse($column, $value, $otherTables = array()) {
+  global $conn;
+
+  // Inisialisasi variabel untuk menyimpan status penggunaan data
+  $dataInUse = false;
+
+  // Persiapkan query SQL untuk setiap tabel lain
+  foreach ($otherTables as $otherTable) {
+    // Persiapkan query SQL untuk mengecek relasi di tabel lain
+    $sql = "SELECT COUNT(*) as count FROM $otherTable WHERE $column = ?";
+
+    // Persiapkan statement
+    $stmt = mysqli_prepare($conn, $sql);
+
+    // Bind parameter
+    mysqli_stmt_bind_param($stmt, "s", $value);
+
+    // Eksekusi statement
+    mysqli_stmt_execute($stmt);
+
+    // Ambil hasil
+    mysqli_stmt_bind_result($stmt, $count);
+    mysqli_stmt_fetch($stmt);
+
+    // Tutup statement
+    mysqli_stmt_close($stmt);
+
+    // Jika jumlah baris lebih dari 0 (data sedang digunakan dalam tabel lain), set status menjadi true
+    if ($count > 0) {
+      $dataInUse = true;
+      // Hentikan loop karena data sudah ditemukan digunakan dalam salah satu tabel lain
+      break;
+    }
+  }
+
+  // Return status penggunaan data
+  return $dataInUse;
+}
