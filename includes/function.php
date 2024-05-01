@@ -115,14 +115,14 @@ function authenticateUser($email, $password) {
   global $conn; // Gunakan koneksi database dari objek global
 
   // Ambil haquotationsh password dari database berdasarkan email
-  $query = "SELECT id_pengguna, tipe_pengguna, password FROM pengguna WHERE email = ?";
+  $query = "SELECT id_pengguna, tipe_pengguna, nama_pengguna, password FROM pengguna WHERE email = ?";
   $stmt = mysqli_prepare($conn, $query);
   mysqli_stmt_bind_param($stmt, "s", $email);
   mysqli_stmt_execute($stmt);
   mysqli_stmt_store_result($stmt);
 
   // Bind result variables
-  mysqli_stmt_bind_result($stmt, $user_id, $user_role, $hashed_password);
+  mysqli_stmt_bind_result($stmt, $user_id, $user_role, $user_name, $hashed_password);
 
   // Fetch value
   mysqli_stmt_fetch($stmt);
@@ -134,7 +134,8 @@ function authenticateUser($email, $password) {
           // Jika password cocok, kembalikan informasi pengguna
           return array(
               'id_pengguna' => $user_id,
-              'tipe_pengguna' => $user_role
+              'tipe_pengguna' => $user_role,
+              'nama_pengguna' => $user_name
           );
       } else {
           // Jika password tidak cocok, kembalikan null
@@ -227,7 +228,6 @@ function insertData($table, $data) {
   return $result;
 }
 
-
 // Fungsi tampil data
 function selectData($table, $conditions = "") {
   global $conn;
@@ -245,6 +245,38 @@ function selectData($table, $conditions = "") {
   }
   // Bebaskan hasil
   mysqli_free_result($result);
+  return $rows;
+}
+
+// Fungsi tampil data dengan join tabel dan fitur order by
+function selectDataJoin($mainTable, $joinTables = [], $columns = '*', $conditions = "", $orderBy = "") {
+  global $conn;
+  
+  // Bangun pernyataan SQL untuk select
+  $sql = "SELECT $columns FROM $mainTable";
+  
+  // Tambahkan join clause jika ada
+  foreach ($joinTables as $joinTable) {
+      $sql .= " JOIN $joinTable[0] ON $joinTable[1]";
+  }
+  
+  // Tambahkan kondisi jika ada
+  if (!empty($conditions)) {
+      $sql .= " WHERE $conditions";
+  }
+  
+  // Tambahkan klausa ORDER BY jika ada
+  if (!empty($orderBy)) {
+      $sql .= " ORDER BY $orderBy";
+  }
+  
+  // Eksekusi query dan ambil hasil
+  $result = mysqli_query($conn, $sql);
+  $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+  
+  // Bebaskan hasil
+  mysqli_free_result($result);
+  
   return $rows;
 }
 
@@ -363,4 +395,44 @@ function isDataInUse($column, $value, $otherTables = array()) {
 
   // Return status penggunaan data
   return $dataInUse;
+}
+
+function getLastDocumentNumber($tabel, $column, $order_by, $prefix, $suffix, $month, $year) {
+  global $conn;
+
+  // Query untuk mengambil nomor dokumen terbaru dari tabel tertentu berdasarkan kolom tertentu
+  // dan berdasarkan bulan dan tahun yang disediakan
+  $query = "SELECT $column FROM $tabel WHERE YEAR($order_by) = $year AND MONTH($order_by) = $month ORDER BY $column DESC LIMIT 1";
+
+  // Eksekusi query
+  $result = mysqli_query($conn, $query);
+
+  // Periksa apakah query berhasil dieksekusi
+  if (!$result) {
+      die("Error: " . mysqli_error($conn));
+  }
+
+  // Inisialisasi nomor dokumen terbaru
+  $new_doc_number = '';
+
+  // Periksa apakah ada hasil dari query
+  if (mysqli_num_rows($result) > 0) {
+      // Ambil nomor dokumen terbaru
+      $row = mysqli_fetch_assoc($result);
+      $last_number = $row[$column];
+
+      // Split nomor dokumen terbaru untuk mendapatkan nomor
+      $doc_parts = explode('/', $last_number);
+      $last_doc_digits = intval($doc_parts[0]);
+
+      // Tambahkan 1 pada nomor dokumen terbaru
+      $new_doc_digits = sprintf('%03d', $last_doc_digits + 1);
+      $new_doc_number = $new_doc_digits . '/' . $prefix . '/' . $suffix . '/' . $month . '/' . $year;
+  } else {
+      // Jika tidak ada nomor dokumen terbaru untuk bulan dan tahun yang sama,
+      // buat nomor dokumen baru dimulai dari 001
+      $new_doc_number = '001/' . $prefix . '/' . $suffix . '/' . $month . '/' . $year;
+  }
+
+  return $new_doc_number;
 }

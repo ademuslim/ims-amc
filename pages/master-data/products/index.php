@@ -15,13 +15,13 @@ $data_produk = selectData('produk');
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">ID Produk</th>
-        <th scope="col">Nomor Produk</th>
-        <th scope="col">Nama Produk</th>
-        <th scope="col">Satuan</th>
-        <th scope="col">Harga</th>
-        <th scope="col">Status</th>
-        <th scope="col">Aksi</th>
+        <th>ID Produk</th>
+        <th>Nomor Produk</th>
+        <th>Nama Produk</th>
+        <th>Satuan</th>
+        <th>Harga</th>
+        <th>Status</th>
+        <th>Aksi</th>
       </tr>
     </thead>
     <tbody>
@@ -32,23 +32,23 @@ $data_produk = selectData('produk');
       <?php else : ?>
       <?php foreach ($data_produk as $produk) : ?>
       <tr>
-        <td><?php echo $produk['id_produk']; ?></td>
-        <td><?php echo $produk['no_produk']; ?></td>
-        <td><?php echo $produk['nama_produk']; ?></td>
-        <td><?php echo $produk['satuan']; ?></td>
-        <td><?php echo $produk['harga']; ?></td>
-        <td><?php echo $produk['status']; ?></td>
+        <td><?= $produk['id_produk']; ?></td>
+        <td><?= $produk['no_produk']; ?></td>
+        <td><?= $produk['nama_produk']; ?></td>
+        <td><?= $produk['satuan']; ?></td>
+        <td><?= $produk['harga']; ?></td>
+        <td><?= $produk['status']; ?></td>
         <td>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#editModal<?php echo $produk['id_produk']; ?>">Edit</button>
-          <a href="del.php?id=<?php echo $produk['id_produk']; ?>" class="btn btn-danger">Hapus</a>
+            data-bs-target="#editModal<?= $produk['id_produk']; ?>">Edit</button>
+          <a href="del.php?id=<?= $produk['id_produk']; ?>" class="btn btn-danger">Hapus</a>
         </td>
       </tr>
 
       <!-- Modal Edit -->
-      <div class="modal fade" id="editModal<?php echo $produk['id_produk']; ?>" tabindex="-1"
+      <div class="modal fade" id="editModal<?= $produk['id_produk']; ?>" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Produk</h1>

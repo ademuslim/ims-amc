@@ -15,13 +15,13 @@ $data_pelanggan = selectData('pelanggan');
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">ID Pelanggan</th>
-        <th scope="col">Nama</th>
-        <th scope="col">Alamat</th>
-        <th scope="col">Telepon</th>
-        <th scope="col">Email</th>
-        <th scope="col">Keterangan</th>
-        <th scope="col">Aksi</th>
+        <th>ID Pelanggan</th>
+        <th>Nama</th>
+        <th>Alamat</th>
+        <th>Telepon</th>
+        <th>Email</th>
+        <th>Keterangan</th>
+        <th>Aksi</th>
       </tr>
     </thead>
     <tbody>
@@ -32,23 +32,23 @@ $data_pelanggan = selectData('pelanggan');
       <?php else : ?>
       <?php foreach ($data_pelanggan as $pelanggan) : ?>
       <tr>
-        <td><?php echo $pelanggan['id_pelanggan']; ?></td>
-        <td><?php echo $pelanggan['nama_pelanggan']; ?></td>
-        <td><?php echo $pelanggan['alamat']; ?></td>
-        <td><?php echo $pelanggan['telepon']; ?></td>
-        <td><?php echo $pelanggan['email']; ?></td>
-        <td><?php echo $pelanggan['keterangan']; ?></td>
+        <td><?= $pelanggan['id_pelanggan']; ?></td>
+        <td><?= $pelanggan['nama_pelanggan']; ?></td>
+        <td><?= $pelanggan['alamat']; ?></td>
+        <td><?= $pelanggan['telepon']; ?></td>
+        <td><?= $pelanggan['email']; ?></td>
+        <td><?= $pelanggan['keterangan']; ?></td>
         <td>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#editModal<?php echo $pelanggan['id_pelanggan']; ?>">Edit</button>
-          <a href="del.php?id=<?php echo $pelanggan['id_pelanggan']; ?>" class="btn btn-danger">Hapus</a>
+            data-bs-target="#editModal<?= $pelanggan['id_pelanggan']; ?>">Edit</button>
+          <a href="del.php?id=<?= $pelanggan['id_pelanggan']; ?>" class="btn btn-danger">Hapus</a>
         </td>
       </tr>
 
       <!-- Modal Edit -->
-      <div class="modal fade" id="editModal<?php echo $pelanggan['id_pelanggan']; ?>" tabindex="-1"
+      <div class="modal fade" id="editModal<?= $pelanggan['id_pelanggan']; ?>" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="editModalLabel">Edit Data pelanggan Internal</h1>

@@ -22,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user) {
             // Simpan informasi pengguna ke sesi
             $_SESSION['peran_pengguna'] = $user['tipe_pengguna'];
+            $_SESSION['nama_pengguna'] = $user['nama_pengguna'];
     
             // Jika dicentang, set cookie "ingat akun" dengan ID pengguna
             if (isset($_POST['remember_me'])) {

@@ -15,12 +15,12 @@ $data_kontak_internal = selectData('kontak_internal');
   <table class="table">
     <thead>
       <tr>
-        <th scope="col">ID Kontak</th>
-        <th scope="col">Nama</th>
-        <th scope="col">Alamat</th>
-        <th scope="col">Telepon</th>
-        <th scope="col">Email</th>
-        <th scope="col">Aksi</th>
+        <th>ID Kontak</th>
+        <th>Nama</th>
+        <th>Alamat</th>
+        <th>Telepon</th>
+        <th>Email</th>
+        <th>Aksi</th>
       </tr>
     </thead>
     <tbody>
@@ -44,9 +44,9 @@ $data_kontak_internal = selectData('kontak_internal');
       </tr>
 
       <!-- Modal Edit -->
-      <div class="modal fade" id="editModal<?php echo $kontak['id_pengirim']; ?>" tabindex="-1"
-        aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+      <div class="modal fade" id="editModal<?php echo $kontak['id_pengirim']; ?>" data-bs-backdrop="static"
+        tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="editModalLabel">Edit Data Kontak Internal</h1>
