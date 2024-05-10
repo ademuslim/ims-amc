@@ -23,12 +23,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Simpan informasi pengguna ke sesi
             $_SESSION['peran_pengguna'] = $user['tipe_pengguna'];
             $_SESSION['nama_pengguna'] = $user['nama_pengguna'];
+
+            // Set pesan login berhasil
+            $_SESSION['login_success'] = "Login berhasil! Selamat datang, " . ucwords($user['nama_pengguna']) . ".";
     
             // Jika dicentang, set cookie "ingat akun" dengan ID pengguna
             if (isset($_POST['remember_me'])) {
                 // Atur cookie dengan ID pengguna dan waktu kedaluwarsa yang ditentukan
                 $user_id = $user['id_pengguna'];
                 setcookie("ingat_user_id", $user_id, time() + $expiry_time, "/"); // Cookie berlaku selama waktu yang ditentukan
+                setcookie("nama_pengguna", $user['nama_pengguna'], time() + $expiry_time, "/"); // Cookie berlaku selama waktu yang ditentukan
             } else {
                 // Jika checkbox "ingat saya" tidak dicentang, hapus cookie "ingat akun" jika ada
                 if (isset($_COOKIE['ingat_user_id'])) {
@@ -40,9 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: " . base_url('index.php'));
             exit();
         } else {
-            // Jika autentikasi gagal, tampilkan pesan kesalahan
-            $login_error = "Kombinasi email dan password salah. Silakan coba lagi.";
-            header("Location: " . base_url('auth/login.php?error=' . urlencode($login_error)));
+            // Jika autentikasi gagal, tampilkan pesan kesalahan dan simpan ke dalam session
+            $_SESSION['login_error'] = "Email dan password salah. Silakan coba lagi.";
+            header("Location: " . base_url('auth/login.php'));
             exit();
         }
     } elseif (isset($_POST['register_submit'])) {
@@ -69,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           // Periksa apakah email sudah ada
         if (isValueExists('pengguna', 'email', $email)) {
-            $_SESSION['error_message'] = "Email sudah terdaftar.";
+            $register_error = "Email sudah terdaftar.";
             header("Location: " . base_url('auth/register.php?error=' . urlencode($register_error)));
             exit();
         }

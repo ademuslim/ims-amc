@@ -1,4 +1,5 @@
 <?php
+$page_title = "Invoice";
 require_once '../../includes/header.php';
 ?>
 

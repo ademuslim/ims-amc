@@ -13,26 +13,26 @@ function base_url($url = null) {
   }
 }
 
-// Fungsi conversi tanggal
-function tanggalIndonesia() {
-  // Set timezone ke Asia/Jakarta agar sesuai dengan waktu Indonesia Barat
-  date_default_timezone_set('Asia/Jakarta');
+function dateID($date) {
+    // Set timezone ke Asia/Jakarta agar sesuai dengan waktu Indonesia Barat
+    date_default_timezone_set('Asia/Jakarta');
 
-  // Array untuk nama bulan dalam bahasa Indonesia
-  $bulanIndonesia = array(
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-  );
+    // Array untuk nama bulan dalam bahasa Indonesia
+    $bulanIndonesia = array(
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    );
 
-  // Mendapatkan indeks bulan saat ini (0-11)
-  $indexBulan = date('n') - 1;
+    // Mendapatkan indeks bulan dari tanggal yang diberikan (0-11)
+    $indexBulan = date('n', strtotime($date)) - 1;
 
-  // Format tanggal dengan nama bulan dalam bahasa Indonesia
-  $tanggal = date('j') . ' ' . $bulanIndonesia[$indexBulan] . ' ' . date('Y');
+    // Format tanggal dengan nama bulan dalam bahasa Indonesia
+    $dateFormatted = date('j', strtotime($date)) . ' ' . $bulanIndonesia[$indexBulan] . ' ' . date('Y', strtotime($date));
 
-  // Kembalikan tanggal yang telah diformat
-  return $tanggal;
+    // Kembalikan tanggal yang telah diformat
+    return $dateFormatted;
 }
+
 
 // Fungsi aktif link
 function setActivePage($page) {
@@ -228,23 +228,40 @@ function insertData($table, $data) {
   return $result;
 }
 
-// Fungsi tampil data
-function selectData($table, $conditions = "") {
+// Fungsi tampil data dengan kemampuan sorting, limit, dan parameter terikat untuk prepared statement
+function selectData($table, $conditions = "", $order_by = "", $limit = "", $bind_params = array()) {
   global $conn;
   // Bangun pernyataan SQL
   $sql = "SELECT * FROM $table";
   if (!empty($conditions)) {
       $sql .= " WHERE $conditions";
   }
-  // Eksekusi query
-  $result = mysqli_query($conn, $sql);
-  // Ambil hasil
-  $rows = [];
-  while ($row = mysqli_fetch_assoc($result)) {
-      $rows[] = $row;
+  if (!empty($order_by)) {
+      $sql .= " ORDER BY $order_by";
   }
-  // Bebaskan hasil
+  if (!empty($limit)) {
+      $sql .= " LIMIT $limit";
+  }
+  // Persiapkan statement
+  $stmt = mysqli_prepare($conn, $sql);
+  // Bind parameters jika ada
+  if (!empty($bind_params)) {
+      $types = "";
+      $bind_values = array();
+      foreach ($bind_params as $param) {
+          $types .= $param['type'];
+          $bind_values[] = $param['value'];
+      }
+      mysqli_stmt_bind_param($stmt, $types, ...$bind_values);
+  }
+  // Eksekusi query
+  mysqli_stmt_execute($stmt);
+  // Ambil hasil
+  $result = mysqli_stmt_get_result($stmt);
+  $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+  // Bebaskan hasil dan tutup statement
   mysqli_free_result($result);
+  mysqli_stmt_close($stmt);
   return $rows;
 }
 
@@ -435,4 +452,39 @@ function getLastDocumentNumber($tabel, $column, $order_by, $prefix, $suffix, $mo
   }
 
   return $new_doc_number;
+}
+
+// Fungsi menangani upload gambar
+function handleLogoUpload($file, $allowed_types, $max_file_size, $upload_path)
+{
+    // Memeriksa apakah file gambar logo diunggah
+    if(isset($file['logo']) && $file['logo']['error'] === UPLOAD_ERR_OK) {
+        // Tentukan jenis MIME yang diizinkan
+        $file_type = $file['logo']['type'];
+        
+        // Memeriksa apakah jenis file diizinkan
+        if (!in_array($file_type, $allowed_types)) {
+            return "Jenis file yang diunggah tidak diizinkan. Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
+        }
+        
+        // Memeriksa apakah ukuran file tidak melebihi batas maksimal
+        if ($file['logo']['size'] > $max_file_size) {
+            return "Ukuran file yang diunggah melebihi batas maksimal (2MB).";
+        }
+
+        // Generate nama file acak dan unik
+        $file_extension = pathinfo($file['logo']['name'], PATHINFO_EXTENSION);
+        $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
+        $file_destination = $upload_path . $file_name;
+
+        // Pindahkan file dari temp ke lokasi tujuan
+        if (!move_uploaded_file($file['logo']['tmp_name'], $file_destination)) {
+            return "Gagal mengunggah file gambar logo.";
+        }
+
+        return $file_destination; // Kembalikan lokasi file gambar logo yang berhasil diunggah
+    } else {
+        // Tidak ada file yang diunggah atau terjadi kesalahan saat mengunggah
+        return "Gagal mengunggah file gambar logo.";
+    }
 }

@@ -1,6 +1,6 @@
-<?php // master-data/product/index
+<?php
+$page_title = "Users";
 require '../../../includes/header.php';
-// selectData "pengguna"
 $data_pengguna = selectData('pengguna');
 ?>
 

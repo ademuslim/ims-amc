@@ -1,5 +1,4 @@
-<?php require '../../../includes/header.php'; ?>
-
-<h1>master-data/index</h1>
-
-<?php require '../../../includes/footer.php'; ?>
+<?php
+require '../../includes/function.php';
+header("Location: " . base_url('pages/master-data/products'));
+exit();

@@ -1,4 +1,4 @@
-<?php // master-data/product/proses
+<?php
 require '../../../includes/function.php';
 require '../../../includes/vendor/autoload.php';
 

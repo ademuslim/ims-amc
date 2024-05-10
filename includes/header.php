@@ -5,6 +5,15 @@ if (!checkLoginStatus()) {
     header("Location: " . base_url('auth/login.php'));
     exit();
 }
+
+// Periksa apakah ada sesi nama_pengguna, jika tidak, coba ambil dari cookie
+if (isset($_SESSION['nama_pengguna'])) {
+  $nama_pengguna = $_SESSION['nama_pengguna'];
+} elseif (isset($_COOKIE['nama_pengguna'])) {
+  $nama_pengguna = $_COOKIE['nama_pengguna'];
+} else {
+  $nama_pengguna = ''; // Jika tidak ada sesi atau cookie, atur nama pengguna ke string kosong
+}
 ?>
 
 <!DOCTYPE html>
@@ -13,10 +22,16 @@ if (!checkLoginStatus()) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= isset($title) ? $title : 'IMS-MTG | By AMC' ?></title>
-  <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
-  <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css'); ?>">
+  <title><?= isset($page_title) ? "$page_title | IMS By AMC" : 'IMS By AMC' ?></title>
   <script src="<?= base_url('assets/js/jquery.js'); ?>"></script>
+  <!-- DataTables Responsive Bootstrap5 CSS-->
+  <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css'); ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/dataTables.bootstrap5.css'); ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/responsive.bootstrap5.css'); ?>">
+  <!-- DataTables Button CSS-->
+  <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.css'); ?>">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
 </head>
 
 <body>
@@ -25,7 +40,7 @@ if (!checkLoginStatus()) {
       <div class="resizer"></div>
       <div class="sidebar-top">
         <div class="header">
-          <a href="/" class="nav-link text-dark">
+          <a href="/" class="nav-link">
             <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
               <path
                 d="M120-120v-80l80-80v160h-80Zm160 0v-240l80-80v320h-80Zm160 0v-320l80 81v239h-80Zm160 0v-239l80-80v319h-80Zm160 0v-400l80-80v480h-80ZM120-327v-113l280-280 160 160 280-280v113L560-447 400-607 120-327Z" />
@@ -61,7 +76,7 @@ if (!checkLoginStatus()) {
           </li>
 
           <li>
-            <div class="accordion accordion-flush" id="accordionFlushMasterData">
+            <div class="accordion accordion-flush" style="background-color: transparent;" id="accordionFlushMasterData">
               <div class="accordion-item">
                 <h2 class="accordion-header">
                   <button class="accordion-button collapsed nav-link" type="button" data-bs-toggle="collapse"
@@ -184,9 +199,7 @@ if (!checkLoginStatus()) {
           <a href="#" class="d-flex align-items-center text-dark text-decoration-none nav-link"
             data-bs-toggle="dropdown" aria-expanded="false">
             <img src="https://github.com/mdo.png" alt="" width="18" height="18" class="rounded-circle">
-            <span class="text-link">
-              <?= ucwords(isset($_SESSION['nama_pengguna']) ? $_SESSION['nama_pengguna'] : ''); ?>
-            </span>
+            <span class="text-link"><?= ucwords($nama_pengguna); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
             <li><a class="dropdown-item" href="<?= base_url('pages/master-data/users/index.php'); ?>">User</a></li>
@@ -204,3 +217,4 @@ if (!checkLoginStatus()) {
   </div>
 
   <div class="rs-content">
+    <div class="container">

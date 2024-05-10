@@ -1,6 +1,6 @@
-<?php // master-data/product/index
+<?php
+$page_title = "PPN";
 require '../../../includes/header.php';
-// selectData "ppn"
 $data_ppn = selectData('ppn');
 ?>
 

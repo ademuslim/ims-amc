@@ -1,4 +1,5 @@
-<?php // master-data/internal-contacts/index
+<?php
+$page_title = "Customers";
 require '../../../includes/header.php';
 // selectData "pelanggan"
 $data_pelanggan = selectData('pelanggan');

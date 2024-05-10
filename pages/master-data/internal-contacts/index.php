@@ -1,4 +1,5 @@
-<?php // master-data/internal-contacts/index
+<?php
+$page_title = "Contacts";
 require '../../../includes/header.php';
 // selectData "kontak"
 $data_kontak_internal = selectData('kontak_internal');

@@ -1,6 +1,5 @@
 /* FONT */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 /* RESET */
 * {
   margin: 0;
@@ -11,79 +10,6 @@
   vertical-align: baseline;
   box-sizing: border-box; /* Optional: Menghindari masalah padding/border memperbesar elemen */
 }
-
-/* Optional: Menangani beberapa elemen yang perlu mendapatkan gaya khusus */
-html {
-  font-size: 16px;
-}
-html,
-body,
-div,
-span,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-a,
-img,
-ul,
-ol,
-li,
-table,
-tr,
-th,
-td,
-form,
-input,
-button {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font: inherit;
-  vertical-align: baseline;
-  box-sizing: border-box;
-}
-
-/* Reset untuk ul, li, dan a */
-ul,
-ol,
-li {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* COLOR */
-:root {
-  --primary-color: #2ecc71; /* Warna utama hijau */
-  --primary-color-2: rgba(0, 255, 21, 0.1); /* Warna utama hijau */
-  --secondary-color: #27ae60; /* Warna hijau sekunder */
-  --accent-color: #3498db; /* Warna aksen, misalnya untuk tombol atau elemen yang menonjol */
-  --background-color: #ebe9e9; /* Warna latar belakang umum */
-  --light-text-color: #ebe9e9; /* Warna latar belakang umum */
-  --text-color: #333; /* Warna teks umum */
-  --link-color: #2980b9; /* Warna untuk tautan/hyperlink */
-  --success-color: #16a085; /* Warna untuk pesan keberhasilan atau indikator positif */
-  --error-color: #e74c3c; /* Warna untuk pesan kesalahan atau indikator negatif */
-  --warning-color: #ff4500; /* Warna untuk pesan kesalahan atau indikator negatif */
-}
-
-body {
-  background-color: grey;
-}
-
-h1 {
-  font-size: 2rem;
-}
-
 html,
 body {
   width: 100%;
@@ -92,7 +18,11 @@ body {
   display: flex;
   background-color: #fff;
 }
-
+body {
+  background-color: grey;
+  overflow: hidden;
+  font-family: "Montserrat", sans-serif;
+}
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -103,16 +33,29 @@ body {
   height: 100vh;
   overflow: hidden;
   position: relative;
-  background-color: lightcyan;
-}
-.accordion-button,
-.accordion-body {
-  background-color: lightcyan !important;
-}
-.accordion-body {
-  padding: 0 1rem 0 34px !important;
+  /* background-image: url("../image/sidebar-bg.jpg");
+  background-size: cover;
+  background-position: center; */
+  background-image: linear-gradient(0deg, #0077b6 3.6%, #081844 87.6%);
 }
 
+/* Accordion */
+.accordion-item {
+  background-color: transparent; /* Atur latar belakang accordion */
+  border-bottom: 1px solid #dee2e6; /* Atur garis pemisah */
+}
+
+/* Tombol accordion */
+.accordion-button {
+  background-color: transparent !important; /* Atur latar belakang tombol accordion */
+  color: black; /* Atur warna teks tombol accordion */
+}
+
+/* Konten accordion */
+.accordion-body {
+  background-color: transparent; /* Atur latar belakang konten accordion */
+  border-top: 1px solid #dee2e6; /* Atur garis pemisah */
+}
 .resizer {
   width: 4px;
   top: 0;
@@ -125,21 +68,18 @@ body {
   z-index: 100;
 }
 .resizer:hover {
-  background-color: grey;
+  background-color: #0077b6;
 }
-
 .rs-content {
   flex-grow: 1;
   height: 100vh;
-  overflow-x: hidden;
+  overflow-y: auto;
   padding: 3% 22px;
-  background-color: lightblue;
+  background-color: #f2fafd;
 }
-
 .sidebar ul {
   padding: 0;
 }
-
 .sidebar .nav-link {
   padding: 1rem;
   display: flex;
@@ -148,16 +88,111 @@ body {
   gap: 1rem;
   white-space: nowrap !important;
 }
-
 .nav-link svg {
   flex-shrink: 0; /* Menghentikan ikon dari pengecilan */
+  fill: #fff;
 }
-
 .text-link {
   flex-grow: 1; /* Memungkinkan teks untuk memperluas dan menyembunyikan jika tidak muat */
   overflow: hidden;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   white-space: nowrap; /* Mencegah pemisahan kata */
-  text-overflow: ellipsis; /* Menampilkan elipsis jika teks terlalu panjang */
+  color: #fff;
+}
+/* Custom Bootstrap CSS */
+.btn {
+  border-width: 2px; /* Atur lebar border */
+  font-size: 0.8rem;
+  border-radius: 20px;
+  padding-inline: 20px;
+}
+.btn-icon {
+  padding-left: 45px;
+}
+.btn-add {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='20px' viewBox='0 -960 960 960' width='20px' fill='%23ffffff'%3E%3Cpath d='M444-288h72v-156h156v-72H516v-156h-72v156H288v72h156v156Zm36.28 192Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Zm-.28-72q130 0 221-91t91-221q0-130-91-221t-221-91q-130 0-221 91t-91 221q0 130 91 221t221 91Zm0-312Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 20px center; /* Posisi SVG di kiri */
+}
+.btn-add:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%230077b6'%3E%3Cpath d='M444-288h72v-156h156v-72H516v-156h-72v156H288v72h156v156Zm36.28 192Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Zm-.28-72q130 0 221-91t91-221q0-130-91-221t-221-91q-130 0-221 91t-91 221q0 130 91 221t221 91Zm0-312Z'/%3E%3C/svg%3E");
+  background-position: 18px center; /* Posisi SVG di kiri */
+}
+.accordion-body > ul {
+  list-style-type: none; /* Menghilangkan bullet points */
+}
+/* DataTables Custom Table CSS */
+#example_wrapper .dt-info,
+#example {
+  font-size: 14px !important;
+}
+#example thead tr th {
+  background-color: transparent !important;
+  font-weight: 700;
+  font-size: 13px;
+}
+#example tbody tr td {
+  height: 50px !important;
+  vertical-align: middle;
+  padding: 0 8px !important;
+}
+#example tbody tr {
+  box-shadow: 0px 3px 15px 0px #c2dbed63;
+}
+#example {
+  border-collapse: separate;
+  border-spacing: 0 14px; /* Atur jarak antara baris (jarak vertikal) */
+}
+td .btn-group {
+  margin-left: 30px;
+  padding-left: 30px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  cursor: default;
+}
+/* Button Action CSS */
+.btn-act {
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.btn-view {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23B7B7B7'%3E%3Cpath d='M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z'/%3E%3C/svg%3E");
+}
+.btn-edit {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23B7B7B7'%3E%3Cpath d='M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z'/%3E%3C/svg%3E");
+}
+.btn-del {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23B7B7B7'%3E%3Cpath d='M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z'/%3E%3C/svg%3E");
+}
+.btn-view:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23007bff'%3E%3Cpath d='M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z'/%3E%3C/svg%3E");
+}
+.btn-edit:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23FF8C00'%3E%3Cpath d='M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z'/%3E%3C/svg%3E");
+}
+.btn-del:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23dc3545'%3E%3Cpath d='M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z'/%3E%3C/svg%3E");
+}
+
+/* DataTables Print CSS */
+body.dt-print-view {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  width: 100%;
+}
+body.dt-print-view table {
+  border-collapse: collapse;
+}
+body.dt-print-view table td {
+  overflow: visible;
+  overflow-wrap: break-word !important;
+  white-space: wrap !important;
 }
