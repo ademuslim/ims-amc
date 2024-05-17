@@ -1,4 +1,3 @@
-</div>
 <!-- <footer>
   <p>&copy; 2024 Invoice Management System | AMC</p>
 </footer> -->

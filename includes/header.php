@@ -35,6 +35,11 @@ if (isset($_SESSION['nama_pengguna'])) {
 </head>
 
 <body>
+  <!-- Loader -->
+  <!-- <div id="overlay">
+    <div class="spinner"></div>
+  </div> -->
+
   <div class="sb-cover">
     <div class="sidebar">
       <div class="resizer"></div>
@@ -217,4 +222,3 @@ if (isset($_SESSION['nama_pengguna'])) {
   </div>
 
   <div class="rs-content">
-    <div class="container">

@@ -1,3 +1,11 @@
+// Ketika halaman sepenuhnya dimuat
+// $(window).on("load", function () {
+//   // Tunda selama 1.5 detik sebelum menyembunyikan overlay
+//   setTimeout(function () {
+//     $("#overlay").fadeOut(); // Menghilangkan overlay secara perlahan
+//   }, 1500); // Waktu penundaan dalam milidetik (di sini: 1500 ms = 1.5 detik)
+// });
+
 // DataTables JS
 $(document).ready(function () {
   var table = $("#example").DataTable({
@@ -6,6 +14,10 @@ $(document).ready(function () {
         className: "dtr-control arrow-right",
         orderable: false,
         targets: -1,
+      },
+      {
+        targets: "_all",
+        defaultContent: "",
       },
     ],
     responsive: {
@@ -140,3 +152,23 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+// Print Paper Wrapper
+function printContent() {
+  // Ambil isi dari elemen dengan kelas paper-wrapper
+  var content = document.querySelector(".paper-wrapper").innerHTML;
+
+  // Simpan konten dalam sebuah jendela pop-up
+  var printWindow = window.open("", "_blank");
+
+  // Tulis konten ke dalam jendela pop-up
+  printWindow.document.write(
+    "<html><head><title>Cetak Dokumen</title></head><body>"
+  );
+  printWindow.document.write(content);
+  printWindow.document.write("</body></html>");
+
+  // Tutup pop-up setelah pencetakan selesai
+  printWindow.document.close();
+  printWindow.print();
+}

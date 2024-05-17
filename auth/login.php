@@ -35,8 +35,7 @@ if (isset($_SESSION['peran_pengguna'])) {
 
 <body class="bg-light">
   <div class="container min-vh-100 d-flex flex-column align-items-center justify-content-center  position-relative">
-    <h1 class="fs-2 fw-bold text-center mb-5" style="color: transparent; -webkit-text-stroke: 1px #666;">IMS
-      AMC</h1>
+    <h1 class="fs-2 fw-bold text-center mb-5" style="color: transparent; -webkit-text-stroke: 1px #666;">MTG IMS</h1>
     <div class="card border border-light shadow p-4 w-50" style="min-width:350px;">
       <form method="post" action="process.php">
         <p>Silahkan masuk</p>

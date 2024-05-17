@@ -197,36 +197,73 @@ function register($id_pengguna, $nama_pengguna, $email, $password, $tipe_penggun
   }
 }
 
-// Fungsi tambah data
+// // Fungsi tambah data
+// function insertData($table, $data) {
+//   global $conn;
+
+//   // Sanitasi data sebelum dimasukkan ke dalam database
+//   $sanitized_data = sanitizeInput($data);
+
+//   // Bangun pernyataan SQL
+//   $columns = implode(", ", array_keys($sanitized_data));
+//   $placeholders = implode(", ", array_fill(0, count($sanitized_data), "?"));
+//   $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
+
+//   // Persiapkan statement
+//   $stmt = mysqli_prepare($conn, $sql);
+
+//   // Bind parameter
+//   $types = str_repeat("s", count($sanitized_data));
+//   mysqli_stmt_bind_param($stmt, $types, ...array_values($sanitized_data));
+
+//   // Eksekusi statement
+//   mysqli_stmt_execute($stmt); //baris 220
+
+//   // Ambil hasil
+//   $result = mysqli_stmt_affected_rows($stmt);
+
+//   // Tutup statement
+//   mysqli_stmt_close($stmt);
+
+//   return $result;
+// }
+
 function insertData($table, $data) {
-  global $conn;
+    global $conn;
 
-  // Sanitasi data sebelum dimasukkan ke dalam database
-  $sanitized_data = sanitizeInput($data);
+    // Sanitasi data sebelum dimasukkan ke dalam database
+    $sanitized_data = sanitizeInput($data);
 
-  // Bangun pernyataan SQL
-  $columns = implode(", ", array_keys($sanitized_data));
-  $placeholders = implode(", ", array_fill(0, count($sanitized_data), "?"));
-  $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
+    // Bangun pernyataan SQL
+    $columns = implode(", ", array_keys($sanitized_data));
+    $placeholders = implode(", ", array_fill(0, count($sanitized_data), "?"));
+    $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
 
-  // Persiapkan statement
-  $stmt = mysqli_prepare($conn, $sql);
+    // Persiapkan statement
+    $stmt = mysqli_prepare($conn, $sql);
 
-  // Bind parameter
-  $types = str_repeat("s", count($sanitized_data));
-  mysqli_stmt_bind_param($stmt, $types, ...array_values($sanitized_data));
+    if ($stmt) {
+        // Bind parameter secara manual berdasarkan jenis data
+        $types = str_repeat("s", count($sanitized_data));
+        $values = array_values($sanitized_data);
+        mysqli_stmt_bind_param($stmt, $types, ...$values);
 
-  // Eksekusi statement
-  mysqli_stmt_execute($stmt);
+        // Eksekusi statement
+        mysqli_stmt_execute($stmt);
 
-  // Ambil hasil
-  $result = mysqli_stmt_affected_rows($stmt);
+        // Ambil hasil
+        $result = mysqli_stmt_affected_rows($stmt);
 
-  // Tutup statement
-  mysqli_stmt_close($stmt);
+        // Tutup statement
+        mysqli_stmt_close($stmt);
 
-  return $result;
+        return $result;
+    } else {
+        // Handle error jika persiapan statement gagal
+        return false;
+    }
 }
+
 
 // Fungsi tampil data dengan kemampuan sorting, limit, dan parameter terikat untuk prepared statement
 function selectData($table, $conditions = "", $order_by = "", $limit = "", $bind_params = array()) {
