@@ -175,9 +175,9 @@ if ($error_message): ?>
             <td><?= strtoupper($detail['nama_produk']); ?></td>
             <td><?= $detail['jumlah']; ?></td>
             <td><?= strtoupper($detail['satuan']); ?></td>
-            <td><?= number_format($detail['harga_satuan'], 2); ?></td>
+            <td><?= number_format($detail['harga_satuan']); ?></td>
             <td>
-              <?= number_format($total_harga, 2) // Format angka dengan dua desimal ?>
+              <?= number_format($total_harga) // Format angka dengan dua desimal ?>
             </td>
           </tr>
           <?php $no++ ?>
@@ -200,22 +200,22 @@ if ($error_message): ?>
           <tr>
             <td colspan="3" rowspan="4" style="background-color: transparent;"></td>
             <td colspan="3">Subtotal</td>
-            <td colspan="2"><?= number_format($subtotal, 2) ?></td>
+            <td colspan="2"><?= number_format($subtotal) ?></td>
           </tr>
           <tr>
             <td colspan="2">Diskon</td>
             <td><?= $data['diskon'] . " %" ?></td>
-            <td colspan="2"><?= number_format($nilai_diskon, 2) ?></td>
+            <td colspan="2"><?= number_format($nilai_diskon) ?></td>
           </tr>
           <tr>
             <td colspan="2">PPN</td>
             <td><?= $data['jenis_ppn'] . "( " . $tarif_ppn . " %)" ?></td>
-            <td><?= number_format($nilai_ppn, 2); ?></td>
+            <td><?= number_format($nilai_ppn); ?></td>
           </tr>
           <tr>
             <td colspan="3">Total</td>
             <!-- <td colspan="2">Dari DB: <?= $data['total'] ?></td> -->
-            <td colspan="2"><?= number_format($total_setelah_ppn, 2); ?></td>
+            <td colspan="2"><?= number_format($total_setelah_ppn); ?></td>
           </tr>
         </tfoot>
       </table>

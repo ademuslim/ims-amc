@@ -525,3 +525,7 @@ function handleLogoUpload($file, $allowed_types, $max_file_size, $upload_path)
         return "Gagal mengunggah file gambar logo.";
     }
 }
+
+function formatDecimal($number) {
+    return number_format((float)$number, 2, '.', '');
+}

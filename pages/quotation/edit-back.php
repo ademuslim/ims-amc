@@ -1,9 +1,8 @@
 <?php
-// fitur hapus dan tambah detail belum berfungsi
 $page_title = "Edit Quotation";
 require '../../includes/header.php';
 
-// Notifikasi
+// Tampilkan pesan sukses jika ada
 if (isset($_SESSION['success_message'])) {
   echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
           ' . $_SESSION['success_message'] . '
@@ -11,6 +10,7 @@ if (isset($_SESSION['success_message'])) {
         </div>';
   unset($_SESSION['success_message']);
 }
+// Tampilkan pesan error jika ada
 if (isset($_SESSION['error_message'])) {
   echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
           ' . $_SESSION['error_message'] . '
@@ -18,9 +18,9 @@ if (isset($_SESSION['error_message'])) {
         </div>';
   unset($_SESSION['error_message']);
 }
-// Variabel data detail
+// Variabel untuk menyimpan data detail
 $data_detail = [];
-$signatureInfo = []; // Array detail signature info
+$signatureDetails = []; // Array untuk menyimpan detail signature info
 $error_message = '';
 // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
 $defaultLogoPath = "";
@@ -51,10 +51,10 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
         $pair = explode(": ", $part);
         // Simpan pasangan kunci dan nilai dalam array asosiatif
         if (count($pair) == 2) {
-          $signatureInfo[$pair[0]] = $pair[1];
+          $signatureDetails[$pair[0]] = $pair[1];
         }
       }
-      $defaultSignaturePath = $signatureInfo["Path"];
+      $defaultSignaturePath = $signatureDetails["Path"];
     }
     // Jika data penawaran harga ditemukan lanjut mengambil detail penawaran berdasarkan id
     $mainDetailTable = 'detail_penawaran';
@@ -204,16 +204,17 @@ if ($error_message): ?>
         </div>
         <hr class="row mb-5 border border-secondary border-1 opacity-25">
         <div class="row">
-          <!-- Tambah, Hapus, Edit detail produk -->
+          <!-- Tambah detail produk -->
           <table class="table table-light table-striped">
             <thead>
               <tr class="fw-bolder">
                 <td>No</td>
-                <td>ID Detail</td>
+                <td>Id Detail</td>
                 <td>Nama Produk</td>
                 <td>Kuantitas</td>
                 <td>Harga (Rp)</td>
-                <td colspan="2">Jumlah</td>
+                <!-- <td colspan="2">Jumlah</td> -->
+                <td>Jumlah</td>
               </tr>
             </thead>
             <tbody id="detail-table">
@@ -229,8 +230,10 @@ if ($error_message): ?>
               $subtotal += $total_harga;
             ?>
               <tr class="main-tr">
+                <!-- Penanganan jika ada hapus baris data detail -->
+                <input type="hidden" name="id_detail_penawaran[]" value="<?= $detail['id_detail_penawaran'] ?>">
                 <td><?= $no ?></td>
-                <td><input type="text" name="id_detail_penawaran[]" value="<?= $detail['id_detail_penawaran'] ?>"></td>
+                <td><?= $detail['id_detail_penawaran'] ?></td>
                 <td>
                   <select class="form-select form-select-sm" name="id_produk[]" required>
                     <?php
@@ -247,8 +250,6 @@ if ($error_message): ?>
                 <td><input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0"
                     value="<?= $detail['harga_satuan'] ?>" required></td>
                 <td class="total"><?= number_format($total_harga, 2) ?></td>
-                <td class="align-middle text-center"><button type="button" class="remove-btn btn-cancel m-0"></button>
-                </td>
               </tr>
               <?php $no++ ?>
               <?php endforeach; ?>
@@ -256,10 +257,7 @@ if ($error_message): ?>
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2" rowspan="2" style="background-color: transparent;">
-                  <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
-                    Baris</button>
-                </td>
+                <td colspan="2" rowspan="4" style="background-color: transparent;"></td>
                 <td colspan="2">Subtotal</td>
                 <td colspan="2" id="total-harga">0.00</td>
               </tr>
@@ -275,7 +273,6 @@ if ($error_message): ?>
                 <td colspan="2" id="nilai-diskon">0.00</td>
               </tr>
               <tr>
-                <td colspan="2" style="background-color: transparent;"></td>
                 <td>PPN</td>
                 <td>
                   <div class="input-group input-group-sm">
@@ -296,7 +293,6 @@ if ($error_message): ?>
                 <td colspan="2" id="total-ppn">0.00</td>
               </tr>
               <tr>
-                <td colspan="2" style="background-color: transparent;"></td>
                 <td colspan="2">Total</td>
                 <td colspan="2">
                   <span id="grand-total">0.00</span>
@@ -306,9 +302,6 @@ if ($error_message): ?>
               </tr>
             </tfoot>
           </table>
-
-          <!-- Input tersembunyi untuk menyimpan ID detail yang dihapus -->
-          <div id="deleted-rows"></div>
         </div>
         <hr class="row mb-5 border border-secondary border-1 opacity-25">
         <div class="row justify-content-between">
@@ -325,10 +318,11 @@ if ($error_message): ?>
               <label class="mb-3">Tempat dan tanggal.</label>
               <div class="input-group input-group-sm p-0">
                 <input type="text" class="form-control" name="signing_location"
-                  value="<?= isset($signatureInfo['Location']) ? ucwords($signatureInfo['Location']) : '' ?>" required>
+                  value="<?= isset($signatureDetails['Location']) ? ucwords($signatureDetails['Location']) : '' ?>"
+                  required>
                 <span class="input-group-text">,</span>
                 <input type="date" class="form-control" name="signing_date"
-                  value="<?= isset($signatureInfo['Date']) ? $signatureInfo['Date'] : '' ?>" required>
+                  value="<?= isset($signatureDetails['Date']) ? $signatureDetails['Date'] : '' ?>" required>
               </div>
             </div>
             <!-- Input Gambar Signature -->
@@ -364,11 +358,12 @@ if ($error_message): ?>
             </div>
             <div class="row mb-3">
               <input type="text" class="form-control form-control-sm" id="signer-name" name="signer_name"
-                value="<?= isset($signatureInfo['Name']) ? ucwords($signatureInfo['Name']) : '' ?>" required>
+                value="<?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?>" required>
             </div>
             <div class="row mb-3">
               <input type="text" class="form-control form-control-sm" id="signer-position" name="signer_position"
-                value="<?= isset($signatureInfo['Position']) ? ucwords($signatureInfo['Position']) : '' ?>" required>
+                value="<?= isset($signatureDetails['Position']) ? ucwords($signatureDetails['Position']) : '' ?>"
+                required>
             </div>
           </div>
         </div>
@@ -388,7 +383,6 @@ if ($error_message): ?>
 <?php endif; ?>
 <?php endif; ?>
 <script>
-// Menangani Perubahan data Tabel
 $(document).ready(function() {
   // Panggil updateTotal() dan updateGrandTotal() saat halaman dimuat
   updateTotal();
@@ -397,17 +391,12 @@ $(document).ready(function() {
   // Event untuk menghapus baris
   $(document).on('click', '.remove-btn', function() {
     var idDetailPenawaran = $(this).closest('.main-tr').find('input[name="id_detail_penawaran[]"]').val();
-
-    // Cetak isi idDetailPenawaran ke konsol untuk debugging
-    console.log('ID Detail Penawaran yang dihapus:', idDetailPenawaran);
-
     $(this).closest('.main-tr').remove();
     updateRowNumbers(); // Panggil fungsi untuk memperbarui nomor urutan setelah menghapus baris
     updateTotal(); // Panggil fungsi untuk memperbarui total setelah menghapus baris
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total setelah menghapus baris
-    // Tambahkan idDetailPenawaran ke #deleted-rows dan cetak konten #deleted-rows ke konsol
+    // Set nilai input tersembunyi
     $('#deleted-rows').append('<input type="hidden" name="deleted_rows[]" value="' + idDetailPenawaran + '">');
-    console.log('Konten #deleted-rows setelah penambahan:', $('#deleted-rows').html());
   });
 
   // Event untuk menambahkan baris baru
@@ -418,12 +407,11 @@ $(document).ready(function() {
           echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
       }
       ?>';
-    var rowCount = $('#detail-table tr.main-tr').length +
-      1; // Ambil jumlah baris saat ini dan tambahkan 1, atur id dengan value default menjadi 0
+    var rowCount = $('#detail-table tr.main-tr').length + 1; // Ambil jumlah baris saat ini dan tambahkan 1
     $('#detail-table').append(
       `<tr class="main-tr">
+          <input type="hidden" name="id_detail_penawaran[]" value="00">
           <td>${rowCount}</td>
-          <td><input type="text" name="id_detail_penawaran[]" value="<?= "addId" ?>"></td>
           <td>
             <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
               <option value="" selected disabled>-- Pilih Produk --</option>
@@ -454,6 +442,11 @@ $(document).ready(function() {
     var idProduk = row.find('select[name="id_produk[]"]').val(); // Dapatkan ID produk
     var jumlah = row.find('.qty').val(); // Dapatkan jumlah
     var hargaSatuan = row.find('.price').val(); // Dapatkan harga satuan
+
+    // Simpan data perubahan ke dalam input tersembunyi di dalam baris
+    row.find('.hidden-id-produk').val(idProduk);
+    row.find('.hidden-jumlah').val(jumlah);
+    row.find('.hidden-harga-satuan').val(hargaSatuan);
 
     updateTotal(); // Panggil fungsi untuk memperbarui total
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total
@@ -663,7 +656,7 @@ function toggleChangeImageButton(visible) {
 // Panggil fungsi previewAddSignature saat halaman dimuat pertama kali
 document.addEventListener('DOMContentLoaded', function() {
   // Ubah panggilan fungsi previewAddSignature untuk menyertakan defaultSignaturePath
-  var defaultSignaturePath = "<?= $signatureInfo['Path']; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
+  var defaultSignaturePath = "<?= $signatureDetails['Path']; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
   previewAddSignature(defaultSignaturePath);
 });
 
@@ -723,7 +716,7 @@ function resetSignature() {
 
 // Fungsi refresh signature
 function refreshSignature() {
-  defaultSignaturePath = "<?= $signatureInfo['Path'] ?>";
+  defaultSignaturePath = "<?= $signatureDetails['Path'] ?>";
   previewAddSignature(defaultSignaturePath);
 }
 

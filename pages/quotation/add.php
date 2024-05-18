@@ -216,7 +216,7 @@ if (!empty($data)) {
                 <input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
               </td>
               <td class="total">
-                0.00
+                0
               </td>
               <td class="align-middle text-center">
                 <div class="d-flex justify-content-center align-items-center">
@@ -232,7 +232,7 @@ if (!empty($data)) {
                   Baris</button>
               </td>
               <td colspan="2">Subtotal</td>
-              <td colspan="2" id="total-harga">0.00</td>
+              <td colspan="2" id="total-harga">0</td>
             </tr>
 
             <tr>
@@ -245,7 +245,7 @@ if (!empty($data)) {
                   <span class="input-group-text" id="basic-addon1">%</span>
                 </div>
               </td>
-              <td colspan="2" id="nilai-diskon">0.00</td>
+              <td colspan="2" id="nilai-diskon">0</td>
             </tr>
 
             <tr>
@@ -266,14 +266,14 @@ if (!empty($data)) {
                   <label class="input-group-text" for="jenis_ppn">%<span class="d-none" id="tarif-ppn"></span></label>
                 </div>
               </td>
-              <td colspan="2" id="total-ppn">0.00</td>
+              <td colspan="2" id="total-ppn">0</td>
             </tr>
 
             <tr>
               <td colspan="2" style="background-color: transparent;"></td>
               <td colspan="2">Total</td>
               <td colspan="2">
-                <span id="grand-total">0.00</span>
+                <span id="grand-total">0</span>
                 <!-- Input tersembunyi untuk menyimpan grand total -->
                 <input type="hidden" id="hidden-grand-total" name="grand_total">
               </td>
@@ -406,7 +406,7 @@ $(document).ready(function() {
           </td>
           <td><input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required></td>
           <td><input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required></td>
-          <td class="total">0.00</td>
+          <td class="total">0</td>
           <td><button type="button" class="remove-btn btn-cancel"></button></td>
         </tr>`
     );
@@ -460,10 +460,10 @@ $(document).ready(function() {
       var qty = parseFloat($(this).find('.qty').val()) || 0;
       var price = parseFloat($(this).find('.price').val()) || 0;
       var total = qty * price;
-      $(this).find('.total').text(total.toFixed(2)); // Atur teks pada elemen <td class="total">
+      $(this).find('.total').text(total); // Atur teks pada elemen <td class="total">
       totalHarga += total; // Tambahkan total baris ke total harga
     });
-    $('#total-harga').text(totalHarga.toFixed(2)); // Atur teks total harga pada elemen dengan id "total-harga"
+    $('#total-harga').text(totalHarga); // Atur teks total harga pada elemen dengan id "total-harga"
   }
 
   // Fungsi untuk memperbarui grand total
@@ -476,16 +476,16 @@ $(document).ready(function() {
     var grandTotal = totalHarga - diskon + totalPPN; // Perhatikan pengurangan diskon dan penambahan total PPN
 
     // Memperbarui teks grand total pada elemen dengan id "grand-total"
-    $('#grand-total').text(grandTotal.toFixed(2));
+    $('#grand-total').text(grandTotal);
 
     // Memperbarui nilai input tersembunyi dengan grand total
-    $('#hidden-grand-total').val(grandTotal.toFixed(2));
+    $('#hidden-grand-total').val(grandTotal);
 
     // Memperbarui teks nilai diskon pada elemen dengan id "nilai-diskon"
-    $('#nilai-diskon').text(diskon.toFixed(2));
+    $('#nilai-diskon').text(diskon);
 
     // Memperbarui teks nilai total PPN pada elemen dengan id "total-ppn"
-    $('#total-ppn').text(totalPPN.toFixed(2));
+    $('#total-ppn').text(totalPPN);
   }
 });
 

@@ -273,7 +273,7 @@ if (isset($_POST['add'])) {
     if (!$result) {
         // Jika gagal, tampilkan pesan kesalahan atau arahkan pengguna kembali ke halaman edit
         $_SESSION['error_message'] = "Gagal memperbarui penawaran harga.";
-        header("Location: edit.php?id=$id_penawaran");
+        // header("Location: edit.php?id=$id_penawaran");
         exit();
     }
     
@@ -282,52 +282,98 @@ if (isset($_POST['add'])) {
     $id_detail = $_POST['id_detail_penawaran'];
     $id_produk = $_POST['id_produk'];
     $jumlah = $_POST['jumlah'];
-    $harga_satuan = $_POST['harga_satuan'];
+    $harga_satuan = $_POST['harga_satuan']; // Format harga_satuan
     $deleted_rows = isset($_POST['deleted_rows']) ? $_POST['deleted_rows'] : [];
 
-    // Loop melalui setiap detail produk yang diedit
-    for ($i = 0; $i < count($id_detail); $i++) {
-        // Jika ID detail penawaran ada dalam array $deleted_rows, lewati pengolahan ini
-        if (in_array($id_detail[$i], $deleted_rows)) {
-            continue;
-        }
-
-        // Bangun data untuk pembaruan
-        $detail_data = [
-            'id_produk' => $id_produk[$i],
-            'jumlah' => $jumlah[$i],
-            'harga_satuan' => $harga_satuan[$i]
+    // Simpan semua data detail ke dalam array utama
+    $all_details = [];
+    foreach ($id_detail as $index => $detail_id) {
+        $all_details[] = [
+            'id_detail_penawaran' => $detail_id,
+            'id_produk' => $id_produk[$index],
+            'jumlah' => $jumlah[$index],
+            'harga_satuan' => $harga_satuan[$index]
         ];
-
-        // Kondisi untuk pembaruan
-        $detail_conditions = "id_detail_penawaran = '" . $id_detail[$i] . "'";
-
-        // Lakukan pembaruan data detail penawaran
-        $detail_result = updateData('detail_penawaran', $detail_data, $detail_conditions);
-        // Periksa apakah pembaruan berhasil
-        if (!$detail_result) {
-            // Jika gagal, tampilkan pesan kesalahan atau arahkan pengguna kembali ke halaman edit
-            $_SESSION['error_message'] = "Gagal memperbarui detail penawaran.";
-            header("Location: edit.php?id=$id_penawaran");
-            exit();
-        }
     }
 
-    // Lanjutkan dengan penghapusan baris detail yang ditandai
+    // Tampilkan isi dari array $all_details untuk debugging
+    echo "Isi dari all_details sebelum penghapusan:";
+    echo "<pre>";
+    var_dump($all_details);
+    echo "</pre>";
+    // exit();
+
+    // Tampilkan isi dari array $deleted_rows untuk debugging
+    echo "Isi dari deleted_rows:";
+    echo "<pre>";
+    var_dump($deleted_rows);
+    echo "</pre>";
+    // exit();
+
+    // Hapus baris yang ada dalam deleted_rows
     foreach ($deleted_rows as $deleted_row) {
-        // Lakukan penghapusan data detail penawaran
-        $delete_result = deleteData('detail_penawaran', "id_detail_penawaran = '$deleted_row'");
-        // Periksa apakah penghapusan berhasil
-        if (!$delete_result) {
-            // Jika gagal, tampilkan pesan kesalahan atau arahkan pengguna kembali ke halaman edit
-            $_SESSION['error_message'] = "Gagal menghapus detail penawaran.";
-            header("Location: edit.php?id=$id_penawaran");
-            exit();
+        // Hanya hapus baris jika id_detail_penawaran tidak mengandung "newId" di awal id-nya
+        if (strpos($deleted_row, "newId") !== 0) {
+            deleteData('detail_penawaran', "id_detail_penawaran = '$deleted_row'");
         }
     }
 
-    // Redirect ke halaman index setelah proses edit selesai
-    header("Location: index.php");
+    // Persiapkan data untuk update dan insert
+    $add_detail = [];
+    $update_detail = [];
+
+    // Kelompokkan detail berdasarkan id
+    foreach ($all_details as $detail) {
+        if (strpos($detail['id_detail_penawaran'], "newId") === 0) {
+            // Jika id_detail_penawaran mengandung "newId", itu adalah baris baru
+            $add_detail[] = $detail;
+        } else {
+            // Jika tidak, itu adalah baris yang harus diperbarui
+            $update_detail[] = $detail;
+        }
+    }
+
+    // Tampilkan isi dari array $add_detail dan $update_detail untuk debugging
+    echo "Isi dari add_detail (baris baru):";
+    echo "<pre>";
+    var_dump($add_detail);
+    echo "</pre>";
+
+    echo "Isi dari update_detail (baris yang harus diperbarui):";
+    echo "<pre>";
+    var_dump($update_detail);
+    echo "</pre>";
+
+    // Lakukan operasi tambah data
+    foreach ($add_detail as $detail) {
+        // Generate UUID untuk ID baru
+        $new_id_detail = Ramsey\Uuid\Uuid::uuid4()->toString();
+        $data = [
+            'id_produk' => $detail['id_produk'],
+            'jumlah' => $detail['jumlah'],
+            'harga_satuan' => $detail['harga_satuan'],
+            // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
+            'id_detail_penawaran' => $new_id_detail,
+            'id_penawaran' => $id_penawaran,
+        ];
+        insertData('detail_penawaran', $data);
+    }
+
+    // Lakukan operasi ubah data
+    foreach ($update_detail as $detail) {
+        $data = [
+            'id_produk' => $detail['id_produk'],
+            'jumlah' => $detail['jumlah'],
+            'harga_satuan' => $detail['harga_satuan'],
+            // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
+        ];
+        updateData('detail_penawaran', $data, "id_detail_penawaran = '{$detail['id_detail_penawaran']}'");
+    }
+
+    echo "Operasi tambah dan ubah data selesai.";
+
+    // Redirect ke halaman detail setelah proses edit selesai
+    header("Location: detail.php?id=$id_penawaran");
     exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php

@@ -1,8 +1,9 @@
 <?php
+// fitur hapus dan tambah detail belum berfungsi
 $page_title = "Edit Quotation";
 require '../../includes/header.php';
 
-// Tampilkan pesan sukses jika ada
+// Notifikasi
 if (isset($_SESSION['success_message'])) {
   echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
           ' . $_SESSION['success_message'] . '
@@ -10,7 +11,6 @@ if (isset($_SESSION['success_message'])) {
         </div>';
   unset($_SESSION['success_message']);
 }
-// Tampilkan pesan error jika ada
 if (isset($_SESSION['error_message'])) {
   echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
           ' . $_SESSION['error_message'] . '
@@ -18,9 +18,9 @@ if (isset($_SESSION['error_message'])) {
         </div>';
   unset($_SESSION['error_message']);
 }
-// Variabel untuk menyimpan data detail
+// Variabel data detail
 $data_detail = [];
-$signatureDetails = []; // Array untuk menyimpan detail signature info
+$signatureInfo = []; // Array detail signature info
 $error_message = '';
 // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
 $defaultLogoPath = "";
@@ -51,10 +51,10 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
         $pair = explode(": ", $part);
         // Simpan pasangan kunci dan nilai dalam array asosiatif
         if (count($pair) == 2) {
-          $signatureDetails[$pair[0]] = $pair[1];
+          $signatureInfo[$pair[0]] = $pair[1];
         }
       }
-      $defaultSignaturePath = $signatureDetails["Path"];
+      $defaultSignaturePath = $signatureInfo["Path"];
     }
     // Jika data penawaran harga ditemukan lanjut mengambil detail penawaran berdasarkan id
     $mainDetailTable = 'detail_penawaran';
@@ -204,7 +204,7 @@ if ($error_message): ?>
         </div>
         <hr class="row mb-5 border border-secondary border-1 opacity-25">
         <div class="row">
-          <!-- Tambah detail produk -->
+          <!-- Tambah, Hapus, Edit detail produk -->
           <table class="table table-light table-striped">
             <thead>
               <tr class="fw-bolder">
@@ -212,8 +212,7 @@ if ($error_message): ?>
                 <td>Nama Produk</td>
                 <td>Kuantitas</td>
                 <td>Harga (Rp)</td>
-                <!-- <td colspan="2">Jumlah</td> -->
-                <td>Jumlah</td>
+                <td colspan="2">Jumlah</td>
               </tr>
             </thead>
             <tbody id="detail-table">
@@ -229,9 +228,8 @@ if ($error_message): ?>
               $subtotal += $total_harga;
             ?>
               <tr class="main-tr">
-                <!-- Penanganan jika ada hapus baris data detail -->
-                <input type="hidden" name="id_detail_penawaran[]" value="<?= $detail['id_detail_penawaran'] ?>">
                 <td><?= $no ?></td>
+                <input type="hidden" name="id_detail_penawaran[]" value="<?= $detail['id_detail_penawaran'] ?>">
                 <td>
                   <select class="form-select form-select-sm" name="id_produk[]" required>
                     <?php
@@ -248,6 +246,8 @@ if ($error_message): ?>
                 <td><input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0"
                     value="<?= $detail['harga_satuan'] ?>" required></td>
                 <td class="total"><?= number_format($total_harga, 2) ?></td>
+                <td class="align-middle text-center"><button type="button" class="remove-btn btn-cancel m-0"></button>
+                </td>
               </tr>
               <?php $no++ ?>
               <?php endforeach; ?>
@@ -255,9 +255,12 @@ if ($error_message): ?>
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="2" rowspan="4" style="background-color: transparent;"></td>
+                <td colspan="2" rowspan="2" style="background-color: transparent;">
+                  <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
+                    Baris</button>
+                </td>
                 <td colspan="2">Subtotal</td>
-                <td colspan="2" id="total-harga">0.00</td>
+                <td colspan="2" id="total-harga">0</td>
               </tr>
               <tr>
                 <td>Diskon</td>
@@ -268,9 +271,10 @@ if ($error_message): ?>
                     <span class="input-group-text" id="basic-addon1">%</span>
                   </div>
                 </td>
-                <td colspan="2" id="nilai-diskon">0.00</td>
+                <td colspan="2" id="nilai-diskon">0</td>
               </tr>
               <tr>
+                <td colspan="2" style="background-color: transparent;"></td>
                 <td>PPN</td>
                 <td>
                   <div class="input-group input-group-sm">
@@ -288,18 +292,22 @@ if ($error_message): ?>
                     <label class="input-group-text" for="jenis_ppn">%<span class="d-none" id="tarif-ppn"></span></label>
                   </div>
                 </td>
-                <td colspan="2" id="total-ppn">0.00</td>
+                <td colspan="2" id="total-ppn">0</td>
               </tr>
               <tr>
+                <td colspan="2" style="background-color: transparent;"></td>
                 <td colspan="2">Total</td>
                 <td colspan="2">
-                  <span id="grand-total">0.00</span>
+                  <span id="grand-total">0</span>
                   <!-- Input tersembunyi untuk menyimpan grand total -->
                   <input type="hidden" id="hidden-grand-total" name="grand_total">
                 </td>
               </tr>
             </tfoot>
           </table>
+
+          <!-- Input tersembunyi untuk menyimpan ID detail yang dihapus -->
+          <div id="deleted-rows"></div>
         </div>
         <hr class="row mb-5 border border-secondary border-1 opacity-25">
         <div class="row justify-content-between">
@@ -316,11 +324,10 @@ if ($error_message): ?>
               <label class="mb-3">Tempat dan tanggal.</label>
               <div class="input-group input-group-sm p-0">
                 <input type="text" class="form-control" name="signing_location"
-                  value="<?= isset($signatureDetails['Location']) ? ucwords($signatureDetails['Location']) : '' ?>"
-                  required>
+                  value="<?= isset($signatureInfo['Location']) ? ucwords($signatureInfo['Location']) : '' ?>" required>
                 <span class="input-group-text">,</span>
                 <input type="date" class="form-control" name="signing_date"
-                  value="<?= isset($signatureDetails['Date']) ? $signatureDetails['Date'] : '' ?>" required>
+                  value="<?= isset($signatureInfo['Date']) ? $signatureInfo['Date'] : '' ?>" required>
               </div>
             </div>
             <!-- Input Gambar Signature -->
@@ -356,12 +363,11 @@ if ($error_message): ?>
             </div>
             <div class="row mb-3">
               <input type="text" class="form-control form-control-sm" id="signer-name" name="signer_name"
-                value="<?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?>" required>
+                value="<?= isset($signatureInfo['Name']) ? ucwords($signatureInfo['Name']) : '' ?>" required>
             </div>
             <div class="row mb-3">
               <input type="text" class="form-control form-control-sm" id="signer-position" name="signer_position"
-                value="<?= isset($signatureDetails['Position']) ? ucwords($signatureDetails['Position']) : '' ?>"
-                required>
+                value="<?= isset($signatureInfo['Position']) ? ucwords($signatureInfo['Position']) : '' ?>" required>
             </div>
           </div>
         </div>
@@ -381,6 +387,7 @@ if ($error_message): ?>
 <?php endif; ?>
 <?php endif; ?>
 <script>
+// Menangani data detail
 $(document).ready(function() {
   // Panggil updateTotal() dan updateGrandTotal() saat halaman dimuat
   updateTotal();
@@ -393,7 +400,7 @@ $(document).ready(function() {
     updateRowNumbers(); // Panggil fungsi untuk memperbarui nomor urutan setelah menghapus baris
     updateTotal(); // Panggil fungsi untuk memperbarui total setelah menghapus baris
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total setelah menghapus baris
-    // Set nilai input tersembunyi
+    // Tambahkan idDetailPenawaran ke #deleted-rows dan cetak konten #deleted-rows ke konsol
     $('#deleted-rows').append('<input type="hidden" name="deleted_rows[]" value="' + idDetailPenawaran + '">');
   });
 
@@ -405,11 +412,13 @@ $(document).ready(function() {
           echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
       }
       ?>';
-    var rowCount = $('#detail-table tr.main-tr').length + 1; // Ambil jumlah baris saat ini dan tambahkan 1
+    // Ambil jumlah baris saat ini dan tambahkan 1,
+    var rowCount = $('#detail-table tr.main-tr').length + 1;
+    var newIdDetail = "newId" + (rowCount - 1);
     $('#detail-table').append(
       `<tr class="main-tr">
-          <input type="hidden" name="id_detail_penawaran[]">
           <td>${rowCount}</td>
+          <input type="hidden" name="id_detail_penawaran[]" value="${newIdDetail}">
           <td>
             <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
               <option value="" selected disabled>-- Pilih Produk --</option>
@@ -418,7 +427,7 @@ $(document).ready(function() {
           </td>
             <td><input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required></td>
             <td><input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required></td>
-            <td class="total">0.00</td>
+            <td class="total">0</td>
             <td class="align-middle text-center"><button type="button" class="remove-btn btn-cancel"></button></td>
         </tr>`
     );
@@ -440,11 +449,6 @@ $(document).ready(function() {
     var idProduk = row.find('select[name="id_produk[]"]').val(); // Dapatkan ID produk
     var jumlah = row.find('.qty').val(); // Dapatkan jumlah
     var hargaSatuan = row.find('.price').val(); // Dapatkan harga satuan
-
-    // Simpan data perubahan ke dalam input tersembunyi di dalam baris
-    row.find('.hidden-id-produk').val(idProduk);
-    row.find('.hidden-jumlah').val(jumlah);
-    row.find('.hidden-harga-satuan').val(hargaSatuan);
 
     updateTotal(); // Panggil fungsi untuk memperbarui total
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total
@@ -494,10 +498,10 @@ $(document).ready(function() {
       var qty = parseFloat($(this).find('.qty').val()) || 0;
       var price = parseFloat($(this).find('.price').val()) || 0;
       var total = qty * price;
-      $(this).find('.total').text(total.toFixed(2)); // Atur teks pada elemen <td class="total">
+      $(this).find('.total').text(total); // Atur teks pada elemen <td class="total">
       totalHarga += total; // Tambahkan total baris ke total harga
     });
-    $('#total-harga').text(totalHarga.toFixed(2)); // Atur teks total harga pada elemen dengan id "total-harga"
+    $('#total-harga').text(totalHarga); // Atur teks total harga pada elemen dengan id "total-harga"
   }
 
   // Fungsi untuk memperbarui grand total
@@ -510,16 +514,16 @@ $(document).ready(function() {
     var grandTotal = totalHarga - diskon + totalPPN; // Perhatikan pengurangan diskon dan penambahan total PPN
 
     // Memperbarui teks grand total pada elemen dengan id "grand-total"
-    $('#grand-total').text(grandTotal.toFixed(2));
+    $('#grand-total').text(grandTotal);
 
     // Memperbarui nilai input tersembunyi dengan grand total
-    $('#hidden-grand-total').val(grandTotal.toFixed(2));
+    $('#hidden-grand-total').val(grandTotal);
 
     // Memperbarui teks nilai diskon pada elemen dengan id "nilai-diskon"
-    $('#nilai-diskon').text(diskon.toFixed(2));
+    $('#nilai-diskon').text(diskon);
 
     // Memperbarui teks nilai total PPN pada elemen dengan id "total-ppn"
-    $('#total-ppn').text(totalPPN.toFixed(2));
+    $('#total-ppn').text(totalPPN);
   }
 });
 
@@ -654,7 +658,7 @@ function toggleChangeImageButton(visible) {
 // Panggil fungsi previewAddSignature saat halaman dimuat pertama kali
 document.addEventListener('DOMContentLoaded', function() {
   // Ubah panggilan fungsi previewAddSignature untuk menyertakan defaultSignaturePath
-  var defaultSignaturePath = "<?= $signatureDetails['Path']; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
+  var defaultSignaturePath = "<?= $signatureInfo['Path']; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
   previewAddSignature(defaultSignaturePath);
 });
 
@@ -714,7 +718,7 @@ function resetSignature() {
 
 // Fungsi refresh signature
 function refreshSignature() {
-  defaultSignaturePath = "<?= $signatureDetails['Path'] ?>";
+  defaultSignaturePath = "<?= $signatureInfo['Path'] ?>";
   previewAddSignature(defaultSignaturePath);
 }
 
