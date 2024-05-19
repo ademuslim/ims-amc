@@ -526,6 +526,6 @@ function handleLogoUpload($file, $allowed_types, $max_file_size, $upload_path)
     }
 }
 
-function formatDecimal($number) {
-    return number_format((float)$number, 2, '.', '');
+function formatRupiah($number) {
+    return 'Rp ' . number_format($number, 0, ',', '.');
 }

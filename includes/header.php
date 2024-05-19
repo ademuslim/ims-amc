@@ -24,6 +24,8 @@ if (isset($_SESSION['nama_pengguna'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= isset($page_title) ? "$page_title | IMS By AMC" : 'IMS By AMC' ?></title>
   <script src="<?= base_url('assets/js/jquery.js'); ?>"></script>
+  <script src="<?= base_url('assets/js/simple.money.format.js'); ?>"></script>
+  <script src="<?= base_url('assets/js/style.money.format.js'); ?>"></script>
   <!-- DataTables Responsive Bootstrap5 CSS-->
   <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css'); ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/dataTables.bootstrap5.css'); ?>">

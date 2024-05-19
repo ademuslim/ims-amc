@@ -224,8 +224,8 @@ if ($error_message): ?>
               <?php
               // Hitung total harga untuk setiap baris
               $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
-              // Tambahkan total harga ke subtotal
-              $subtotal += $total_harga;
+              // // Tambahkan total harga ke subtotal
+              // $subtotal += $total_harga;
             ?>
               <tr class="main-tr">
                 <td><?= $no ?></td>
@@ -243,9 +243,9 @@ if ($error_message): ?>
                 </td>
                 <td><input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1"
                     value="<?= $detail['jumlah'] ?>" required></td>
-                <td><input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0"
+                <td><input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0"
                     value="<?= $detail['harga_satuan'] ?>" required></td>
-                <td class="total"><?= number_format($total_harga, 2) ?></td>
+                <td class="total"><?= $total_harga ?></td>
                 <td class="align-middle text-center"><button type="button" class="remove-btn btn-cancel m-0"></button>
                 </td>
               </tr>
@@ -266,7 +266,7 @@ if ($error_message): ?>
                 <td>Diskon</td>
                 <td>
                   <div class="input-group input-group-sm">
-                    <input type="number" class="form-control" id="diskon" name="diskon" min="0" step="0.01"
+                    <input type="number" class="form-control" id="diskon" name="diskon" min="0" max="99"
                       value="<?= $data['diskon'] ?>" aria-describedby="basic-addon1">
                     <span class="input-group-text" id="basic-addon1">%</span>
                   </div>
@@ -387,12 +387,94 @@ if ($error_message): ?>
 <?php endif; ?>
 <?php endif; ?>
 <script>
-// Menangani data detail
+// Data Detail
 $(document).ready(function() {
+  $(document).on('input', '.price', function() {
+    // Ambil nilai input
+    var input = $(this).val();
+
+    // Hapus semua karakter kecuali angka
+    var number = input.replace(/\D/g, '');
+
+    // Periksa apakah input hanya 'Rp', 'Rp ' dengan spasi, diikuti '0', diawali '0', atau tidak mengandung angka
+    if (/^Rp\s?0*$/.test(input.trim()) || /^[^\d]+$/.test(number) || /^0/.test(number)) {
+      // Jika kondisi terpenuhi, kosongkan input
+      $(this).val('');
+    } else {
+      // Format angka dengan Rp dan pemisah ribuan
+      var formatted = formatRupiah(number);
+
+      // Perbarui nilai input dengan format yang diformat
+      $(this).val(formatted);
+    }
+  });
+
+
+  // Event listener untuk keypress
+  $(document).on('keypress', '.price', function(event) {
+    // Hanya izinkan angka (kode ASCII 48-57)
+    var charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+    }
+  });
+
+  // Fungsi untuk format angka dengan Rp dan pemisah ribuan
+  function formatRupiah(angka) {
+    var reverse = angka.toString().split('').reverse().join('');
+    var ribuan = reverse.match(/\d{1,3}/g);
+    var formatted = ribuan.join('.').split('').reverse().join('');
+    return 'Rp ' + formatted;
+  }
+
+  // Fungsi untuk mengembalikan nilai harga yang telah diunformat ke dalam bentuk angka
+  function unformatRupiah(price) {
+    // Hapus semua karakter kecuali angka
+    return parseFloat(price.replace(/\D/g, ''));
+  }
+
   // Panggil updateTotal() dan updateGrandTotal() saat halaman dimuat
   updateTotal();
   setPPNTarif(); // Memastikan tarif PPN diatur saat halaman dimuat
   updateGrandTotal();
+
+  // Format harga satuan saat halaman dimuat
+  $('.price').each(function() {
+    var value = $(this).val();
+    $(this).val(formatRupiah(value));
+  });
+
+  // Format total saat halaman dimuat
+  $('.total').each(function() {
+    var value = $(this).text();
+    $(this).text(formatRupiah(value));
+  });
+
+  // Format subtotal saat halaman dimuat
+  $('#total-harga').each(function() {
+    var value = $(this).text();
+    $(this).text(formatRupiah(value));
+  });
+
+  // Format nilai diskon saat halaman dimuat
+  $('#nilai-diskon').each(function() {
+    var value = $(this).text();
+    $(this).text(formatRupiah(value));
+  });
+
+  // Format nilai ppn saat halaman dimuat
+  $('#total-ppn').each(function() {
+    var value = $(this).text();
+    $(this).text(formatRupiah(value));
+  });
+
+  // Format nilai ppn saat halaman dimuat
+  $('#grand-total').each(function() {
+    var value = $(this).text();
+    $(this).text(formatRupiah(value));
+  });
+
+
   // Event untuk menghapus baris
   $(document).on('click', '.remove-btn', function() {
     var idDetailPenawaran = $(this).closest('.main-tr').find('input[name="id_detail_penawaran[]"]').val();
@@ -426,7 +508,7 @@ $(document).ready(function() {
             </select>
           </td>
             <td><input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required></td>
-            <td><input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required></td>
+            <td><input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required></td>
             <td class="total">0</td>
             <td class="align-middle text-center"><button type="button" class="remove-btn btn-cancel"></button></td>
         </tr>`
@@ -442,13 +524,14 @@ $(document).ready(function() {
       $(this).find('td:first').text(index + 1); // Atur nomor urutan sesuai dengan indeks baris
     });
   }
+
   // Event listener untuk menghitung total saat nilai "Qty" atau "Harga Satuan" berubah
   $(document).on('input', '.qty, .price', function() {
     var row = $(this).closest('.main-tr'); // Temukan baris terdekat
     var idDetailPenawaran = row.find('input[name="id_detail_penawaran[]"]').val(); // Dapatkan ID detail
     var idProduk = row.find('select[name="id_produk[]"]').val(); // Dapatkan ID produk
     var jumlah = row.find('.qty').val(); // Dapatkan jumlah
-    var hargaSatuan = row.find('.price').val(); // Dapatkan harga satuan
+    var hargaSatuan = unformatRupiah(row.find('.price').val()); // Dapatkan harga satuan tanpa format Rupiah
 
     updateTotal(); // Panggil fungsi untuk memperbarui total
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total
@@ -496,34 +579,34 @@ $(document).ready(function() {
     var totalHarga = 0;
     $('#detail-table tr.main-tr').each(function() {
       var qty = parseFloat($(this).find('.qty').val()) || 0;
-      var price = parseFloat($(this).find('.price').val()) || 0;
+      var price = parseFloat(unformatRupiah($(this).find('.price').val())) || 0;
       var total = qty * price;
-      $(this).find('.total').text(total); // Atur teks pada elemen <td class="total">
+      $(this).find('.total').text(formatRupiah(total)); // Atur teks pada elemen <td class="total">
       totalHarga += total; // Tambahkan total baris ke total harga
     });
-    $('#total-harga').text(totalHarga); // Atur teks total harga pada elemen dengan id "total-harga"
+    $('#total-harga').text(formatRupiah(totalHarga)); // Atur teks total harga pada elemen dengan id "total-harga"
   }
 
   // Fungsi untuk memperbarui grand total
   function updateGrandTotal() {
-    var totalHarga = parseFloat($('#total-harga').text()) || 0;
-    var diskonPersen = parseFloat($('#diskon').val()) || 0;
+    var totalHarga = unformatRupiah($('#total-harga').text()) || 0;
+    var diskonPersen = unformatRupiah($('#diskon').val()) || 0;
     var diskon = (totalHarga * diskonPersen) / 100; // Hitung nilai diskon dari persentase
     var tarifPPN = parseFloat($('#tarif-ppn').text()) || 0;
-    var totalPPN = (totalHarga - diskon) * (tarifPPN / 100);
+    var totalPPN = Math.round((totalHarga - diskon) * (tarifPPN / 100)); // Hitung dan bulatkan total PPN
     var grandTotal = totalHarga - diskon + totalPPN; // Perhatikan pengurangan diskon dan penambahan total PPN
 
     // Memperbarui teks grand total pada elemen dengan id "grand-total"
-    $('#grand-total').text(grandTotal);
+    $('#grand-total').text(formatRupiah(grandTotal));
 
     // Memperbarui nilai input tersembunyi dengan grand total
     $('#hidden-grand-total').val(grandTotal);
 
     // Memperbarui teks nilai diskon pada elemen dengan id "nilai-diskon"
-    $('#nilai-diskon').text(diskon);
+    $('#nilai-diskon').text(formatRupiah(diskon));
 
     // Memperbarui teks nilai total PPN pada elemen dengan id "total-ppn"
-    $('#total-ppn').text(totalPPN);
+    $('#total-ppn').text(formatRupiah(totalPPN));
   }
 });
 

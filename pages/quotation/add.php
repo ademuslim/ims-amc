@@ -213,11 +213,9 @@ if (!empty($data)) {
                 <input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required>
               </td>
               <td>
-                <input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
+                <input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
               </td>
-              <td class="total">
-                0
-              </td>
+              <td class="total">0</td>
               <td class="align-middle text-center">
                 <div class="d-flex justify-content-center align-items-center">
                   <button type="button" class="remove-btn btn-cancel m-0"></button>
@@ -376,7 +374,52 @@ $('form.needs-validation').on('submit', function(e) {
   $(this).addClass('was-validated');
 });
 
+// Data Detail
 $(document).ready(function() {
+  // Event listener untuk input harga satuan
+  $(document).on('input', '.price', function() {
+    // Ambil nilai input
+    var input = $(this).val();
+
+    // Hapus semua karakter kecuali angka
+    var number = input.replace(/\D/g, '');
+
+    // Periksa apakah input hanya 'Rp', 'Rp ' dengan spasi, diikuti '0', diawali '0', atau tidak mengandung angka
+    if (/^Rp\s?0*$/.test(input.trim()) || /^[^\d]+$/.test(number) || /^0/.test(number)) {
+      // Jika kondisi terpenuhi, kosongkan input
+      $(this).val('');
+    } else {
+      // Format angka dengan Rp dan pemisah ribuan
+      var formatted = formatRupiah(number);
+
+      // Perbarui nilai input dengan format yang diformat
+      $(this).val(formatted);
+    }
+  });
+
+  // Event listener untuk keypress
+  $(document).on('keypress', '.price', function(event) {
+    // Hanya izinkan angka (kode ASCII 48-57)
+    var charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+    }
+  });
+
+  // Fungsi untuk format angka dengan Rp dan pemisah ribuan
+  function formatRupiah(angka) {
+    var reverse = angka.toString().split('').reverse().join('');
+    var ribuan = reverse.match(/\d{1,3}/g);
+    var formatted = ribuan.join('.').split('').reverse().join('');
+    return 'Rp ' + formatted;
+  }
+
+  // Fungsi untuk mengembalikan nilai harga yang telah diunformat ke dalam bentuk angka
+  function unformatRupiah(price) {
+    // Hapus semua karakter kecuali angka
+    return parseFloat(price.replace(/\D/g, ''));
+  }
+
   // Event untuk menghapus baris
   $(document).on('click', '.remove-btn', function() {
     $(this).closest('.main-tr').remove();
@@ -404,10 +447,18 @@ $(document).ready(function() {
               ${produkOptions}
             </select>
           </td>
-          <td><input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required></td>
-          <td><input type="number" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required></td>
+          <td>
+            <input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required>
+          </td>
+          <td>
+            <input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
+          </td>
           <td class="total">0</td>
-          <td><button type="button" class="remove-btn btn-cancel"></button></td>
+          <td class="align-middle text-center">
+            <div class="d-flex justify-content-center align-items-center">
+              <button type="button" class="remove-btn btn-cancel m-0"></button>
+            </div>
+          </td>
         </tr>`
     );
     updateRowNumbers(); // Panggil fungsi untuk memperbarui nomor urutan setelah menambahkan baris baru
@@ -458,17 +509,18 @@ $(document).ready(function() {
     var totalHarga = 0;
     $('#detail-table tr.main-tr').each(function() {
       var qty = parseFloat($(this).find('.qty').val()) || 0;
-      var price = parseFloat($(this).find('.price').val()) || 0;
+      var price = unformatRupiah($(this).find('.price').val()) || 0; // Unformat harga sebelum perhitungan
       var total = qty * price;
-      $(this).find('.total').text(total); // Atur teks pada elemen <td class="total">
+      $(this).find('.total').text(formatRupiah(total)); // Format dan atur teks pada elemen <td class="total">
       totalHarga += total; // Tambahkan total baris ke total harga
     });
-    $('#total-harga').text(totalHarga); // Atur teks total harga pada elemen dengan id "total-harga"
+    $('#total-harga').text(formatRupiah(
+      totalHarga)); // Format dan atur teks total harga pada elemen dengan id "total-harga"
   }
 
   // Fungsi untuk memperbarui grand total
   function updateGrandTotal() {
-    var totalHarga = parseFloat($('#total-harga').text()) || 0;
+    var totalHarga = unformatRupiah($('#total-harga').text()) || 0;
     var diskonPersen = parseFloat($('#diskon').val()) || 0;
     var diskon = (totalHarga * diskonPersen) / 100; // Hitung nilai diskon dari persentase
     var tarifPPN = parseFloat($('#tarif-ppn').text()) || 0;
@@ -476,16 +528,16 @@ $(document).ready(function() {
     var grandTotal = totalHarga - diskon + totalPPN; // Perhatikan pengurangan diskon dan penambahan total PPN
 
     // Memperbarui teks grand total pada elemen dengan id "grand-total"
-    $('#grand-total').text(grandTotal);
+    $('#grand-total').text(formatRupiah(grandTotal));
 
     // Memperbarui nilai input tersembunyi dengan grand total
     $('#hidden-grand-total').val(grandTotal);
 
     // Memperbarui teks nilai diskon pada elemen dengan id "nilai-diskon"
-    $('#nilai-diskon').text(diskon);
+    $('#nilai-diskon').text(formatRupiah(diskon));
 
     // Memperbarui teks nilai total PPN pada elemen dengan id "total-ppn"
-    $('#total-ppn').text(totalPPN);
+    $('#total-ppn').text(formatRupiah(totalPPN));
   }
 });
 

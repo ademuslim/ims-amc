@@ -153,7 +153,7 @@ if ($error_message): ?>
             <td>No. Produk</td>
             <td>Nama Produk</td>
             <td colspan="2">Kuantitas</td>
-            <td>Harga (Rp)</td>
+            <td>Harga</td>
             <td>Total Harga</td>
           </tr>
         </thead>
@@ -175,10 +175,8 @@ if ($error_message): ?>
             <td><?= strtoupper($detail['nama_produk']); ?></td>
             <td><?= $detail['jumlah']; ?></td>
             <td><?= strtoupper($detail['satuan']); ?></td>
-            <td><?= number_format($detail['harga_satuan']); ?></td>
-            <td>
-              <?= number_format($total_harga) // Format angka dengan dua desimal ?>
-            </td>
+            <td><?= formatRupiah($detail['harga_satuan']); ?></td>
+            <td><?= formatRupiah($total_harga); ?></td>
           </tr>
           <?php $no++ ?>
           <?php endforeach; ?>
@@ -200,22 +198,22 @@ if ($error_message): ?>
           <tr>
             <td colspan="3" rowspan="4" style="background-color: transparent;"></td>
             <td colspan="3">Subtotal</td>
-            <td colspan="2"><?= number_format($subtotal) ?></td>
+            <td colspan="2"><?= formatRupiah($subtotal) ?></td>
           </tr>
           <tr>
             <td colspan="2">Diskon</td>
             <td><?= $data['diskon'] . " %" ?></td>
-            <td colspan="2"><?= number_format($nilai_diskon) ?></td>
+            <td colspan="2"><?= formatRupiah($nilai_diskon) ?></td>
           </tr>
           <tr>
             <td colspan="2">PPN</td>
             <td><?= $data['jenis_ppn'] . "( " . $tarif_ppn . " %)" ?></td>
-            <td><?= number_format($nilai_ppn); ?></td>
+            <td><?= formatRupiah($nilai_ppn); ?></td>
           </tr>
           <tr>
             <td colspan="3">Total</td>
             <!-- <td colspan="2">Dari DB: <?= $data['total'] ?></td> -->
-            <td colspan="2"><?= number_format($total_setelah_ppn); ?></td>
+            <td colspan="2"><?= formatRupiah($total_setelah_ppn); ?></td>
           </tr>
         </tfoot>
       </table>

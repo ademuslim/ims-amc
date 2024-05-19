@@ -122,6 +122,10 @@ if (isset($_POST['add'])) {
     $result = insertData('penawaran_harga', $data);
 
     // Lanjut insert data detail jika insert data penawaran_harga berhasil
+    function unformatRupiah($rupiah) {
+        return (int) preg_replace('/[^0-9]/', '', $rupiah);
+    }
+
     if ($result) {
         $id_produk = $_POST['id_produk'];
         $jumlah = $_POST['jumlah'];
@@ -132,13 +136,16 @@ if (isset($_POST['add'])) {
             // Generate UUID untuk id_detail_penawaran
             $id_detail_penawaran = Ramsey\Uuid\Uuid::uuid4()->toString();
 
+            // Unformat harga satuan sebelum menyimpan ke database
+            $harga_satuan_unformatted = unformatRupiah($harga_satuan[$i]);
+
             // Data untuk disimpan
             $detail_produk = [
                 'id_detail_penawaran' => $id_detail_penawaran,
                 'id_penawaran' => $id_penawaran,
                 'id_produk' => $id_produk[$i], // Menggunakan indeks yang sama untuk setiap array
                 'jumlah' => $jumlah[$i], // Menggunakan indeks yang sama untuk setiap array
-                'harga_satuan' => $harga_satuan[$i] // Menggunakan indeks yang sama untuk setiap array
+                'harga_satuan' => $harga_satuan_unformatted // Menggunakan nilai unformat untuk harga satuan
             ];
 
             // Insert data detail produk ke dalam database
@@ -278,11 +285,15 @@ if (isset($_POST['add'])) {
     }
     
     // Lanjutkan edit detail
+    // Fungsi untuk mengubah format Rupiah ke dalam bentuk integer
+    function unformatRupiah($rupiah) {
+        return (int) preg_replace('/[^0-9]/', '', $rupiah);
+    }
     // Peroleh nilai-nilai dari detail penawaran
     $id_detail = $_POST['id_detail_penawaran'];
     $id_produk = $_POST['id_produk'];
     $jumlah = $_POST['jumlah'];
-    $harga_satuan = $_POST['harga_satuan']; // Format harga_satuan
+    $harga_satuan = $_POST['harga_satuan'];
     $deleted_rows = isset($_POST['deleted_rows']) ? $_POST['deleted_rows'] : [];
 
     // Simpan semua data detail ke dalam array utama
@@ -292,23 +303,23 @@ if (isset($_POST['add'])) {
             'id_detail_penawaran' => $detail_id,
             'id_produk' => $id_produk[$index],
             'jumlah' => $jumlah[$index],
-            'harga_satuan' => $harga_satuan[$index]
+            'harga_satuan' => unformatRupiah($harga_satuan[$index])
         ];
     }
 
-    // Tampilkan isi dari array $all_details untuk debugging
-    echo "Isi dari all_details sebelum penghapusan:";
-    echo "<pre>";
-    var_dump($all_details);
-    echo "</pre>";
-    // exit();
+    // // Tampilkan isi dari array $all_details untuk debugging
+    // echo "Isi dari all_details sebelum penghapusan:";
+    // echo "<pre>";
+    // var_dump($all_details);
+    // echo "</pre>";
+    // // exit();
 
-    // Tampilkan isi dari array $deleted_rows untuk debugging
-    echo "Isi dari deleted_rows:";
-    echo "<pre>";
-    var_dump($deleted_rows);
-    echo "</pre>";
-    // exit();
+    // // Tampilkan isi dari array $deleted_rows untuk debugging
+    // echo "Isi dari deleted_rows:";
+    // echo "<pre>";
+    // var_dump($deleted_rows);
+    // echo "</pre>";
+    // // exit();
 
     // Hapus baris yang ada dalam deleted_rows
     foreach ($deleted_rows as $deleted_row) {
@@ -333,16 +344,16 @@ if (isset($_POST['add'])) {
         }
     }
 
-    // Tampilkan isi dari array $add_detail dan $update_detail untuk debugging
-    echo "Isi dari add_detail (baris baru):";
-    echo "<pre>";
-    var_dump($add_detail);
-    echo "</pre>";
+    // // Tampilkan isi dari array $add_detail dan $update_detail untuk debugging
+    // echo "Isi dari add_detail (baris baru):";
+    // echo "<pre>";
+    // var_dump($add_detail);
+    // echo "</pre>";
 
-    echo "Isi dari update_detail (baris yang harus diperbarui):";
-    echo "<pre>";
-    var_dump($update_detail);
-    echo "</pre>";
+    // echo "Isi dari update_detail (baris yang harus diperbarui):";
+    // echo "<pre>";
+    // var_dump($update_detail);
+    // echo "</pre>";
 
     // Lakukan operasi tambah data
     foreach ($add_detail as $detail) {
@@ -370,7 +381,7 @@ if (isset($_POST['add'])) {
         updateData('detail_penawaran', $data, "id_detail_penawaran = '{$detail['id_detail_penawaran']}'");
     }
 
-    echo "Operasi tambah dan ubah data selesai.";
+    // echo "Operasi tambah dan ubah data selesai.";
 
     // Redirect ke halaman detail setelah proses edit selesai
     header("Location: detail.php?id=$id_penawaran");
