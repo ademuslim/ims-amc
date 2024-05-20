@@ -324,6 +324,10 @@ td .btn-group {
 .btn-del:hover {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23dc3545'%3E%3Cpath d='M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z'/%3E%3C/svg%3E");
 }
+input[readonly] {
+  pointer-events: none;
+  background-color: #f0f0f0; /* Opsional: Memberikan efek visual */
+}
 
 /* DataTables Print CSS */
 body.dt-print-view {

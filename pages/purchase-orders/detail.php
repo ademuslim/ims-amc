@@ -21,29 +21,29 @@ if (isset($_SESSION['error_message'])) {
 }
 
 // Variabel untuk menyimpan data penawaran harga dan detail
-$data_penawaran_harga = [];
-$data_penawaran_harga_detail = [];
+$data_pesanan_pembelian = [];
+$data_pesanan_pembelian_detail = [];
 $signatureDetails = []; // Array untuk menyimpan detail signature info
 $error_message = '';
 
 // Ambil Data Penawaran Harga berdasarkan id
 if (isset($_GET['id']) && $_GET['id'] !== '') {
-  $id_penawaran = $_GET['id'];
-  $mainTable = 'penawaran_harga';
+  $id_pesanan = $_GET['id'];
+  $mainTable = 'pesanan_pembelian';
   $joinTables = [
-      ['kontak_internal', 'penawaran_harga.id_pengirim = kontak_internal.id_pengirim'], 
-      ['pelanggan', 'penawaran_harga.id_penerima = pelanggan.id_pelanggan'],
-      ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
+      ['kontak_internal', 'pesanan_pembelian.id_pengirim = kontak_internal.id_pengirim'], 
+      ['pelanggan', 'pesanan_pembelian.id_penerima = pelanggan.id_pelanggan'],
+      ['ppn', 'pesanan_pembelian.id_ppn = ppn.id_ppn']
   ];
-  $columns = 'penawaran_harga.*, kontak_internal.*, pelanggan.nama_pelanggan AS nama_penerima, pelanggan.alamat, ppn.jenis_ppn, ppn.tarif';
-  $conditions = "penawaran_harga.id_penawaran = '$id_penawaran'";
+  $columns = 'pesanan_pembelian.*, kontak_internal.*, pelanggan.nama_pelanggan AS nama_penerima, pelanggan.alamat, ppn.jenis_ppn, ppn.tarif';
+  $conditions = "pesanan_pembelian.id_pesanan = '$id_pesanan'";
 
   // Panggil fungsi selectDataJoin dengan ORDER BY
-  $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+  $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 
   // Cek apakah data ditemukan
-  if (!empty($data_penawaran_harga)) {
-    $data = $data_penawaran_harga[0]; // Karena kita mengharapkan satu hasil saja berdasarkan id
+  if (!empty($data_pesanan_pembelian)) {
+    $data = $data_pesanan_pembelian[0]; // Karena kita mengharapkan satu hasil saja berdasarkan id
 
     if (!empty($data["signature_info"])) {
       // Pisahkan data signature_info berdasarkan koma (,) untuk mendapatkan setiap elemen
@@ -60,18 +60,18 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
         }
       }
     }
-    
-    // Jika data penawaran harga ditemukan lanjut mengambil detail penawaran berdasarkan id
-    $mainDetailTable = 'detail_penawaran';
+
+    // Jika data po ditemukan lanjut mengambil detail po berdasarkan id
+    $mainDetailTable = 'detail_pesanan';
     $joinDetailTables = [
-        ['penawaran_harga', 'detail_penawaran.id_penawaran = penawaran_harga.id_penawaran'], 
-        ['produk', 'detail_penawaran.id_produk = produk.id_produk']
+        ['pesanan_pembelian', 'detail_pesanan.id_pesanan = pesanan_pembelian.id_pesanan'], 
+        ['produk', 'detail_pesanan.id_produk = produk.id_produk']
     ];
-    $columns = 'detail_penawaran.*, produk.*';
-    $conditions = "detail_penawaran.id_penawaran = '$id_penawaran'";
+    $columns = 'detail_pesanan.*, produk.*';
+    $conditions = "detail_pesanan.id_pesanan = '$id_pesanan'";
 
     // Panggil fungsi selectDataJoin dengan ORDER BY
-    $data_penawaran_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
+    $data_pesanan_pembelian_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
     
   } else {
       echo "Penawaran tidak ditemukan.";
@@ -83,7 +83,7 @@ echo "ID penawaran tidak ditemukan.";
 if ($error_message): ?>
 <p><?php echo $error_message; ?></p>
 <?php else: ?>
-<?php if (!empty($data_penawaran_harga)): ?>
+<?php if (!empty($data_pesanan_pembelian)): ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 mb-4">Detail Penawaran Harga</h1>
   <!-- Tombol untuk memicu cetak -->
@@ -101,7 +101,7 @@ if ($error_message): ?>
       </div>
       <!-- Judul Dokumen -->
       <div class="col-md-6 p-0">
-        <p class="fs-2 text-end">Penawaran Harga</p>
+        <p class="fs-2 text-end">Purchase Order</p>
       </div>
     </div>
 
@@ -120,7 +120,7 @@ if ($error_message): ?>
             <p>Tanggal</p>
           </div>
           <div class="col-auto">
-            <p><?= ": " . strtoupper($data['no_penawaran']) ?></p>
+            <p><?= ": " . strtoupper($data['no_pesanan']) ?></p>
             <p><?= ": " . $data['tanggal'] ?></p>
           </div>
         </div>
@@ -144,7 +144,7 @@ if ($error_message): ?>
 
     <div class="row">
       <p class="p-0">Dengan hormat,</p>
-      <p class="p-0">Kami ingin menawarkan harga untuk layanan dan produk kami. Berikut detailnya:</p>
+      <p class="p-0">Dengan ini, kami mengajukan pesanan pembelian untuk produk/jasa yang tercantum di bawah ini. </p>
       <!-- Tampil detail produk -->
       <table class="table table-light table-striped">
         <thead>
@@ -160,9 +160,9 @@ if ($error_message): ?>
         <tbody id="detail-table">
           <?php
           $subtotal = 0;
-          if (!empty($data_penawaran_detail)): ?>
+          if (!empty($data_pesanan_pembelian_detail)): ?>
           <?php $no = 1; ?>
-          <?php foreach ($data_penawaran_detail as $detail): ?>
+          <?php foreach ($data_pesanan_pembelian_detail as $detail): ?>
           <?php
             // Hitung total harga untuk setiap baris
             $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
@@ -194,33 +194,23 @@ if ($error_message): ?>
             $nilai_ppn = ($subtotal_setelah_diskon * $tarif_ppn) / 100;
             // Hitung total setelah PPN
             $total_setelah_ppn = $subtotal_setelah_diskon + $nilai_ppn;
-            $tampil_subtotal = ($diskon > 0 || $tarif_ppn > 0);
           ?>
-          <?php if ($tampil_subtotal): ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
+            <td colspan="3" rowspan="4" style="background-color: transparent;"></td>
             <td colspan="3">Subtotal</td>
             <td colspan="2"><?= formatRupiah($subtotal) ?></td>
           </tr>
-          <?php endif; ?>
-          <?php if ($diskon > 0): ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
             <td colspan="2">Diskon</td>
             <td><?= $data['diskon'] . " %" ?></td>
             <td colspan="2"><?= formatRupiah($nilai_diskon) ?></td>
           </tr>
-          <?php endif; ?>
-          <?php if ($tarif_ppn > 0): ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
             <td colspan="2">PPN</td>
-            <td><?= $data['jenis_ppn'] . " (" . $tarif_ppn . " %)" ?></td>
+            <td><?= $data['jenis_ppn'] . "( " . $tarif_ppn . " %)" ?></td>
             <td><?= formatRupiah($nilai_ppn); ?></td>
           </tr>
-          <?php endif; ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
             <td colspan="3">Total</td>
             <!-- <td colspan="2">Dari DB: <?= $data['total'] ?></td> -->
             <td colspan="2"><?= formatRupiah($total_setelah_ppn); ?></td>
@@ -237,9 +227,8 @@ if ($error_message): ?>
     </div>
 
     <div class="row mb-3">
-      <p>Kami berharap penawaran ini dapat memenuhi kebutuhan yang Bapak/Ibu miliki. Apabila terdapat pertanyaan atau
-        klarifikasi
-        lebih lanjut mengenai penawaran ini, silakan hubungi kami. Kami sangat menghargai kerjasama dan dukungan yang
+      <p>Demikian pesanan pembelian dari Kami, mohon diproses dengan baik. Apabila terdapat pertanyaan atau klarifikasi
+        lebih lanjut mengenai pesanan ini, silakan hubungi kami. Kami sangat menghargai kerjasama dan dukungan yang
         berkelanjutan.</p>
       <p>Terima kasih atas perhatian dan kerjasamanya.</p>
     </div>
@@ -256,7 +245,8 @@ if ($error_message): ?>
           <p class="col-auto">Hormat Kami,</p>
         </div>
         <div class="row justify-content-center mb-3">
-          <img class="image" src="<?= $signatureDetails['Path'] ?>" alt="Preview Signature.">
+          <img class="image" src="<?= isset($signatureDetails['Path']) ? $signatureDetails['Path'] : '' ?>"
+            alt="Preview Signature.">
         </div>
         <div class="row justify-content-center mb-3">
           <div class="col-auto"><?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?></div>
@@ -273,8 +263,8 @@ if ($error_message): ?>
 
   <div class="row justify-content-end mt-5 mb-4">
     <div class="col-auto">
-      <a href="edit.php?id=<?= $id_penawaran ?>">
-        <button type="button" class="btn btn-warning btn-lg">Ubah Penawaran Harga</button>
+      <a href="edit.php?id=<?= $id_pesanan ?>">
+        <button type="button" class="btn btn-warning btn-lg">Ubah Purchase Order Harga</button>
       </a>
     </div>
 

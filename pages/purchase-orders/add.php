@@ -1,5 +1,5 @@
 <?php
-$page_title = "Add Quotation";
+$page_title = "Add PO";
 require '../../includes/header.php';
 
 // Tampilkan pesan sukses jika ada
@@ -24,10 +24,11 @@ if (isset($_SESSION['error_message'])) {
 $defaultLogoPath = "";
 $defaultSignaturePath = "";
 
-// Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel pesanan_pembelian
+// Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel penawaran_harga
 $order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
 $limit = "1"; // Ambil hanya 1 hasil
 $data = selectData("penawaran_harga", "", $order_by, $limit);
+
 // Jika data ditemukan, ambil path logo dan signature
 if (!empty($data)) {
   $defaultLogoPath = $data[0]["logo"];
@@ -52,7 +53,7 @@ if (!empty($data)) {
 }
 ?>
 
-<h1 class="fs-5 mb-4">Buat Penawaran Harga Baru</h1>
+<h1 class="fs-5 mb-4">Buat Purchase Order Baru</h1>
 <div class="paper-wrapper">
   <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
     <div class="container">
@@ -88,7 +89,7 @@ if (!empty($data)) {
         </div>
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Penawaran Harga</p>
+          <p class="fs-2 text-end">Purchase Order</p>
         </div>
       </div>
 
@@ -120,10 +121,9 @@ if (!empty($data)) {
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
-            <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
+            <label for="no_po" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" id="no_penawaran" name="no_penawaran" readonly
-                required>
+              <input type="text" class="form-control form-control-sm" id="no_po" name="no_po" readonly required>
               <div class="invalid-feedback">
                 Sistem error, nomor penawaran gagal dimuat.
               </div>
@@ -300,12 +300,12 @@ if (!empty($data)) {
             </div>
           </div>
 
-          <!-- Input Signature -->
+          <!-- Input Gambar Signature -->
           <div class="row justify-content-center mb-3">
             <div class="col-md-6 p-0 position-relative">
               <div id="signature-preview-container" class="position-relative">
                 <div class="d-flex flex-column justify-content-center align-items-center h-100">
-                  <img id="signature-preview" src="" alt="Preview Signature">
+                  <img id="signature-preview" src="" alt="Preview Signature.">
                 </div>
 
                 <button type="button" title="Hapus Tanda Tangan" class="position-absolute top-0 end-0 z-3"
@@ -553,24 +553,24 @@ document.getElementById("tanggal").addEventListener("change", function() {
       month = '0' + month;
     }
 
-    // Request nomor penawaran berdasarkan bulan dan tahun ke getDocumentNumber.php
+    // Request nomor po berdasarkan bulan dan tahun ke getDocumentNumber.php
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        // Ubah nomor penawaran menjadi huruf kapital
-        var nomorPenawaran = this.responseText.toUpperCase();
-        document.getElementById("no_penawaran").value = nomorPenawaran;
+        // Ubah nomor po menjadi huruf kapital
+        var nomorPO = this.responseText.toUpperCase();
+        document.getElementById("no_po").value = nomorPO;
       }
     };
     xhttp.open("GET", "getDocumentNumber.php?month=" + month + "&year=" + year, true);
     xhttp.send();
   } else {
-    document.getElementById("no_penawaran").value =
+    document.getElementById("no_po").value =
       ""; // Kosongkan nilai nomor penawaran jika tanggal tidak diisi
   }
 });
 
-// Penanganan logo
+// Fungsi preview gambar
 // Panggil fungsi previewAddImage saat halaman dimuat pertama kali
 document.addEventListener('DOMContentLoaded', function() {
   // Ubah panggilan fungsi previewAddImage untuk menyertakan defaultLogoPath
@@ -592,15 +592,15 @@ document.getElementById('logo').addEventListener('change', function(event) {
   }
 });
 
+// Fungsi untuk menampilkan preview gambar
 function previewAddImage(imageURL) {
   let imgElement = document.getElementById("logo-preview");
   let placeholderContainer = document.getElementById("placeholder-container");
   let imagePreviewContainer = document.getElementById("image-preview-container");
   let cancelButton = document.getElementById("cancelButton");
-  var defaultLogoPath = "<?= $defaultLogoPath; ?>";
 
-  if (imageURL && imageURL.trim() !== "") {
-    // Tampilkan gambar yang dipilih
+  if (imageURL) {
+    // Tampilkan gambar
     imgElement.src = imageURL;
     imgElement.style.display = "block";
     // Sembunyikan placeholder dan tampilkan container gambar
@@ -609,7 +609,8 @@ function previewAddImage(imageURL) {
     // Tampilkan tombol "Batal"
     cancelButton.style.display = "block";
   } else {
-    // Tampilkan gambar default
+    // Jika tidak ada gambar yang dipilih, gunakan gambar default
+    var defaultLogoPath = "<?php echo $defaultLogoPath; ?>";
     imgElement.src = defaultLogoPath;
     imgElement.style.display = "block";
     // Sembunyikan placeholder dan tampilkan container gambar
@@ -665,7 +666,7 @@ function toggleChangeImageButton(visible) {
 // Panggil fungsi previewAddSignature saat halaman dimuat pertama kali
 document.addEventListener('DOMContentLoaded', function() {
   // Ubah panggilan fungsi previewAddSignature untuk menyertakan defaultSignaturePath
-  var defaultSignaturePath = "<?= $defaultSignaturePath; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
+  var defaultSignaturePath = "<?php echo $defaultSignaturePath; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
   previewAddSignature(defaultSignaturePath);
 });
 
@@ -689,22 +690,22 @@ function previewAddSignature(signatureURL) {
   let signaturePlaceholderContainer = document.getElementById("signature-placeholder-container");
   let signaturePreviewContainer = document.getElementById("signature-preview-container");
   let cancelButton2 = document.getElementById("cancelButton2");
-  var defaultSignaturePath = "<?= $defaultSignaturePath; ?>";
 
-  if (signatureURL && signatureURL.trim() !== "") {
-    // Tampilkan signature
+  if (signatureURL) {
+    // Tampilkan gambar
     signatureElement.src = signatureURL;
     signatureElement.style.display = "block";
-    // Sembunyikan placeholder dan tampilkan container signature
+    // Sembunyikan placeholder dan tampilkan container gambar
     signaturePlaceholderContainer.style.display = "none";
     signaturePreviewContainer.style.display = "block";
     // Tampilkan tombol "Batal"
     cancelButton2.style.display = "block";
   } else {
-    // Jika tidak ada signature yang dipilih, gunakan signature default
-    signatureElement.src = defaultSignaturePath;
+    // Jika tidak ada gambar yang dipilih, gunakan gambar default
+    var defaultLogoPath = "<?php echo $defaultLogoPath; ?>";
+    signatureElement.src = defaultLogoPath;
     signatureElement.style.display = "block";
-    // Sembunyikan placeholder dan tampilkan container signature
+    // Sembunyikan placeholder dan tampilkan container gambar
     signaturePlaceholderContainer.style.display = "none";
     signaturePreviewContainer.style.display = "block";
     // Tampilkan tombol "Batal"
