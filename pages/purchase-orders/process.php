@@ -11,6 +11,17 @@ if (isset($_POST['add'])) {
     $diskon = $_POST['diskon'];
     $jenis_ppn = $_POST['jenis_ppn'];
     $grand_total = $_POST['grand_total'];
+    $kategori = $_POST['kategori'];
+
+    // Tentukan $category_param berdasarkan nilai $kategori
+    if ($kategori == "keluar") {
+        $category_param = "outgoing";
+    } elseif ($kategori == "masuk") {
+        $category_param = "incoming";
+    } else {
+        // Berikan penanganan jika nilai kategori tidak valid
+        die("Invalid category");
+    }
 
     // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
     $defaultLogoPath = "";
@@ -19,7 +30,7 @@ if (isset($_POST['add'])) {
     // Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel penawaran_harga
     $order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
     $limit = "1"; // Ambil hanya 1 hasil
-    $data = selectData("pesanan_pembelian", "", $order_by, $limit);
+    $data = selectData("penawaran_harga", "", $order_by, $limit);
 
     // Jika data ditemukan, ambil path logo dan signature
     if (!empty($data)) {
@@ -130,7 +141,9 @@ if (isset($_POST['add'])) {
         'id_ppn' => $jenis_ppn,
         'total' => $grand_total,
         'logo' => $file_destination_logo,
-        'signature_info' => $signature_info
+        'signature_info' => $signature_info,
+        'kategori' => $kategori,
+        'status' => 'draft'
     ];
 
     // Lakukan insert data
@@ -174,7 +187,7 @@ if (isset($_POST['add'])) {
             }
         }
         // Jika berhasil disimpan, arahkan pengguna ke halaman detail
-        header("Location: detail.php?id=" . $id_pesanan);
+        header("Location: detail.php?category=" . $category_param . "&id=" . $id_pesanan);
         exit();
     } else {
         // Gagal memindahkan file
@@ -182,7 +195,6 @@ if (isset($_POST['add'])) {
     }
 // Edit Data
 } elseif (isset($_POST['edit'])) {
-    // Ambil nilai Data Penawaran
     $id_pesanan = $_POST['id_pesanan'];
     $pengirim = $_POST['pengirim'];
     $tanggal = $_POST['tanggal'];
@@ -193,6 +205,17 @@ if (isset($_POST['add'])) {
     $up = strtolower($_POST['up']);
     $diskon = isset($_POST['diskon']) ? $_POST['diskon'] : 0;
     $jenis_ppn = $_POST['jenis_ppn'];
+    $kategori = $_POST['kategori'];
+
+    // Tentukan $category_param berdasarkan nilai $kategori
+    if ($kategori == "keluar") {
+        $category_param = "outgoing";
+    } elseif ($kategori == "masuk") {
+        $category_param = "incoming";
+    } else {
+        // Berikan penanganan jika nilai kategori tidak valid
+        die("Invalid category");
+    }
 
     // Variabel untuk menyimpan path logo
     $logoPath = '';
@@ -273,7 +296,6 @@ if (isset($_POST['add'])) {
 
     // Bangun data untuk pembaruan po
     $data = [
-        // 'id_pesanan' => $id_pesanan,
         'id_pengirim' => $pengirim,
         'no_pesanan' => $no_pesanan,
         'tanggal' => $tanggal,
@@ -399,7 +421,7 @@ if (isset($_POST['add'])) {
     // echo "Operasi tambah dan ubah data selesai.";
 
     // Redirect ke halaman detail setelah proses edit selesai
-    header("Location: detail.php?id=$id_pesanan");
+    header("Location: detail.php?category=" . $category_param . "&id=" . $id_pesanan);
     exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php

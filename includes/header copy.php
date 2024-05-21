@@ -60,8 +60,7 @@ if (isset($_SESSION['nama_pengguna'])) {
         <hr>
         <ul>
           <li>
-            <a href="<?= base_url('pages/dashboard/index.php'); ?>"
-              class="nav-link text-dark <?= setActivePage('pages/dashboard/index.php'); ?>">
+            <a href="<?= base_url('pages/dashboard/index.php'); ?>" class="nav-link text-dark">
               <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
                 <path
                   d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
@@ -71,10 +70,8 @@ if (isset($_SESSION['nama_pengguna'])) {
               </span>
             </a>
           </li>
-
           <li>
-            <a href="<?= base_url('pages/dashboard-views/index.php'); ?>"
-              class="nav-link text-dark <?= setActivePage('pages/dashboard-views/index.php'); ?>">
+            <a href="<?= base_url('pages/dashboard-views/index.php'); ?>" class="nav-link text-dark">
               <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
                 <path
                   d="M320-414v-306h120v306l-60-56-60 56Zm200 60v-526h120v406L520-354ZM120-216v-344h120v224L120-216Zm0 98 258-258 142 122 224-224h-64v-80h200v200h-80v-64L524-146 382-268 232-118H120Z" />
@@ -106,8 +103,7 @@ if (isset($_SESSION['nama_pengguna'])) {
                   <div class="accordion-body">
                     <ul>
                       <li>
-                        <a href="<?= base_url('pages/master-data/products/index.php'); ?>"
-                          class="nav-link <?= setActivePage('pages/master-data/products/index.php'); ?>">
+                        <a href="<?= base_url('pages/master-data/products/index.php'); ?>" class="nav-link">
                           <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
                             <path
                               d="M440-183v-274L200-596v274l240 139Zm80 0 240-139v-274L520-457v274Zm-40-343 237-137-237-137-237 137 237 137ZM160-252q-19-11-29.5-29T120-321v-318q0-22 10.5-40t29.5-29l280-161q19-11 40-11t40 11l280 161q19 11 29.5 29t10.5 40v318q0 22-10.5 40T800-252L520-91q-19 11-40 11t-40-11L160-252Zm320-228Z" />
@@ -118,8 +114,7 @@ if (isset($_SESSION['nama_pengguna'])) {
                         </a>
                       </li>
                       <li>
-                        <a href="<?= base_url('pages/master-data/internal-contacts/index.php'); ?>"
-                          class="nav-link <?= setActivePage('pages/master-data/internal-contacts/index.php'); ?>">
+                        <a href="<?= base_url('pages/master-data/internal-contacts/index.php'); ?>" class="nav-link">
                           <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
                             <path
                               d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
@@ -158,136 +153,77 @@ if (isset($_SESSION['nama_pengguna'])) {
             </div>
           </li>
 
-          <!-- Outgoing -->
           <li>
-            <div class="accordion accordion-flush" style="background-color: transparent;" id="accordionFlushOutgoing">
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed nav-link" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                      <path
-                        d="M480-564 336-420l51 51 57-57v150h72v-150l57 57 51-51-144-144Zm-264-60v408h528v-408H216Zm0 480q-29.7 0-50.85-21.15Q144-186.3 144-216v-474q0-14 5.25-27T165-741l54-54q11-11 23.94-16 12.94-5 27.06-5h420q14.12 0 27.06 5T741-795l54 54q10.5 11 15.75 24t5.25 27v474q0 29.7-21.15 50.85Q773.7-144 744-144H216Zm6-552h516l-48-48H270l-48 48Zm258 276Z" />
-                    </svg>
-                    <span class="text-link">
-                      Outgoing
-                    </span>
-                  </button>
-                </h2>
-                <div id="flush-collapseTwo" class="accordion-collapse collapse"
-                  data-bs-parent="#accordionFlushOutgoing">
-                  <div class="accordion-body">
-                    <ul>
-                      <li>
-                        <a href="<?= base_url('pages/quotation/index.php?category=outgoing'); ?>"
-                          class="nav-link text-dark">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                            <path
-                              d="M440-200h80v-40h40q17 0 28.5-11.5T600-280v-120q0-17-11.5-28.5T560-440H440v-40h160v-80h-80v-40h-80v40h-40q-17 0-28.5 11.5T360-520v120q0 17 11.5 28.5T400-360h120v40H360v80h80v40ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-480H520ZM240-800v160-160 640-640Z" />
-                          </svg>
-                          <span class="text-link">
-                            Penawaran Harga
-                          </span>
-                        </a>
-                      </li>
-
-                      <li>
-                        <a href="<?= base_url('pages/purchase-orders/index.php?category=outgoing'); ?>"
-                          class="nav-link text-dark">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                            <path
-                              d="m691-150 139-138-42-42-97 95-39-39-42 43 81 81ZM240-600h480v-80H240v80ZM720-40q-83 0-141.5-58.5T520-240q0-83 58.5-141.5T720-440q83 0 141.5 58.5T920-240q0 83-58.5 141.5T720-40ZM120-80v-680q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v267q-19-9-39-15t-41-9v-243H200v562h243q5 31 15.5 59T486-86l-6 6-60-60-60 60-60-60-60 60-60-60-60 60Zm120-200h203q3-21 9-41t15-39H240v80Zm0-160h284q38-37 88.5-58.5T720-520H240v80Zm-40 242v-562 562Z" />
-                          </svg>
-                          <span class="text-link">
-                            Purchase Order
-                          </span>
-                        </a>
-                      </li>
-
-                      <li>
-                        <a href="<?= base_url('pages/invoices/index.php?category=outgoing'); ?>"
-                          class="nav-link text-dark">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                            <path
-                              d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
-                          </svg>
-                          <span class="text-link">
-                            Invoice
-                          </span>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <a href="<?= base_url('pages/quotation/index.php?category=outgoing'); ?>" class="nav-link text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                <path
+                  d="M440-200h80v-40h40q17 0 28.5-11.5T600-280v-120q0-17-11.5-28.5T560-440H440v-40h160v-80h-80v-40h-80v40h-40q-17 0-28.5 11.5T360-520v120q0 17 11.5 28.5T400-360h120v40H360v80h80v40ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-480H520ZM240-800v160-160 640-640Z" />
+              </svg>
+              <span class="text-link">
+                Penawaran Harga Keluar
+              </span>
+            </a>
           </li>
 
-          <!-- Incoming -->
           <li>
-            <div class="accordion accordion-flush" style="background-color: transparent;" id="accordionFlushIncoming">
-              <div class="accordion-item">
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed nav-link" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                      <path
-                        d="m480-276 144-144-51-51-57 57v-150h-72v150l-57-57-51 51 144 144ZM216-624v408h528v-408H216Zm0 480q-29.7 0-50.85-21.15Q144-186.3 144-216v-474q0-14 5.25-27T165-741l54-54q11-11 23.94-16 12.94-5 27.06-5h420q14.12 0 27.06 5T741-795l54 54q10.5 11 15.75 24t5.25 27v474q0 29.7-21.15 50.85Q773.7-144 744-144H216Zm6-552h516l-48-48H270l-48 48Zm258 276Z" />
-                    </svg>
-                    <span class="text-link">
-                      Incoming
-                    </span>
-                  </button>
-                </h2>
-                <div id="flush-collapseThree" class="accordion-collapse collapse"
-                  data-bs-parent="#accordionFlushIncoming">
-                  <div class="accordion-body">
-                    <ul>
-                      <li>
-                        <a href="<?= base_url('pages/quotation/index.php?category=incoming'); ?>"
-                          class="nav-link text-dark">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                            <path
-                              d="M440-200h80v-40h40q17 0 28.5-11.5T600-280v-120q0-17-11.5-28.5T560-440H440v-40h160v-80h-80v-40h-80v40h-40q-17 0-28.5 11.5T360-520v120q0 17 11.5 28.5T400-360h120v40H360v80h80v40ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-480H520ZM240-800v160-160 640-640Z" />
-                          </svg>
-                          <span class="text-link">
-                            Penawaran Harga
-                          </span>
-                        </a>
-                      </li>
-
-                      <li>
-                        <a href="<?= base_url('pages/purchase-orders/index.php?category=incoming'); ?>"
-                          class="nav-link text-dark">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                            <path
-                              d="m691-150 139-138-42-42-97 95-39-39-42 43 81 81ZM240-600h480v-80H240v80ZM720-40q-83 0-141.5-58.5T520-240q0-83 58.5-141.5T720-440q83 0 141.5 58.5T920-240q0 83-58.5 141.5T720-40ZM120-80v-680q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v267q-19-9-39-15t-41-9v-243H200v562h243q5 31 15.5 59T486-86l-6 6-60-60-60 60-60-60-60 60-60-60-60 60Zm120-200h203q3-21 9-41t15-39H240v80Zm0-160h284q38-37 88.5-58.5T720-520H240v80Zm-40 242v-562 562Z" />
-                          </svg>
-                          <span class="text-link">
-                            Purchase Order
-                          </span>
-                        </a>
-                      </li>
-
-                      <li>
-                        <a href="<?= base_url('pages/invoices/index.php?category=incoming'); ?>"
-                          class="nav-link text-dark">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
-                            <path
-                              d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
-                          </svg>
-                          <span class="text-link">
-                            Invoice
-                          </span>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <a href="<?= base_url('pages/quotation/index.php?category=incoming'); ?>" class="nav-link text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                <path
+                  d="M440-200h80v-40h40q17 0 28.5-11.5T600-280v-120q0-17-11.5-28.5T560-440H440v-40h160v-80h-80v-40h-80v40h-40q-17 0-28.5 11.5T360-520v120q0 17 11.5 28.5T400-360h120v40H360v80h80v40ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-480H520ZM240-800v160-160 640-640Z" />
+              </svg>
+              <span class="text-link">
+                Penawaran Harga Masuk
+              </span>
+            </a>
           </li>
 
+          <li>
+            <a href="<?= base_url('pages/purchase-orders/index.php?category=outgoing'); ?>" class="nav-link text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                <path
+                  d="m691-150 139-138-42-42-97 95-39-39-42 43 81 81ZM240-600h480v-80H240v80ZM720-40q-83 0-141.5-58.5T520-240q0-83 58.5-141.5T720-440q83 0 141.5 58.5T920-240q0 83-58.5 141.5T720-40ZM120-80v-680q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v267q-19-9-39-15t-41-9v-243H200v562h243q5 31 15.5 59T486-86l-6 6-60-60-60 60-60-60-60 60-60-60-60 60Zm120-200h203q3-21 9-41t15-39H240v80Zm0-160h284q38-37 88.5-58.5T720-520H240v80Zm-40 242v-562 562Z" />
+              </svg>
+              <span class="text-link">
+                Purchase Order Keluar
+              </span>
+            </a>
+          </li>
+
+          <li>
+            <a href="<?= base_url('pages/purchase-orders/index.php?category=incoming'); ?>" class="nav-link text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                <path
+                  d="m691-150 139-138-42-42-97 95-39-39-42 43 81 81ZM240-600h480v-80H240v80ZM720-40q-83 0-141.5-58.5T520-240q0-83 58.5-141.5T720-440q83 0 141.5 58.5T920-240q0 83-58.5 141.5T720-40ZM120-80v-680q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v267q-19-9-39-15t-41-9v-243H200v562h243q5 31 15.5 59T486-86l-6 6-60-60-60 60-60-60-60 60-60-60-60 60Zm120-200h203q3-21 9-41t15-39H240v80Zm0-160h284q38-37 88.5-58.5T720-520H240v80Zm-40 242v-562 562Z" />
+              </svg>
+              <span class="text-link">
+                Purchase Order Masuk
+              </span>
+            </a>
+          </li>
+
+          <li>
+            <a href="<?= base_url('pages/invoices/index.php?category=outgoing'); ?>" class="nav-link text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                <path
+                  d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
+              </svg>
+              <span class="text-link">
+                Invoice Keluar
+              </span>
+            </a>
+          </li>
+
+          <li>
+            <a href="<?= base_url('pages/invoices/index.php?category=incoming'); ?>" class="nav-link text-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                <path
+                  d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm440 240H120q-33 0-56.5-23.5T40-240v-440h80v440h680v80ZM280-400v-320 320Z" />
+              </svg>
+              <span class="text-link">
+                Invoice Masuk
+              </span>
+            </a>
+          </li>
           <li>
             <a href="<?= base_url('pages/activity-log/index.php'); ?>" class="nav-link text-dark">
               <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">

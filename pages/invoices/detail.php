@@ -1,5 +1,10 @@
 <?php
-$page_title = "Detail Invoice";
+// Ambil nilai kategori dari parameter URL
+$category_param = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Atur judul halaman berdasarkan kategori
+$page_title = $category_param === 'outgoing' ? 'Detail Invoice Outgoing' : 'Detail Invoice Incoming';
+
 require '../../includes/header.php';
 
 // Tampilkan pesan sukses jika ada
@@ -20,13 +25,13 @@ if (isset($_SESSION['error_message'])) {
   unset($_SESSION['error_message']);
 }
 
-// Variabel untuk menyimpan data penawaran harga dan detail
+// Variabel untuk menyimpan data faktur dan detail
 $data_faktur = [];
 $data_faktur_detail = [];
 $signatureDetails = []; // Array untuk menyimpan detail signature info
 $error_message = '';
 
-// Ambil Data Penawaran Harga berdasarkan id
+// Ambil Data faktur berdasarkan id
 if (isset($_GET['id']) && $_GET['id'] !== '') {
   $id_faktur = $_GET['id'];
   $mainTable = 'faktur';
@@ -118,10 +123,23 @@ if ($error_message): ?>
           <div class="col-auto">
             <p>No.</p>
             <p>Tanggal</p>
+            <p>Status</p>
           </div>
           <div class="col-auto">
             <p><?= ": " . strtoupper($data['no_faktur']) ?></p>
-            <p><?= ": " . $data['tanggal'] ?></p>
+            <p><?= ": " . dateID(date('Y-m-d', strtotime($data['tanggal']))) ?></p>
+            <?php
+            // Tentukan kelas bootstrap berdasarkan nilai status
+            $status_class = '';
+            if ($data['status'] == 'draft') {
+                $status_class = 'text-bg-warning';
+            } elseif ($data['status'] == 'belum dibayar') {
+                $status_class = 'text-bg-info';
+            } elseif ($data['status'] == 'dibayar') {
+                $status_class = 'text-bg-success';
+            }
+            ?>
+            <span class="badge <?= $status_class ?>"><?= strtoupper($data['status']) ?></span>
           </div>
         </div>
       </div>
@@ -129,18 +147,13 @@ if ($error_message): ?>
 
     <hr class="row mb-4 border border-secondary border-1 opacity-25">
 
+    <?php if ($category_param == 'outgoing') : ?>
     <div class="row">
       <p class="p-0">Kepada Yth,</p>
       <p class="p-0"><?= strtoupper($data['nama_penerima']) ?></p>
       <p class="p-0"><?= ucwords($data['alamat']) ?></p>
     </div>
-
-    <div class="row mb-3">
-      <div class="col-sm-2 p-0">U.P.</div>
-      <div class="col-auto">
-        <p><?= ": " . ucwords($data['up']) ?></p>
-      </div>
-    </div>
+    <?php endif; ?>
 
     <div class="row">
       <!-- Tampil detail produk -->
@@ -192,23 +205,33 @@ if ($error_message): ?>
             $nilai_ppn = ($subtotal_setelah_diskon * $tarif_ppn) / 100;
             // Hitung total setelah PPN
             $total_setelah_ppn = $subtotal_setelah_diskon + $nilai_ppn;
+            $tampil_subtotal = ($diskon > 0 || $tarif_ppn > 0);
           ?>
+          <?php if ($tampil_subtotal): ?>
           <tr>
-            <td colspan="3" rowspan="4" style="background-color: transparent;"></td>
+            <td colspan="3" style="background-color: transparent;"></td>
             <td colspan="3">Subtotal</td>
             <td colspan="2"><?= formatRupiah($subtotal) ?></td>
           </tr>
+          <?php endif; ?>
+          <?php if ($diskon > 0): ?>
           <tr>
+            <td colspan="3" style="background-color: transparent;"></td>
             <td colspan="2">Diskon</td>
             <td><?= $data['diskon'] . " %" ?></td>
             <td colspan="2"><?= formatRupiah($nilai_diskon) ?></td>
           </tr>
+          <?php endif; ?>
+          <?php if ($tarif_ppn > 0): ?>
           <tr>
+            <td colspan="3" style="background-color: transparent;"></td>
             <td colspan="2">PPN</td>
             <td><?= $data['jenis_ppn'] . "( " . $tarif_ppn . " %)" ?></td>
             <td><?= formatRupiah($nilai_ppn); ?></td>
           </tr>
+          <?php endif; ?>
           <tr>
+            <td colspan="3" style="background-color: transparent;"></td>
             <td colspan="3">Total</td>
             <!-- <td colspan="2">Dari DB: <?= $data['total'] ?></td> -->
             <td colspan="2"><?= formatRupiah($total_setelah_ppn); ?></td>
@@ -222,7 +245,7 @@ if ($error_message): ?>
         <div class="row justify-content-center mb-3">
           <div class="col-auto">
             <?= isset($signatureDetails['Location']) ? ucfirst($signatureDetails['Location']) : '' ?>,
-            <?= isset($signatureDetails['Date']) ? $signatureDetails['Date'] : '' ?>
+            <?= isset($signatureDetails['Date']) ? dateID($signatureDetails['Date']) : '' ?>
           </div>
         </div>
         <div class="row justify-content-center mb-3">

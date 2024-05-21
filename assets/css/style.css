@@ -65,7 +65,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 200px;
+  width: 250px;
   min-width: 50px;
   max-width: 400px;
   height: 100vh;
@@ -75,6 +75,12 @@ body {
   background-size: cover;
   background-position: center; */
   background-image: linear-gradient(0deg, #0077b6 3.6%, #081844 87.6%);
+}
+
+.nav-link.active {
+  font-weight: bold !important;
+  background-color: rgba(0, 0, 0, 0.2);
+  /* Ganti dengan gaya yang diinginkan */
 }
 
 /* Accordion */

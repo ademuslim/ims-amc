@@ -11,6 +11,17 @@ if (isset($_POST['add'])) {
     $diskon = $_POST['diskon'];
     $jenis_ppn = $_POST['jenis_ppn'];
     $grand_total = $_POST['grand_total'];
+    $kategori = $_POST['kategori'];
+
+    // Tentukan $category_param berdasarkan nilai $kategori
+    if ($kategori == "keluar") {
+        $category_param = "outgoing";
+    } elseif ($kategori == "masuk") {
+        $category_param = "incoming";
+    } else {
+        // Berikan penanganan jika nilai kategori tidak valid
+        die("Invalid category");
+    }
 
     // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
     $defaultLogoPath = "";
@@ -173,8 +184,8 @@ if (isset($_POST['add'])) {
                 exit();
             }
         }
-        // Jika berhasil disimpan, arahkan pengguna ke halaman detail
-        header("Location: detail.php?id=" . $id_penawaran);
+         // Jika berhasil disimpan, arahkan pengguna ke halaman detail
+        header("Location: detail.php?category=" . $category_param . "&id=" . $id_penawaran);
         exit();
     } else {
         // Gagal memindahkan file
@@ -193,6 +204,17 @@ if (isset($_POST['add'])) {
     $up = strtolower($_POST['up']);
     $diskon = isset($_POST['diskon']) ? $_POST['diskon'] : 0;
     $jenis_ppn = $_POST['jenis_ppn'];
+    $kategori = $_POST['kategori'];
+
+    // Tentukan $category_param berdasarkan nilai $kategori
+    if ($kategori == "keluar") {
+        $category_param = "outgoing";
+    } elseif ($kategori == "masuk") {
+        $category_param = "incoming";
+    } else {
+        // Berikan penanganan jika nilai kategori tidak valid
+        die("Invalid category");
+    }
 
     // Variabel untuk menyimpan path logo
     $logoPath = '';
@@ -273,7 +295,6 @@ if (isset($_POST['add'])) {
 
     // Bangun data untuk pembaruan penawaran_harga
     $data = [
-        // 'id_penawaran' => $id_penawaran,
         'id_pengirim' => $pengirim,
         'no_penawaran' => $no_penawaran,
         'tanggal' => $tanggal,
@@ -399,7 +420,7 @@ if (isset($_POST['add'])) {
     // echo "Operasi tambah dan ubah data selesai.";
 
     // Redirect ke halaman detail setelah proses edit selesai
-    header("Location: detail.php?id=$id_penawaran");
+    header("Location: detail.php?category=" . $category_param . "&id=" . $id_penawaran);
     exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php

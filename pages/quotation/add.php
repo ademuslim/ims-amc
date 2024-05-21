@@ -1,6 +1,20 @@
 <?php
-$page_title = "Add Quotation";
+// Ambil nilai kategori dari parameter URL
+$category_param = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Atur judul halaman berdasarkan kategori
+$page_title = $category_param === 'outgoing' ? 'Add Quotation Outgoing' : 'Add Quotation Incoming';
+
 require '../../includes/header.php';
+
+// Validasi nilai kategori dan atur nilai deskriptif
+if ($category_param === 'outgoing') {
+    $category = 'keluar';
+} elseif ($category_param === 'incoming') {
+    $category = 'masuk';
+} else {
+    die("Kategori tidak valid");
+}
 
 // Tampilkan pesan sukses jika ada
 if (isset($_SESSION['success_message'])) {
@@ -28,6 +42,7 @@ $defaultSignaturePath = "";
 $order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
 $limit = "1"; // Ambil hanya 1 hasil
 $data = selectData("penawaran_harga", "", $order_by, $limit);
+
 // Jika data ditemukan, ambil path logo dan signature
 if (!empty($data)) {
   $defaultLogoPath = $data[0]["logo"];
@@ -55,6 +70,8 @@ if (!empty($data)) {
 <h1 class="fs-5 mb-4">Buat Penawaran Harga Baru</h1>
 <div class="paper-wrapper">
   <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+    <!-- Input kategori -->
+    <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
     <div class="container">
       <div class="row">
         <!-- Input Logo -->
@@ -100,15 +117,21 @@ if (!empty($data)) {
             <div class="col-sm-9">
               <select class="form-select form-select-sm" id="pengirim" name="pengirim" required>
                 <?php
-                  $kontak_internal = selectData("kontak_internal");
-                  foreach ($kontak_internal as $row_pengirim) {
-                    $selected = ""; // variabel untuk menentukan apakah opsi saat ini harus dipilih
-                    // Tentukan pengirim mana yang akan menjadi default
-                    if ($row_pengirim['nama_pengirim'] == "pt. mitra tehno gemilang") {
-                      $selected = "selected";
-                    }
-                    echo '<option value="' . $row_pengirim['id_pengirim'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_pengirim']) . '</option>';
+                // Tambahkan opsi kosong untuk mencegah opsi terpilih secara otomatis pada 'incoming'
+                if ($category_param == 'incoming') {
+                  echo '<option value="" selected disabled>Pilih pengirim</option>';
+                }
+
+                $kontak_internal = selectData("kontak_internal");
+                foreach ($kontak_internal as $row_pengirim) {
+                  $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
+
+                  // Tentukan pengirim mana yang akan menjadi default berdasarkan kategori
+                  if ($category_param == 'outgoing' && $row_pengirim['nama_pengirim'] == "pt. mitra tehno gemilang") {
+                    $selected = "selected";
                   }
+                  echo '<option value="' . $row_pengirim['id_pengirim'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_pengirim']) . '</option>';
+                }
                 ?>
               </select>
               <div class="invalid-feedback">
@@ -120,6 +143,8 @@ if (!empty($data)) {
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
+            <!-- input no invoice outgoing -->
+            <?php if ($category_param == 'outgoing') { ?>
             <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
               <input type="text" class="form-control form-control-sm" id="no_penawaran" name="no_penawaran" readonly
@@ -128,6 +153,17 @@ if (!empty($data)) {
                 Sistem error, nomor penawaran gagal dimuat.
               </div>
             </div>
+
+            <!-- input no invoice incoming -->
+            <?php } elseif ($category_param == 'incoming') { ?>
+            <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control form-control-sm" name="no_penawaran" required>
+              <div class="invalid-feedback">
+                No penawaran harga tidak boleh kosong.
+              </div>
+            </div>
+            <?php } ?>
           </div>
 
           <div class="row mb-3">
@@ -149,18 +185,38 @@ if (!empty($data)) {
           <div class="row mb-3">
             <label for="penerima" class="col-sm-3 col-form-label">Penerima</label>
             <div class="col-sm-9">
+              <?php if ($category_param == 'incoming') {
+                // Panggil fungsi selectData untuk mengambil data pelanggan
+                $pelanggan = selectData("pelanggan", "nama_pelanggan = 'pt. mitra tehno gemilang'", "", "", array());
+
+                // Periksa apakah ada hasil dari query
+                if (!empty($pelanggan)) {
+                  // Jika ada hasil, ambil ID pelanggan pertama dari hasil query
+                  $id_pelanggan_mitra = $pelanggan[0]['id_pelanggan'];
+                } else {
+                  // Jika tidak ada hasil, atur ID pelanggan menjadi kosong atau sesuai kebutuhan
+                  $id_pelanggan_mitra = "";
+                } 
+              ?>
+              <!-- Jika kategori adalah 'incoming', gunakan input tersembunyi untuk menyimpan ID pelanggan -->
+              <input type="hidden" id="penerima" name="penerima" value="<?= $id_pelanggan_mitra ?>">
+              <input type="text" class="form-control form-control-sm" value="PT. Mitra Tehno Gemilang" readonly>
+
+              <?php } elseif ($category_param == 'outgoing') { ?>
+              <!-- Jika kategori adalah 'outgoing', tampilkan dropdown untuk memilih pelanggan -->
               <select class="form-select form-select-sm" id="penerima" name="penerima" required>
                 <option value="" selected disabled>-- Pilih Penerima --</option>
                 <?php
-                $pelanggan = selectData("pelanggan");
-                foreach ($pelanggan as $row_penerima) {
-                  echo '<option value="' . $row_penerima['id_pelanggan'] . '">' . ucwords($row_penerima['nama_pelanggan']) . '</option>';
-                }
+              $pelanggan = selectData("pelanggan");
+              foreach ($pelanggan as $row_penerima) {
+                echo '<option value="' . $row_penerima['id_pelanggan'] . '">' . ucwords($row_penerima['nama_pelanggan']) . '</option>';
+              }
               ?>
               </select>
               <div class="invalid-feedback">
                 Harap pilih penerima.
               </div>
+              <?php } ?>
             </div>
           </div>
         </div>

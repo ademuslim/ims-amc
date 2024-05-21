@@ -1,5 +1,10 @@
 <?php
-$page_title = "Detail Quotation";
+// Ambil nilai kategori dari parameter URL
+$category_param = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Atur judul halaman berdasarkan kategori
+$page_title = $category_param === 'outgoing' ? 'Detail Quotation Outgoing' : 'Detail Quotation Incoming';
+
 require '../../includes/header.php';
 
 // Tampilkan pesan sukses jika ada
@@ -118,10 +123,25 @@ if ($error_message): ?>
           <div class="col-auto">
             <p>No.</p>
             <p>Tanggal</p>
+            <p>Status</p>
           </div>
           <div class="col-auto">
             <p><?= ": " . strtoupper($data['no_penawaran']) ?></p>
-            <p><?= ": " . $data['tanggal'] ?></p>
+            <p><?= ": " . dateID(date('Y-m-d', strtotime($data['tanggal']))) ?></p>
+            <?php
+            // Tentukan kelas bootstrap berdasarkan nilai status
+            $status_class = '';
+            if ($data['status'] == 'draft') {
+                $status_class = 'text-bg-warning';
+            } elseif ($data['status'] == 'terkirim') {
+                $status_class = 'text-bg-info';
+            } elseif ($data['status'] == 'ditolak') {
+                $status_class = 'text-bg-danger';
+            } elseif ($data['status'] == 'dibayar') {
+                $status_class = 'text-bg-success';
+            }
+            ?>
+            <span class="badge <?= $status_class ?>"><?= strtoupper($data['status']) ?></span>
           </div>
         </div>
       </div>
@@ -129,11 +149,13 @@ if ($error_message): ?>
 
     <hr class="row mb-4 border border-secondary border-1 opacity-25">
 
+    <?php if ($category_param == 'outgoing') : ?>
     <div class="row">
       <p class="p-0">Kepada Yth,</p>
       <p class="p-0"><?= strtoupper($data['nama_penerima']) ?></p>
       <p class="p-0"><?= ucwords($data['alamat']) ?></p>
     </div>
+    <?php endif; ?>
 
     <div class="row mb-3">
       <div class="col-sm-2 p-0">U.P.</div>
@@ -249,7 +271,7 @@ if ($error_message): ?>
         <div class="row justify-content-center mb-3">
           <div class="col-auto">
             <?= isset($signatureDetails['Location']) ? ucfirst($signatureDetails['Location']) : '' ?>,
-            <?= isset($signatureDetails['Date']) ? $signatureDetails['Date'] : '' ?>
+            <?= isset($signatureDetails['Date']) ? dateID($signatureDetails['Date']) : '' ?>
           </div>
         </div>
         <div class="row justify-content-center mb-3">

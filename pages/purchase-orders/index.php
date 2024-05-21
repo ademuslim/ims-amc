@@ -1,6 +1,20 @@
 <?php
-$page_title = "Purchase Orders";
+// Ambil nilai kategori dari parameter URL
+$category_param = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Atur judul halaman berdasarkan kategori
+$page_title = $category_param === 'outgoing' ? 'PO Outgoing' : 'PO Incoming';
+
 require '../../includes/header.php';
+
+// Validasi nilai kategori dan atur nilai deskriptif
+if ($category_param === 'outgoing') {
+    $category = 'keluar';
+} elseif ($category_param === 'incoming') {
+    $category = 'masuk';
+} else {
+    die("Kategori tidak valid");
+}
 
 $mainTable = 'pesanan_pembelian';
 $joinTables = [
@@ -13,7 +27,7 @@ $joinTables = [
 $columns = 'pesanan_pembelian.*, kontak_internal.nama_pengirim AS nama_pengirim, pelanggan.nama_pelanggan AS nama_penerima, ppn.jenis_ppn AS jenis_ppn';
 
 // Kondisi tambahan untuk seleksi data (opsional)
-$conditions = "";
+$conditions = "pesanan_pembelian.kategori = '$category'";
 
 // Klausa ORDER BY
 $orderBy = 'pesanan_pembelian.tanggal DESC';
@@ -24,7 +38,8 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Purchase Order</h1>
-  <a href="add.php" class="btn btn-primary btn-lg btn-icon btn-add">Buat Purchase Order</a>
+  <a href="add.php?category=<?= $category_param ?>" class="btn btn-primary btn-lg btn-icon btn-add">Buat Purchase
+    Order</a>
 </div>
 <table id="example" class="table nowrap table-hover" style="width:100%">
   <thead>
@@ -38,6 +53,7 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
       <th>Total</th>
       <th>PPN</th>
       <th>Diskon</th>
+      <th>Status</th>
       <th>Pengirim</th>
       <th>Catatan</th>
       <th>Aksi</th>
@@ -50,25 +66,41 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
     </tr>
     <?php else : ?>
     <?php $no = 1; ?>
-    <?php foreach ($data_pesanan_pembelian as $ph) : ?>
+    <?php foreach ($data_pesanan_pembelian as $po) : ?>
     <tr>
       <td class="text-start"><?= $no; ?></td>
-      <!-- <td><?= $ph['id_pesanan']; ?></td> -->
-      <td><?= strtoupper($ph['no_pesanan']); ?></td>
-      <td><?= dateID($ph['tanggal']); ?></td>
-      <td><?= ucwords($ph['nama_penerima']); ?></td>
-      <td><?= ucwords($ph['up']); ?></td>
-      <td><?= $ph['total']; ?></td>
-      <td><?= ucwords($ph['jenis_ppn']); ?></td>
-      <td><?= $ph['diskon']; ?></td>
-      <td><img class="me-3" src="<?= base_url($ph['logo']); ?>" alt="Logo"
-          width="50"><?= ucwords($ph['nama_pengirim']); ?></td>
-      <td><?= ucfirst($ph['catatan']); ?></td>
+      <!-- <td><?= $po['id_pesanan']; ?></td> -->
+      <td><?= strtoupper($po['no_pesanan']); ?></td>
+      <td><?= dateID($po['tanggal']); ?></td>
+      <td><?= ucwords($po['nama_penerima']); ?></td>
+      <td><?= ucwords($po['up']); ?></td>
+      <td><?= $po['total']; ?></td>
+      <td><?= ucwords($po['jenis_ppn']); ?></td>
+      <td><?= $po['diskon']; ?></td>
+      <td>
+        <?php
+        // Tentukan kelas bootstrap berdasarkan nilai status
+        $status_class = '';
+        if ($po['status'] == 'draft') {
+            $status_class = 'text-bg-warning';
+        } elseif ($po['status'] == 'terkirim' || $po['status'] == 'diproses') {
+            $status_class = 'text-bg-info';
+        } elseif ($po['status'] == 'selesai') {
+            $status_class = 'text-bg-success';
+        }
+        ?>
+        <span class="badge <?= $status_class ?>"><?= strtoupper($po['status']) ?></span>
+      </td>
+      <td><img class="me-3" src="<?= base_url($po['logo']); ?>" alt="Logo"
+          width="50"><?= ucwords($po['nama_pengirim']); ?></td>
+      <td><?= ucfirst($po['catatan']); ?></td>
       <td>
         <div class="btn-group">
-          <a href="detail.php?id=<?= $ph['id_pesanan']; ?>" class="btn-act btn-view" title="Lihat Detail"></a>
-          <a href="edit.php?id=<?= $ph['id_pesanan']; ?>" class="btn-act btn-edit" title="Ubah Data"></a>
-          <a href="del.php?id=<?= $ph['id_pesanan']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
+          <a href="detail.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>" class="btn-act btn-view"
+            title="Lihat Detail"></a>
+          <a href="edit.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>" class="btn-act btn-edit"
+            title="Ubah Data"></a>
+          <a href="del.php?id=<?= $po['id_pesanan']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
     </tr>

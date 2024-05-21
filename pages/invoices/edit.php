@@ -1,7 +1,20 @@
 <?php
-// fitur hapus dan tambah detail belum berfungsi
-$page_title = "Edit Invoice";
+// Ambil nilai kategori dari parameter URL
+$category_param = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Atur judul halaman berdasarkan kategori
+$page_title = $category_param === 'outgoing' ? 'Edit Invoice Outgoing' : 'Edit Invoice Incoming';
+
 require '../../includes/header.php';
+
+// Validasi nilai kategori dan atur nilai deskriptif
+if ($category_param === 'outgoing') {
+  $category = 'keluar';
+} elseif ($category_param === 'incoming') {
+  $category = 'masuk';
+} else {
+  die("Kategori tidak valid");
+}
 
 // Notifikasi
 if (isset($_SESSION['success_message'])) {
@@ -80,6 +93,7 @@ if ($error_message): ?>
 <div class="paper-wrapper">
   <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
     <div class="container">
+      <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
       <input type="hidden" name="id_faktur" value="<?= $id_faktur ?>">
       <!-- Input Hidden untuk Mengirim Path Default Logo -->
       <input type="hidden" id="defaultLogoPath" name="defaultLogoPath" value="<?= $defaultLogoPath ?>">
@@ -172,6 +186,25 @@ if ($error_message): ?>
             <div class="row mb-3">
               <label for="penerima" class="col-sm-3 col-form-label">Penerima</label>
               <div class="col-sm-9">
+                <?php if ($category_param == 'incoming') {
+                // Panggil fungsi selectData untuk mengambil data pelanggan
+                $pelanggan = selectData("pelanggan", "nama_pelanggan = 'pt. mitra tehno gemilang'", "", "", array());
+
+                // Periksa apakah ada hasil dari query
+                if (!empty($pelanggan)) {
+                  // Jika ada hasil, ambil ID pelanggan pertama dari hasil query
+                  $id_pelanggan_mitra = $pelanggan[0]['id_pelanggan'];
+                } else {
+                  // Jika tidak ada hasil, atur ID pelanggan menjadi kosong atau sesuai kebutuhan
+                  $id_pelanggan_mitra = "";
+                } 
+              ?>
+                <!-- Jika kategori adalah 'incoming', gunakan input tersembunyi untuk menyimpan ID pelanggan -->
+                <input type="hidden" id="penerima" name="penerima" value="<?= $id_pelanggan_mitra ?>">
+                <input type="text" class="form-control form-control-sm" value="PT. Mitra Tehno Gemilang" readonly>
+
+                <?php } elseif ($category_param == 'outgoing') { ?>
+                <!-- Jika kategori adalah 'outgoing', tampilkan dropdown untuk ubah pelanggan -->
                 <select class="form-select form-select-sm" id="penerima" name="penerima" required>
                   <?php
                   $pelanggan = selectData("pelanggan");
@@ -184,20 +217,7 @@ if ($error_message): ?>
                 <div class="invalid-feedback">
                   Harap pilih penerima.
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-5 p-0">
-            <div class="row mb-3">
-              <label for="up" class="col-sm-3 col-form-label">U.P.</label>
-              <div class="col-sm-9">
-                <input type="text" class="form-control form-control-sm" id="up" name="up" value="<?= $data['up'] ?>"
-                  required>
-                <div class="invalid-feedback">
-                  Harap masukan U.P. dengan valid.
-                </div>
+                <?php } ?>
               </div>
             </div>
           </div>

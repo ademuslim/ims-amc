@@ -7,19 +7,29 @@ if (isset($_POST['add'])) {
     $tanggal = $_POST['tanggal'];
     $catatan = strtolower($_POST['catatan']);
     $penerima = $_POST['penerima'];
-    $up = strtolower($_POST['up']);
     $diskon = $_POST['diskon'];
     $jenis_ppn = $_POST['jenis_ppn'];
     $grand_total = $_POST['grand_total'];
+    $kategori = $_POST['kategori'];
+
+    // Tentukan $category_param berdasarkan nilai $kategori
+    if ($kategori == "keluar") {
+        $category_param = "outgoing";
+    } elseif ($kategori == "masuk") {
+        $category_param = "incoming";
+    } else {
+        // Berikan penanganan jika nilai kategori tidak valid
+        die("Invalid category");
+    }
 
     // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
     $defaultLogoPath = "";
     $defaultSignaturePath = "";
 
-    // Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel faktur
+    // Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel penawaran
     $order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
     $limit = "1"; // Ambil hanya 1 hasil
-    $data = selectData("faktur", "", $order_by, $limit);
+    $data = selectData("penawaran_harga", "", $order_by, $limit);
 
     // Jika data ditemukan, ambil path logo dan signature
     if (!empty($data)) {
@@ -115,7 +125,7 @@ if (isset($_POST['add'])) {
     // Susun data signature info sebagai string
     $signature_info = "Location: $signing_location, Date: $signing_date, Name: $signer_name, Position: $signer_position, Path: $file_destination_signature";
 
-    // Buat ID penawaran baru
+    // Buat ID faktur baru
     $id_faktur = Ramsey\Uuid\Uuid::uuid4()->toString();
 
     $data = [
@@ -125,12 +135,13 @@ if (isset($_POST['add'])) {
         'tanggal' => $tanggal,
         'catatan' => $catatan,
         'id_penerima' => $penerima,
-        'up' => $up,
         'diskon' => $diskon,
         'id_ppn' => $jenis_ppn,
         'total' => $grand_total,
         'logo' => $file_destination_logo,
-        'signature_info' => $signature_info
+        'signature_info' => $signature_info,
+        'kategori' => $kategori,
+        'status' => 'draft'
     ];
 
     // Lakukan insert data
@@ -174,7 +185,7 @@ if (isset($_POST['add'])) {
             }
         }
         // Jika berhasil disimpan, arahkan pengguna ke halaman detail
-        header("Location: detail.php?id=" . $id_faktur);
+        header("Location: detail.php?category=" . $category_param . "&id=" . $id_faktur);
         exit();
     } else {
         // Gagal memindahkan file
@@ -182,7 +193,6 @@ if (isset($_POST['add'])) {
     }
 // Edit Data
 } elseif (isset($_POST['edit'])) {
-    // Ambil nilai Data Faktur
     $id_faktur = $_POST['id_faktur'];
     $pengirim = $_POST['pengirim'];
     $tanggal = $_POST['tanggal'];
@@ -190,9 +200,19 @@ if (isset($_POST['add'])) {
     $total = $_POST['grand_total'];
     $catatan = strtolower($_POST['catatan']);
     $penerima = $_POST['penerima'];
-    $up = strtolower($_POST['up']);
     $diskon = isset($_POST['diskon']) ? $_POST['diskon'] : 0;
     $jenis_ppn = $_POST['jenis_ppn'];
+    $kategori = $_POST['kategori'];
+
+    // Tentukan $category_param berdasarkan nilai $kategori
+    if ($kategori == "keluar") {
+        $category_param = "outgoing";
+    } elseif ($kategori == "masuk") {
+        $category_param = "incoming";
+    } else {
+        // Berikan penanganan jika nilai kategori tidak valid
+        die("Invalid category");
+    }
 
     // Variabel untuk menyimpan path logo
     $logoPath = '';
@@ -273,14 +293,12 @@ if (isset($_POST['add'])) {
 
     // Bangun data untuk pembaruan faktur
     $data = [
-        // 'id_faktur' => $id_faktur,
         'id_pengirim' => $pengirim,
         'no_faktur' => $no_faktur,
         'tanggal' => $tanggal,
         'total' => $total,
         'catatan' => $catatan,
         'id_penerima' => $penerima,
-        'up' => $up,
         'diskon' => $diskon,
         'id_ppn' => $jenis_ppn,
         'logo' => $logoPath, // tambahkan lokasi file logo ke dalam data yang akan diupdate
@@ -399,7 +417,7 @@ if (isset($_POST['add'])) {
     // echo "Operasi tambah dan ubah data selesai.";
 
     // Redirect ke halaman detail setelah proses edit selesai
-    header("Location: detail.php?id=$id_faktur");
+    header("Location: detail.php?category=" . $category_param . "&id=" . $id_faktur);
     exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php

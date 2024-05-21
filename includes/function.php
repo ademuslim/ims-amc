@@ -33,18 +33,17 @@ function dateID($date) {
     return $dateFormatted;
 }
 
-
 // Fungsi aktif link
 function setActivePage($page) {
-  $current_page = $_SERVER['REQUEST_URI'];
-  $active_class = '';
+    $current_page = $_SERVER['REQUEST_URI'];
+    $active_class = '';
 
-  // Periksa apakah halaman saat ini mengandung string yang sesuai dengan halaman yang ditentukan
-  if (str_contains($current_page, $page)) {
-      $active_class = 'class="active"';
-  }
+    // Periksa apakah halaman saat ini mengandung string yang sesuai dengan halaman yang ditentukan
+    if (strpos($current_page, $page) !== false) {
+        $active_class = 'active';
+    }
 
-  return $active_class;
+    return $active_class;
 }
 
 // Fungsi mengarahkan pengguna
@@ -456,7 +455,7 @@ function getLastDocumentNumber($tabel, $column, $order_by, $prefix, $suffix, $mo
 
   // Query untuk mengambil nomor dokumen terbaru dari tabel tertentu berdasarkan kolom tertentu
   // dan berdasarkan bulan dan tahun yang disediakan
-  $query = "SELECT $column FROM $tabel WHERE YEAR($order_by) = $year AND MONTH($order_by) = $month ORDER BY $column DESC LIMIT 1";
+  $query = "SELECT $column FROM $tabel WHERE YEAR($order_by) = $year AND MONTH($order_by) = $month AND kategori = 'keluar' ORDER BY $column DESC LIMIT 1";
 
   // Eksekusi query
   $result = mysqli_query($conn, $query);
