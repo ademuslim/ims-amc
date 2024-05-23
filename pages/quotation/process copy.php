@@ -3,7 +3,7 @@ require '../../includes/function.php';
 require '../../includes/vendor/autoload.php';
 if (isset($_POST['add'])) {
     $pengirim = $_POST['pengirim'];
-    $no_pesanan = strtolower($_POST['no_po']);
+    $no_penawaran = strtolower($_POST['no_penawaran']);
     $tanggal = $_POST['tanggal'];
     $catatan = strtolower($_POST['catatan']);
     $penerima = $_POST['penerima'];
@@ -27,6 +27,7 @@ if (isset($_POST['add'])) {
         if (!empty($data)) {
             $defaultLogoPath = $data[0]["logo"];
             $signature_info = $data[0]["signature_info"];
+        
             // Pisahkan data signature_info berdasarkan koma (,) untuk mendapatkan setiap elemen
             $signature_info_parts = explode(", ", $signature_info);
         
@@ -122,13 +123,13 @@ if (isset($_POST['add'])) {
     // Susun data signature info sebagai string
     $signature_info = "Location: $signing_location, Date: $signing_date, Name: $signer_name, Position: $signer_position, Path: $file_destination_signature";
 
-    // Buat ID PO baru
-    $id_pesanan = Ramsey\Uuid\Uuid::uuid4()->toString();
+    // Buat ID penawaran baru
+    $id_penawaran = Ramsey\Uuid\Uuid::uuid4()->toString();
 
     $data = [
-        'id_pesanan' => $id_pesanan,
+        'id_penawaran' => $id_penawaran,
         'id_pengirim' => $pengirim,
-        'no_pesanan' => $no_pesanan,
+        'no_penawaran' => $no_penawaran,
         'tanggal' => $tanggal,
         'catatan' => $catatan,
         'id_penerima' => $penerima,
@@ -143,9 +144,9 @@ if (isset($_POST['add'])) {
     ];
 
     // Lakukan insert data
-    $result = insertData('pesanan_pembelian', $data);
+    $result = insertData('penawaran_harga', $data);
 
-    // Lanjut insert data detail jika insert data po berhasil
+    // Lanjut insert data detail jika insert data penawaran_harga berhasil
     function unformatRupiah($rupiah) {
         return (int) preg_replace('/[^0-9]/', '', $rupiah);
     }
@@ -154,28 +155,26 @@ if (isset($_POST['add'])) {
         $id_produk = $_POST['id_produk'];
         $jumlah = $_POST['jumlah'];
         $harga_satuan = $_POST['harga_satuan'];
-        $id_penawaran = $_POST['id_penawaran'];
 
         // Loop untuk menyimpan setiap detail produk ke dalam database
         for ($i = 0; $i < count($id_produk); $i++) {
-            // Generate UUID untuk id_detail_pesanan
-            $id_detail_pesanan = Ramsey\Uuid\Uuid::uuid4()->toString();
+            // Generate UUID untuk id_detail_penawaran
+            $id_detail_penawaran = Ramsey\Uuid\Uuid::uuid4()->toString();
 
             // Unformat harga satuan sebelum menyimpan ke database
             $harga_satuan_unformatted = unformatRupiah($harga_satuan[$i]);
 
             // Data untuk disimpan
             $detail_produk = [
-                'id_detail_pesanan' => $id_detail_pesanan,
-                'id_pesanan' => $id_pesanan,
+                'id_detail_penawaran' => $id_detail_penawaran,
+                'id_penawaran' => $id_penawaran,
                 'id_produk' => $id_produk[$i], // Menggunakan indeks yang sama untuk setiap array
                 'jumlah' => $jumlah[$i], // Menggunakan indeks yang sama untuk setiap array
-                'harga_satuan' => $harga_satuan_unformatted, // Menggunakan nilai unformat untuk harga satuan
-                'id_penawaran' => $id_penawaran
+                'harga_satuan' => $harga_satuan_unformatted // Menggunakan nilai unformat untuk harga satuan
             ];
 
             // Insert data detail produk ke dalam database
-            $detail_result = insertData('detail_pesanan', $detail_produk);
+            $detail_result = insertData('detail_penawaran', $detail_produk);
 
             // Jika gagal menyimpan,
             if (!$detail_result) {
@@ -184,8 +183,8 @@ if (isset($_POST['add'])) {
                 exit();
             }
         }
-        // Jika berhasil disimpan, arahkan pengguna ke halaman detail
-        header("Location: detail.php?category=" . $category_param . "&id=" . $id_pesanan);
+         // Jika berhasil disimpan, arahkan pengguna ke halaman detail
+        header("Location: detail.php?category=" . $category_param . "&id=" . $id_penawaran);
         exit();
     } else {
         // Gagal memindahkan file
@@ -193,10 +192,11 @@ if (isset($_POST['add'])) {
     }
 // Edit Data
 } elseif (isset($_POST['edit'])) {
-    $id_pesanan = $_POST['id_pesanan'];
+    // Ambil nilai Data Penawaran
+    $id_penawaran = $_POST['id_penawaran'];
     $pengirim = $_POST['pengirim'];
     $tanggal = $_POST['tanggal'];
-    $no_pesanan = strtolower($_POST['no_po']);
+    $no_penawaran = strtolower($_POST['no_penawaran']);
     $total = $_POST['grand_total'];
     $catatan = strtolower($_POST['catatan']);
     $penerima = $_POST['penerima'];
@@ -292,10 +292,10 @@ if (isset($_POST['add'])) {
     $signatureInfo = "Location: " . $_POST['signing_location'] . ", Date: " . $_POST['signing_date'] . ", Name: " . $_POST['signer_name'] . ", Position: " . $_POST['signer_position'] . ", Path: " . $signaturePath;
 
 
-    // Bangun data untuk pembaruan po
+    // Bangun data untuk pembaruan penawaran_harga
     $data = [
         'id_pengirim' => $pengirim,
-        'no_pesanan' => $no_pesanan,
+        'no_penawaran' => $no_penawaran,
         'tanggal' => $tanggal,
         'total' => $total,
         'catatan' => $catatan,
@@ -307,15 +307,15 @@ if (isset($_POST['add'])) {
         'signature_info' => $signatureInfo
     ];
     
-    $conditions = "id_pesanan = '$id_pesanan'";
+    $conditions = "id_penawaran = '$id_penawaran'";
 
-    $result = updateData('pesanan_pembelian', $data, $conditions);
+    $result = updateData('penawaran_harga', $data, $conditions);
 
-    // Periksa apakah pembaruan pesanan_harga berhasil
+    // Periksa apakah pembaruan penawaran_harga berhasil
     if (!$result) {
         // Jika gagal, tampilkan pesan kesalahan atau arahkan pengguna kembali ke halaman edit
-        $_SESSION['error_message'] = "Gagal memperbarui pesanan harga.";
-        // header("Location: edit.php?id=$id_pesanan");
+        $_SESSION['error_message'] = "Gagal memperbarui penawaran harga.";
+        // header("Location: edit.php?id=$id_penawaran");
         exit();
     }
     
@@ -324,8 +324,8 @@ if (isset($_POST['add'])) {
     function unformatRupiah($rupiah) {
         return (int) preg_replace('/[^0-9]/', '', $rupiah);
     }
-    // Peroleh nilai-nilai dari detail pesanan
-    $id_detail = $_POST['id_detail_pesanan'];
+    // Peroleh nilai-nilai dari detail penawaran
+    $id_detail = $_POST['id_detail_penawaran'];
     $id_produk = $_POST['id_produk'];
     $jumlah = $_POST['jumlah'];
     $harga_satuan = $_POST['harga_satuan'];
@@ -335,7 +335,7 @@ if (isset($_POST['add'])) {
     $all_details = [];
     foreach ($id_detail as $index => $detail_id) {
         $all_details[] = [
-            'id_detail_pesanan' => $detail_id,
+            'id_detail_penawaran' => $detail_id,
             'id_produk' => $id_produk[$index],
             'jumlah' => $jumlah[$index],
             'harga_satuan' => unformatRupiah($harga_satuan[$index])
@@ -358,9 +358,9 @@ if (isset($_POST['add'])) {
 
     // Hapus baris yang ada dalam deleted_rows
     foreach ($deleted_rows as $deleted_row) {
-        // Hanya hapus baris jika id_detail_pesanan tidak mengandung "newId" di awal id-nya
+        // Hanya hapus baris jika id_detail_penawaran tidak mengandung "newId" di awal id-nya
         if (strpos($deleted_row, "newId") !== 0) {
-            deleteData('detail_pesanan', "id_detail_pesanan = '$deleted_row'");
+            deleteData('detail_penawaran', "id_detail_penawaran = '$deleted_row'");
         }
     }
 
@@ -370,8 +370,8 @@ if (isset($_POST['add'])) {
 
     // Kelompokkan detail berdasarkan id
     foreach ($all_details as $detail) {
-        if (strpos($detail['id_detail_pesanan'], "newId") === 0) {
-            // Jika id_detail_pesanan mengandung "newId", itu adalah baris baru
+        if (strpos($detail['id_detail_penawaran'], "newId") === 0) {
+            // Jika id_detail_penawaran mengandung "newId", itu adalah baris baru
             $add_detail[] = $detail;
         } else {
             // Jika tidak, itu adalah baris yang harus diperbarui
@@ -399,10 +399,10 @@ if (isset($_POST['add'])) {
             'jumlah' => $detail['jumlah'],
             'harga_satuan' => $detail['harga_satuan'],
             // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
-            'id_detail_pesanan' => $new_id_detail,
-            'id_pesanan' => $id_pesanan,
+            'id_detail_penawaran' => $new_id_detail,
+            'id_penawaran' => $id_penawaran,
         ];
-        insertData('detail_pesanan', $data);
+        insertData('detail_penawaran', $data);
     }
 
     // Lakukan operasi ubah data
@@ -413,13 +413,13 @@ if (isset($_POST['add'])) {
             'harga_satuan' => $detail['harga_satuan'],
             // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
         ];
-        updateData('detail_pesanan', $data, "id_detail_pesanan = '{$detail['id_detail_pesanan']}'");
+        updateData('detail_penawaran', $data, "id_detail_penawaran = '{$detail['id_detail_penawaran']}'");
     }
 
     // echo "Operasi tambah dan ubah data selesai.";
 
     // Redirect ke halaman detail setelah proses edit selesai
-    header("Location: detail.php?category=" . $category_param . "&id=" . $id_pesanan);
+    header("Location: detail.php?category=" . $category_param . "&id=" . $id_penawaran);
     exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php

@@ -36,6 +36,12 @@
               <input type="number" class="form-control form-control-sm" id="harga" name="harga" min="0" required>
             </div>
           </div>
+          <div class="row mb-3">
+            <label for="keterangan" class="col-sm-3 col-form-label">Keterangan:</label>
+            <div class="col-sm-9">
+              <textarea class="form-control" id="keterangan" name="keterangan" placeholder="Opsional."></textarea>
+            </div>
+          </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -3,48 +3,63 @@ $page_title = "Products";
 require '../../../includes/header.php';
 $data_produk = selectData('produk');
 ?>
-
-<!-- Button add modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-  Tambah Data Produk
-</button>
-
-<!-- Tampil data -->
-<h1>Data Produk</h1>
-
-<table id="example" class="table table-striped nowrap" style="width:100%">
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="fs-5 m-0">Data Produk</h1>
+  <button type="button" class="btn btn-primary btn-lg btn-icon btn-add" data-bs-toggle="modal"
+    data-bs-target="#addModal">
+    Tambah Data Produk
+  </button>
+</div>
+<table id="example" class="table nowrap table-hover" style="width:100%">
   <thead>
     <tr>
       <th>No.</th>
-      <!-- <th>ID Produk</th> -->
       <th>Nomor Produk</th>
       <th>Nama Produk</th>
       <th>Satuan</th>
       <th>Harga</th>
       <th>Status</th>
+      <th>Keterangan</th>
       <th>Aksi</th>
     </tr>
   </thead>
   <tbody>
     <?php if (empty($data_produk)) : ?>
     <tr>
-      <td colspan="7">Tidak ada data</td>
+      <td colspan="8">Tidak ada data</td>
     </tr>
     <?php else : ?>
     <?php $no = 1; ?>
     <?php foreach ($data_produk as $produk) : ?>
     <tr>
       <td class="text-start"><?= $no; ?></td>
-      <!-- <td><?= $produk['id_produk']; ?></td> -->
       <td class="text-primary"><?= strtoupper($produk['no_produk']); ?></td>
       <td><?= ucwords($produk['nama_produk']); ?></td>
       <td><?= strtoupper($produk['satuan']); ?></td>
-      <td><?= $produk['harga']; ?></td>
-      <td><?= ucwords($produk['status']); ?></td>
+      <td><?= "Rp " . $produk['harga']; ?></td>
       <td>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-          data-bs-target="#editModal<?= $produk['id_produk']; ?>">Edit</button>
-        <a href="del.php?id=<?= $produk['id_produk']; ?>" class="btn btn-danger">Hapus</a>
+        <?php
+        // Tentukan kelas bootstrap berdasarkan nilai status
+        $status_class = '';
+        if ($produk['status'] == 'draft') {
+            $status_class = 'text-bg-warning';
+        } elseif ($produk['status'] == 'pending') {
+            $status_class = 'text-bg-info';
+        } elseif ($produk['status'] == 'ditolak') {
+            $status_class = 'text-bg-danger';
+        } elseif ($produk['status'] == 'disetujui') {
+            $status_class = 'text-bg-success';
+        }
+        ?>
+        <span class="badge <?= $status_class ?>"><?= ucwords($produk['status']); ?></span>
+      </td>
+      <td><?= ucwords($produk['keterangan']) ?></td>
+      <td>
+        <div class="btn-group">
+          <button type="button" class="btn-act btn-edit bg-transparent" data-bs-toggle="modal"
+            data-bs-target="#editModal<?= $produk['id_produk']; ?>" title="Ubah Data"></button>
+          <a href="del.php?id=<?= $produk['id_produk']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
+        </div>
       </td>
     </tr>
 

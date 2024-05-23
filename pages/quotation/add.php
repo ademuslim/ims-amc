@@ -1,68 +1,48 @@
 <?php
-// Ambil nilai kategori dari parameter URL
-$category_param = isset($_GET['category']) ? $_GET['category'] : '';
-
-// Atur judul halaman berdasarkan kategori
-$page_title = $category_param === 'outgoing' ? 'Add Quotation Outgoing' : 'Add Quotation Incoming';
-
+$category_param = isset($_GET['category']) ? $_GET['category'] : ''; // Ambil kategori URL
+$page_title = $category_param === 'outgoing' ? 'Add Quotation Outgoing' : 'Add Quotation Incoming'; // Set judul halaman
 require '../../includes/header.php';
 
-// Validasi nilai kategori dan atur nilai deskriptif
+// Set kategori halaman (Outgoing / Incoming)
 if ($category_param === 'outgoing') {
-    $category = 'keluar';
+  $category = 'keluar';
+  $sender = 'internal';
+  $receiver = 'customer';
 } elseif ($category_param === 'incoming') {
-    $category = 'masuk';
+  $category = 'masuk';
+  $sender = 'customer';
+  $receiver = 'internal';
 } else {
-    die("Kategori tidak valid");
+  die("Kategori tidak valid");
 }
 
-// Tampilkan pesan sukses jika ada
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
+// Khusus Outgoing
+if ($category_param === 'outgoing') {
+  $default_logo_path = "";
+  $default_signature_path = "";
+  
+  // Ambil path logo dan path signature terbaru dari tabel penawaran_harga (Kategori = keluar)
+  $data = selectData("penawaran_harga", "kategori = 'keluar' AND logo IS NOT NULL AND logo != ''", "tanggal DESC", "1");
 
-// Tampilkan pesan error jika ada
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
-// Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
-$defaultLogoPath = "";
-$defaultSignaturePath = "";
-
-// Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel pesanan_pembelian
-$order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
-$limit = "1"; // Ambil hanya 1 hasil
-$data = selectData("penawaran_harga", "", $order_by, $limit);
-
-// Jika data ditemukan, ambil path logo dan signature
-if (!empty($data)) {
-  $defaultLogoPath = $data[0]["logo"];
-
-  // Jika kolom signature_info diisi
-  if (!empty($data[0]["signature_info"])) {
-      // Pisahkan data signature_info berdasarkan koma (,) untuk mendapatkan setiap elemen
+  if (!empty($data)) {
+    $default_logo_path = $data[0]["logo"];
+    
+    // Ambil signature_info
+    if (!empty($data[0]["signature_info"])) {
+      // Pisahkan setiap elemen signature_info berdasarkan koma (,)
       $signature_info_parts = explode(", ", $data[0]["signature_info"]);
-      
-      // Loop melalui setiap elemen untuk mencari bagian 'path'
+
+      // Ambil 'path' untuk path signature
       foreach ($signature_info_parts as $part) {
-          // Pecah setiap elemen menjadi pasangan kunci dan nilai
-          $pair = explode(": ", $part);
-          
-          // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
-          if ($pair[0] == 'Path') {
-              $defaultSignaturePath = $pair[1];
-              break; // Keluar dari loop setelah menemukan path
-          }
+        $pair = explode(": ", $part); // Pecah menjadi pasangan kunci dan nilai
+        
+        // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
+        if ($pair[0] == 'Path') {
+          $default_signature_path = $pair[1];
+          break; // Keluar dari loop setelah menemukan path
+        }
       }
+    }
   }
 }
 ?>
@@ -70,22 +50,24 @@ if (!empty($data)) {
 <h1 class="fs-5 mb-4">Buat Penawaran Harga Baru</h1>
 <div class="paper-wrapper">
   <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+
     <!-- Input kategori -->
     <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
+
     <div class="container">
+      <!-- Input Logo Outgoing-->
       <div class="row">
-        <!-- Input Logo -->
+        <?php if ($category_param === 'outgoing') {?>
         <div class="col-md-6 p-0 position-relative">
+          <input type="hidden" id="removeLogoInput" name="remove_logo" value="false">
           <div id="image-preview-container" class="position-relative">
             <div class="d-flex flex-column justify-content-center align-items-center h-100">
               <img id="logo-preview" src="" alt="Preview Logo">
             </div>
             <button type="button" title="Hapus Logo" class="position-absolute top-0 end-0 z-3" id="cancelButton"
-              onclick="resetImage()"></button>
-            <span class="position-absolute top-0 start-0" id="changeImage">Ubah
-              Logo</span>
+              onclick="removeLogo()"></button>
+            <span class="position-absolute top-0 start-0" id="changeImage">Ubah Logo</span>
           </div>
-
           <div id="placeholder-container">
             <div class="d-flex flex-column justify-content-center align-items-center h-100">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -97,40 +79,47 @@ if (!empty($data)) {
               <p class="text-center">Maksimal ukuran 20MB JPEG, PNG. Rekomendasi ukuran 300x300</p>
             </div>
           </div>
-
           <div class="position-absolute top-0 start-0 p-0">
             <input type="file" title="" class="form-control form-control-sm" id="logo" name="logo" accept="image/*"
               onchange="previewAddImage(event)">
           </div>
         </div>
+
+
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
           <p class="fs-2 text-end">Penawaran Harga</p>
         </div>
+        <?php } else { ?>
+        <p class="fs-2 p-0">Penawaran Harga Incoming</p>
+        <?php } ?>
       </div>
 
       <div class="row justify-content-between align-items-end">
         <!-- Input Pengirim -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
+
             <label for="pengirim" class="col-sm-3 col-form-label">Pengirim</label>
             <div class="col-sm-9">
               <select class="form-select form-select-sm" id="pengirim" name="pengirim" required>
                 <?php
                 // Tambahkan opsi kosong untuk mencegah opsi terpilih secara otomatis pada 'incoming'
                 if ($category_param == 'incoming') {
-                  echo '<option value="" selected disabled>Pilih pengirim</option>';
+                    echo '<option value="" selected disabled>Pilih pengirim</option>';
                 }
 
-                $kontak_internal = selectData("kontak_internal");
-                foreach ($kontak_internal as $row_pengirim) {
-                  $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
+                // Ambil data kontak sesuai dengan kategori sender
+                $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                
+                foreach ($kontak_pengirim as $row_pengirim) {
+                    $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
 
-                  // Tentukan pengirim mana yang akan menjadi default berdasarkan kategori
-                  if ($category_param == 'outgoing' && $row_pengirim['nama_pengirim'] == "pt. mitra tehno gemilang") {
-                    $selected = "selected";
-                  }
-                  echo '<option value="' . $row_pengirim['id_pengirim'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_pengirim']) . '</option>';
+                    // Tentukan pengirim mana yang akan menjadi default berdasarkan kategori
+                    if ($category_param == 'outgoing' && strtolower($row_pengirim['nama_kontak']) == "pt. mitra tehno gemilang") {
+                        $selected = "selected";
+                    }
+                    echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
                 }
                 ?>
               </select>
@@ -138,6 +127,7 @@ if (!empty($data)) {
                 Harap pilih pengirim.
               </div>
             </div>
+
           </div>
         </div>
         <!-- Info Dokumen -->
@@ -186,32 +176,33 @@ if (!empty($data)) {
             <label for="penerima" class="col-sm-3 col-form-label">Penerima</label>
             <div class="col-sm-9">
               <?php if ($category_param == 'incoming') {
-                // Panggil fungsi selectData untuk mengambil data pelanggan
-                $pelanggan = selectData("pelanggan", "nama_pelanggan = 'pt. mitra tehno gemilang'", "", "", array());
+                // Panggil fungsi selectData untuk mengambil data penerima dengan kategori 'internal'
+                $penerima = selectData("kontak", "kategori = 'internal' AND nama_kontak = 'pt. mitra tehno gemilang'", "", "", array());
 
                 // Periksa apakah ada hasil dari query
-                if (!empty($pelanggan)) {
-                  // Jika ada hasil, ambil ID pelanggan pertama dari hasil query
-                  $id_pelanggan_mitra = $pelanggan[0]['id_pelanggan'];
+                if (!empty($penerima)) {
+                  // Jika ada hasil, ambil ID penerima pertama dari hasil query
+                  $id_penerima_mitra = $penerima[0]['id_kontak'];
                 } else {
-                  // Jika tidak ada hasil, atur ID pelanggan menjadi kosong atau sesuai kebutuhan
-                  $id_pelanggan_mitra = "";
+                  // Jika tidak ada hasil, atur ID penerima menjadi kosong atau sesuai kebutuhan
+                  $id_penerima_mitra = "";
                 } 
               ?>
-              <!-- Jika kategori adalah 'incoming', gunakan input tersembunyi untuk menyimpan ID pelanggan -->
-              <input type="hidden" id="penerima" name="penerima" value="<?= $id_pelanggan_mitra ?>">
+              <!-- Jika kategori adalah 'incoming', gunakan input tersembunyi untuk menyimpan ID penerima -->
+              <input type="hidden" id="penerima" name="penerima" value="<?= $id_penerima_mitra ?>">
               <input type="text" class="form-control form-control-sm" value="PT. Mitra Tehno Gemilang" readonly>
 
               <?php } elseif ($category_param == 'outgoing') { ?>
-              <!-- Jika kategori adalah 'outgoing', tampilkan dropdown untuk memilih pelanggan -->
+              <!-- Jika kategori adalah 'outgoing', tampilkan dropdown untuk memilih penerima -->
               <select class="form-select form-select-sm" id="penerima" name="penerima" required>
                 <option value="" selected disabled>-- Pilih Penerima --</option>
                 <?php
-              $pelanggan = selectData("pelanggan");
-              foreach ($pelanggan as $row_penerima) {
-                echo '<option value="' . $row_penerima['id_pelanggan'] . '">' . ucwords($row_penerima['nama_pelanggan']) . '</option>';
-              }
-              ?>
+                  // Ambil data kontak dengan kategori 'customer'
+                  $kontak_penerima = selectData("kontak", "kategori = 'customer'");
+                  foreach ($kontak_penerima as $row_penerima) {
+                    echo '<option value="' . $row_penerima['id_kontak'] . '">' . ucwords($row_penerima['nama_kontak']) . '</option>';
+                  }
+                ?>
               </select>
               <div class="invalid-feedback">
                 Harap pilih penerima.
@@ -222,15 +213,13 @@ if (!empty($data)) {
         </div>
       </div>
 
+
       <div class="row">
         <div class="col-md-5 p-0">
           <div class="row mb-3">
             <label for="up" class="col-sm-3 col-form-label">U.P.</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" id="up" name="up" value="-" required>
-              <div class="invalid-feedback">
-                Harap masukan U.P. dengan valid.
-              </div>
+              <input type="text" class="form-control form-control-sm" id="up" name="up">
             </div>
           </div>
         </div>
@@ -356,20 +345,20 @@ if (!empty($data)) {
             </div>
           </div>
 
-          <!-- Input Signature -->
+
+          <!-- Input Signature Outgoing-->
+          <?php if ($category_param === 'outgoing') {?>
           <div class="row justify-content-center mb-3">
             <div class="col-md-6 p-0 position-relative">
+              <input type="hidden" name="remove_signature" id="removeSignatureInput" value="false">
               <div id="signature-preview-container" class="position-relative">
                 <div class="d-flex flex-column justify-content-center align-items-center h-100">
                   <img id="signature-preview" src="" alt="Preview Signature">
                 </div>
-
                 <button type="button" title="Hapus Tanda Tangan" class="position-absolute top-0 end-0 z-3"
-                  id="cancelButton2" onclick="resetSignature()"></button>
-
+                  id="cancelButtonSignature" onclick="removeSignature()"></button>
                 <span class="position-absolute top-0 start-0" id="changeSignature">Ubah Tanda Tangan.</span>
               </div>
-
               <div id="signature-placeholder-container">
                 <div class="d-flex flex-column justify-content-center align-items-center h-100">
                   <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -387,8 +376,8 @@ if (!empty($data)) {
                   accept="image/*" onchange="previewAddSignature(event)">
               </div>
             </div>
-            <!--  -->
           </div>
+          <?php } ?>
           <div class="row mb-3">
             <input type="text" class="form-control form-control-sm" id="signer-name" name="signer_name" required
               placeholder="Nama Lengkap">
@@ -406,7 +395,7 @@ if (!empty($data)) {
         </div>
 
         <div class="col-auto">
-          <a href="index.php">
+          <a href="index.php?category=<?= $category_param ?>">
             <button type="button" class="btn btn-secondary btn-lg">Batal</button>
           </a>
         </div>
@@ -595,7 +584,10 @@ $(document).ready(function() {
     $('#total-ppn').text(formatRupiah(totalPPN));
   }
 });
+</script>
 
+<?php if ($category_param === 'outgoing'): ?>
+<script>
 // Tampil Nomor Dokumen
 document.getElementById("tanggal").addEventListener("change", function() {
   var tanggalInput = document.getElementById("tanggal").value;
@@ -627,63 +619,70 @@ document.getElementById("tanggal").addEventListener("change", function() {
 });
 
 // Penanganan logo
-// Panggil fungsi previewAddImage saat halaman dimuat pertama kali
-document.addEventListener('DOMContentLoaded', function() {
-  // Ubah panggilan fungsi previewAddImage untuk menyertakan defaultLogoPath
-  var defaultLogoPath = "<?= $defaultLogoPath; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
-  previewAddImage(defaultLogoPath);
-});
-
-// Panggil fungsi previewAddImage saat pengguna memilih file
-document.getElementById('logo').addEventListener('change', function(event) {
-  // Ambil file yang dipilih oleh pengguna
-  var selectedFile = event.target.files[0];
-
-  // Cek apakah pengguna telah memilih file baru
-  if (selectedFile) {
-    // Buat URL untuk file yang dipilih
-    var fileURL = URL.createObjectURL(selectedFile);
-    // Panggil fungsi previewAddImage dengan menggunakan file yang dipilih
-    previewAddImage(fileURL);
-  }
-});
-
-function previewAddImage(imageURL) {
+// Fungsi untuk menampilkan preview gambar
+function previewAddImage(event) {
   let imgElement = document.getElementById("logo-preview");
   let placeholderContainer = document.getElementById("placeholder-container");
   let imagePreviewContainer = document.getElementById("image-preview-container");
   let cancelButton = document.getElementById("cancelButton");
-  var defaultLogoPath = "<?= $defaultLogoPath; ?>";
 
-  if (imageURL && imageURL.trim() !== "") {
-    // Tampilkan gambar yang dipilih
+  let imageURL = "";
+
+  if (event && event.target && event.target.files && event.target.files[0]) {
+    let file = event.target.files[0];
+    imageURL = URL.createObjectURL(file);
+    console.log(`File selected: ${file.name}`);
     imgElement.src = imageURL;
     imgElement.style.display = "block";
-    // Sembunyikan placeholder dan tampilkan container gambar
     placeholderContainer.style.display = "none";
     imagePreviewContainer.style.display = "block";
-    // Tampilkan tombol "Batal"
     cancelButton.style.display = "block";
   } else {
-    // Tampilkan gambar default
-    imgElement.src = defaultLogoPath;
+    let default_logo_path = "<?= $default_logo_path; ?>";
+    imgElement.src = default_logo_path;
     imgElement.style.display = "block";
-    // Sembunyikan placeholder dan tampilkan container gambar
     placeholderContainer.style.display = "none";
     imagePreviewContainer.style.display = "block";
-    // Tampilkan tombol "Batal"
     cancelButton.style.display = "block";
+    console.log("No file selected. Using default image.");
   }
+  console.log("Image preview updated.");
 }
 
-// Fungsi untuk menghapus gambar
-function resetImage() {
-  var logoInput = document.getElementById('logo');
-  logoInput.value = ''; // Menghapus nilai input
-  document.getElementById('image-preview-container').style.display = 'none'; // Menyembunyikan kontainer preview gambar
-  document.getElementById('placeholder-container').style.display = 'block'; // Menampilkan kontainer placeholder
-  document.getElementById('cancelButton').style.display = 'none'; // Menyembunyikan tombol "Batal"
+// Fungsi untuk menghapus logo dan menampilkan placeholder
+function removeLogo() {
+  let imgElement = document.getElementById("logo-preview");
+  let placeholderContainer = document.getElementById("placeholder-container");
+  let imagePreviewContainer = document.getElementById("image-preview-container");
+  let cancelButton = document.getElementById("cancelButton");
+  let inputFile = document.getElementById("logo");
+
+  document.getElementById("removeLogoInput").value = "true";
+
+  // Sembunyikan elemen gambar
+  imgElement.src = "";
+  imgElement.style.display = "none";
+  // Tampilkan container placeholder
+  placeholderContainer.style.display = "block";
+  // Sembunyikan container preview gambar
+  imagePreviewContainer.style.display = "none";
+  // Sembunyikan tombol "Batal"
+  cancelButton.style.display = "none";
+  // Hapus nilai input file
+  inputFile.value = "";
+
+  console.log("Image removed and input file cleared.");
 }
+
+// Panggil fungsi previewAddImage saat halaman dimuat pertama kali
+document.addEventListener('DOMContentLoaded', function() {
+  previewAddImage();
+});
+
+// Panggil fungsi previewAddImage saat pengguna memilih file
+document.getElementById('logo').addEventListener('change', function(event) {
+  previewAddImage(event);
+});
 
 document.addEventListener('DOMContentLoaded', function() {
   // Panggil fungsi untuk mengatur visibilitas tombol "Change Image" secara awal
@@ -717,86 +716,91 @@ function toggleChangeImageButton(visible) {
 }
 
 /////////////////////////////////////
-// Fungsi preview signature
+
+// Penanganan signature
+// Fungsi untuk menampilkan preview signature
+function previewAddSignature(event) {
+  let signElement = document.getElementById("signature-preview");
+  let signaturePlaceholderContainer = document.getElementById("signature-placeholder-container");
+  let signaturePreviewContainer = document.getElementById("signature-preview-container");
+  let cancelButtonSignature = document.getElementById("cancelButtonSignature");
+
+  let signatureURL = "";
+
+  if (event && event.target && event.target.files && event.target.files[0]) {
+    let file = event.target.files[0];
+    signatureURL = URL.createObjectURL(file);
+    console.log(`File selected: ${file.name}`);
+    signElement.src = signatureURL;
+    signElement.style.display = "block";
+    signaturePlaceholderContainer.style.display = "none";
+    signaturePreviewContainer.style.display = "block";
+    cancelButtonSignature.style.display = "block";
+  } else {
+    let default_signature_path = "<?= $default_signature_path; ?>";
+    signElement.src = default_signature_path;
+    signElement.style.display = "block";
+    signaturePlaceholderContainer.style.display = "none";
+    signaturePreviewContainer.style.display = "block";
+    cancelButtonSignature.style.display = "block";
+    console.log("No file selected. Using default signature.");
+  }
+  console.log("Signature preview updated.");
+}
+
+// Fungsi untuk menghapus signature dan menampilkan placeholder
+function removeSignature() {
+  let signElement = document.getElementById("signature-preview");
+  let signaturePlaceholderContainer = document.getElementById("signature-placeholder-container");
+  let signaturePreviewContainer = document.getElementById("signature-preview-container");
+  let cancelButtonSignature = document.getElementById("cancelButtonSignature");
+  let inputSignature = document.getElementById("signature");
+
+  document.getElementById("removeSignatureInput").value = "true";
+
+  // Sembunyikan elemen gambar
+  signElement.src = "";
+  signElement.style.display = "none";
+  // Tampilkan container placeholder
+  signaturePlaceholderContainer.style.display = "block";
+  // Sembunyikan container preview gambar
+  signaturePreviewContainer.style.display = "none";
+  // Sembunyikan tombol "Batal"
+  cancelButtonSignature.style.display = "none";
+  // Hapus nilai input file
+  inputSignature.value = "";
+
+  console.log("Signature removed and input file cleared.");
+}
+
 // Panggil fungsi previewAddSignature saat halaman dimuat pertama kali
 document.addEventListener('DOMContentLoaded', function() {
-  // Ubah panggilan fungsi previewAddSignature untuk menyertakan defaultSignaturePath
-  var defaultSignaturePath = "<?= $defaultSignaturePath; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
-  previewAddSignature(defaultSignaturePath);
+  previewAddSignature();
 });
 
 // Panggil fungsi previewAddSignature saat pengguna memilih file
 document.getElementById('signature').addEventListener('change', function(event) {
-  // Ambil file yang dipilih oleh pengguna
-  var selectedSignature = event.target.files[0];
-
-  // Cek apakah pengguna telah memilih file baru
-  if (selectedSignature) {
-    // Buat URL untuk file yang dipilih
-    var fileURL = URL.createObjectURL(selectedSignature);
-    // Panggil fungsi previewAddSignature dengan menggunakan file yang dipilih
-    previewAddSignature(fileURL);
-  }
+  previewAddSignature(event);
 });
 
-// Fungsi untuk menampilkan preview signature
-function previewAddSignature(signatureURL) {
-  let signatureElement = document.getElementById("signature-preview");
-  let signaturePlaceholderContainer = document.getElementById("signature-placeholder-container");
-  let signaturePreviewContainer = document.getElementById("signature-preview-container");
-  let cancelButton2 = document.getElementById("cancelButton2");
-  var defaultSignaturePath = "<?= $defaultSignaturePath; ?>";
-
-  if (signatureURL && signatureURL.trim() !== "") {
-    // Tampilkan signature
-    signatureElement.src = signatureURL;
-    signatureElement.style.display = "block";
-    // Sembunyikan placeholder dan tampilkan container signature
-    signaturePlaceholderContainer.style.display = "none";
-    signaturePreviewContainer.style.display = "block";
-    // Tampilkan tombol "Batal"
-    cancelButton2.style.display = "block";
-  } else {
-    // Jika tidak ada signature yang dipilih, gunakan signature default
-    signatureElement.src = defaultSignaturePath;
-    signatureElement.style.display = "block";
-    // Sembunyikan placeholder dan tampilkan container signature
-    signaturePlaceholderContainer.style.display = "none";
-    signaturePreviewContainer.style.display = "block";
-    // Tampilkan tombol "Batal"
-    cancelButton2.style.display = "block";
-  }
-}
-
-// Fungsi untuk menghapus signature
-function resetSignature() {
-  var signatureInput = document.getElementById('signature');
-  signatureInput.value = ''; // Menghapus nilai input
-  document.getElementById('signature-preview-container').style.display =
-    'none'; // Menyembunyikan kontainer preview gambar
-  document.getElementById('signature-placeholder-container').style.display =
-    'block'; // Menampilkan kontainer placeholder
-  document.getElementById('cancelButton2').style.display = 'none'; // Menyembunyikan tombol "Batal"
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-  // Panggil fungsi untuk mengatur visibilitas tombol "Change Signature" secara awal
+  // Panggil fungsi untuk mengatur visibilitas tombol "Change signature" secara awal
   toggleChangeSignatureButton(false);
 
   // Tambahkan event listener untuk event mouseenter
   document.getElementById("signature").addEventListener("mouseenter", function(event) {
     toggleChangeSignatureButton(
-      true); // Tampilkan tombol "Change Signature" saat mouse masuk ke dalam SignaturePreviewContainer
+      true); // Tampilkan tombol "Change signature" saat mouse masuk ke dalam signaturePreviewContainer
   });
 
   // Tambahkan event listener untuk event mouseleave
   document.getElementById("signature").addEventListener("mouseleave", function(event) {
     toggleChangeSignatureButton(
-      false); // Sembunyikan tombol "Change Signature" saat mouse meninggalkan SignaturePreviewContainer
+      false); // Sembunyikan tombol "Change signature" saat mouse meninggalkan signaturePreviewContainer
   });
 });
 
-// Fungsi untuk mengatur visibilitas tombol "Change Signature"
+// Fungsi untuk mengatur visibilitas tombol "Change signature"
 function toggleChangeSignatureButton(visible) {
   let changeSignature = document.getElementById("changeSignature");
   if (visible) {
@@ -810,6 +814,7 @@ function toggleChangeSignatureButton(visible) {
   }
 }
 </script>
+<?php endif; ?>
 
 <?php
 require '../../includes/footer.php';

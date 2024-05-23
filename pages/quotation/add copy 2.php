@@ -3,78 +3,67 @@
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 
 // Atur judul halaman berdasarkan kategori
-$page_title = $category_param === 'outgoing' ? 'Add Invoice Outgoing' : 'Add Invoice Incoming';
+$page_title = $category_param === 'outgoing' ? 'Add Quotation Outgoing' : 'Add Quotation Incoming';
 
 require '../../includes/header.php';
 
 // Validasi nilai kategori dan atur nilai deskriptif
 if ($category_param === 'outgoing') {
-    $category = 'keluar';
+  $category = 'keluar';
+  $sender = 'internal';
+  $receiver = 'customer';
 } elseif ($category_param === 'incoming') {
-    $category = 'masuk';
+  $category = 'masuk';
+  $sender = 'customer';
+  $receiver = 'internal';
 } else {
-    die("Kategori tidak valid");
+  die("Kategori tidak valid");
 }
 
-// Tampilkan pesan sukses jika ada
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-
-// Tampilkan pesan error jika ada
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
-// Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
-$defaultLogoPath = "";
-$defaultSignaturePath = "";
-
-// Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel penawaran_harga
-$order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
-$limit = "1"; // Ambil hanya 1 hasil
-$data = selectData("penawaran_harga", "", $order_by, $limit);
-
-// Jika data ditemukan, ambil path logo dan signature
-if (!empty($data)) {
-  $defaultLogoPath = $data[0]["logo"];
-
-  // Jika kolom signature_info diisi
-  if (!empty($data[0]["signature_info"])) {
-      // Pisahkan data signature_info berdasarkan koma (,) untuk mendapatkan setiap elemen
-      $signature_info_parts = explode(", ", $data[0]["signature_info"]);
-      
-      // Loop melalui setiap elemen untuk mencari bagian 'path'
-      foreach ($signature_info_parts as $part) {
-          // Pecah setiap elemen menjadi pasangan kunci dan nilai
-          $pair = explode(": ", $part);
+// Inisialisasi nilai defaultLogoPath dan defaultSignaturePath untuk dokumen outgoing
+if ($category_param === 'outgoing') {
+  $defaultLogoPath = "";
+  $defaultSignaturePath = "";
+  
+  // Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel penawaran_harga
+  $order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
+  $limit = "1"; // Ambil hanya 1 hasil
+  $data = selectData("penawaran_harga", "", $order_by, $limit);
+  
+  // Jika data ditemukan, ambil path logo dan signature
+  if (!empty($data)) {
+      $defaultLogoPath = $data[0]["logo"];
+  
+      // Jika kolom signature_info diisi
+      if (!empty($data[0]["signature_info"])) {
+          // Pisahkan data signature_info berdasarkan koma (,) untuk mendapatkan setiap elemen
+          $signature_info_parts = explode(", ", $data[0]["signature_info"]);
           
-          // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
-          if ($pair[0] == 'Path') {
-              $defaultSignaturePath = $pair[1];
-              break; // Keluar dari loop setelah menemukan path
-          }
-      }
+          // Loop melalui setiap elemen untuk mencari bagian 'path'
+          foreach ($signature_info_parts as $part) {
+              // Pecah setiap elemen menjadi pasangan kunci dan nilai
+              $pair = explode(": ", $part);
+              
+              // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
+              if ($pair[0] == 'Path') {
+                  $defaultSignaturePath = $pair[1];
+                  break; // Keluar dari loop setelah menemukan path
+            }
+        }
+    }
   }
 }
 ?>
 
-<h1 class="fs-5 mb-4">Buat Invoice Baru</h1>
+<h1 class="fs-5 mb-4">Buat Penawaran Harga Baru</h1>
 <div class="paper-wrapper">
   <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
     <!-- Input kategori -->
     <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
     <div class="container">
       <div class="row">
-        <!-- Input Logo -->
+        <!-- Input Logo Dokumen Outgoing-->
+        <?php if ($category_param === 'outgoing') {?>
         <div class="col-md-6 p-0 position-relative">
           <div id="image-preview-container" class="position-relative">
             <div class="d-flex flex-column justify-content-center align-items-center h-100">
@@ -102,35 +91,43 @@ if (!empty($data)) {
             <input type="file" title="" class="form-control form-control-sm" id="logo" name="logo" accept="image/*"
               onchange="previewAddImage(event)">
           </div>
+          <!-- Hidden input untuk reset status -->
+          <input type="hidden" name="reset_logo" id="reset_logo" value="false">
         </div>
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Invoice</p>
+          <p class="fs-2 text-end">Penawaran Harga</p>
         </div>
+        <?php } else { ?>
+        <p class="fs-2 p-0">Penawaran Harga Incoming</p>
+        <?php } ?>
       </div>
 
       <div class="row justify-content-between align-items-end">
         <!-- Input Pengirim -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
+
             <label for="pengirim" class="col-sm-3 col-form-label">Pengirim</label>
             <div class="col-sm-9">
               <select class="form-select form-select-sm" id="pengirim" name="pengirim" required>
                 <?php
                 // Tambahkan opsi kosong untuk mencegah opsi terpilih secara otomatis pada 'incoming'
                 if ($category_param == 'incoming') {
-                  echo '<option value="" selected disabled>Pilih pengirim</option>';
+                    echo '<option value="" selected disabled>Pilih pengirim</option>';
                 }
 
-                $kontak_internal = selectData("kontak_internal");
-                foreach ($kontak_internal as $row_pengirim) {
-                  $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
+                // Ambil data kontak sesuai dengan kategori sender
+                $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                
+                foreach ($kontak_pengirim as $row_pengirim) {
+                    $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
 
-                  // Tentukan pengirim mana yang akan menjadi default berdasarkan kategori
-                  if ($category_param == 'outgoing' && $row_pengirim['nama_pengirim'] == "pt. mitra tehno gemilang") {
-                    $selected = "selected";
-                  }
-                  echo '<option value="' . $row_pengirim['id_pengirim'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_pengirim']) . '</option>';
+                    // Tentukan pengirim mana yang akan menjadi default berdasarkan kategori
+                    if ($category_param == 'outgoing' && strtolower($row_pengirim['nama_kontak']) == "pt. mitra tehno gemilang") {
+                        $selected = "selected";
+                    }
+                    echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
                 }
                 ?>
               </select>
@@ -138,6 +135,7 @@ if (!empty($data)) {
                 Harap pilih pengirim.
               </div>
             </div>
+
           </div>
         </div>
         <!-- Info Dokumen -->
@@ -145,9 +143,10 @@ if (!empty($data)) {
           <div class="row mb-3">
             <!-- input no invoice outgoing -->
             <?php if ($category_param == 'outgoing') { ?>
-            <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
+            <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" id="no_faktur" name="no_faktur" readonly required>
+              <input type="text" class="form-control form-control-sm" id="no_penawaran" name="no_penawaran" readonly
+                required>
               <div class="invalid-feedback">
                 Sistem error, nomor penawaran gagal dimuat.
               </div>
@@ -155,11 +154,11 @@ if (!empty($data)) {
 
             <!-- input no invoice incoming -->
             <?php } elseif ($category_param == 'incoming') { ?>
-            <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
+            <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" name="no_faktur" required>
+              <input type="text" class="form-control form-control-sm" name="no_penawaran" required>
               <div class="invalid-feedback">
-                No faktur tidak boleh kosong.
+                No penawaran harga tidak boleh kosong.
               </div>
             </div>
             <?php } ?>
@@ -185,37 +184,50 @@ if (!empty($data)) {
             <label for="penerima" class="col-sm-3 col-form-label">Penerima</label>
             <div class="col-sm-9">
               <?php if ($category_param == 'incoming') {
-                // Panggil fungsi selectData untuk mengambil data pelanggan
-                $pelanggan = selectData("pelanggan", "nama_pelanggan = 'pt. mitra tehno gemilang'", "", "", array());
+                // Panggil fungsi selectData untuk mengambil data penerima dengan kategori 'internal'
+                $penerima = selectData("kontak", "kategori = 'internal' AND nama_kontak = 'pt. mitra tehno gemilang'", "", "", array());
 
                 // Periksa apakah ada hasil dari query
-                if (!empty($pelanggan)) {
-                  // Jika ada hasil, ambil ID pelanggan pertama dari hasil query
-                  $id_pelanggan_mitra = $pelanggan[0]['id_pelanggan'];
+                if (!empty($penerima)) {
+                  // Jika ada hasil, ambil ID penerima pertama dari hasil query
+                  $id_penerima_mitra = $penerima[0]['id_kontak'];
                 } else {
-                  // Jika tidak ada hasil, atur ID pelanggan menjadi kosong atau sesuai kebutuhan
-                  $id_pelanggan_mitra = "";
+                  // Jika tidak ada hasil, atur ID penerima menjadi kosong atau sesuai kebutuhan
+                  $id_penerima_mitra = "";
                 } 
               ?>
-              <!-- Jika kategori adalah 'incoming', gunakan input tersembunyi untuk menyimpan ID pelanggan -->
-              <input type="hidden" id="penerima" name="penerima" value="<?= $id_pelanggan_mitra ?>">
+              <!-- Jika kategori adalah 'incoming', gunakan input tersembunyi untuk menyimpan ID penerima -->
+              <input type="hidden" id="penerima" name="penerima" value="<?= $id_penerima_mitra ?>">
               <input type="text" class="form-control form-control-sm" value="PT. Mitra Tehno Gemilang" readonly>
 
               <?php } elseif ($category_param == 'outgoing') { ?>
-              <!-- Jika kategori adalah 'outgoing', tampilkan dropdown untuk memilih pelanggan -->
+              <!-- Jika kategori adalah 'outgoing', tampilkan dropdown untuk memilih penerima -->
               <select class="form-select form-select-sm" id="penerima" name="penerima" required>
                 <option value="" selected disabled>-- Pilih Penerima --</option>
                 <?php
-              $pelanggan = selectData("pelanggan");
-              foreach ($pelanggan as $row_penerima) {
-                echo '<option value="' . $row_penerima['id_pelanggan'] . '">' . ucwords($row_penerima['nama_pelanggan']) . '</option>';
-              }
-              ?>
+                  // Ambil data kontak dengan kategori 'customer'
+                  $kontak_penerima = selectData("kontak", "kategori = 'customer'");
+                  foreach ($kontak_penerima as $row_penerima) {
+                    echo '<option value="' . $row_penerima['id_kontak'] . '">' . ucwords($row_penerima['nama_kontak']) . '</option>';
+                  }
+                ?>
               </select>
               <div class="invalid-feedback">
                 Harap pilih penerima.
               </div>
               <?php } ?>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-5 p-0">
+          <div class="row mb-3">
+            <label for="up" class="col-sm-3 col-form-label">U.P.</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control form-control-sm" id="up" name="up">
             </div>
           </div>
         </div>
@@ -228,8 +240,7 @@ if (!empty($data)) {
         <table class="table table-light table-striped">
           <thead>
             <tr class="fw-bolder">
-              <td>No.</td>
-              <td>No. Pesanan Pembelian</td>
+              <td>No</td>
               <td>Nama Produk</td>
               <td>Kuantitas</td>
               <td>Harga (Rp)</td>
@@ -239,29 +250,6 @@ if (!empty($data)) {
           <tbody id="detail-table">
             <tr class="main-tr">
               <td>1</td>
-              <td>
-                <select class="form-select form-select-sm" id="id_pesanan" name="id_pesanan[]" required>
-                  <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
-                  <?php
-                  // Tentukan kategori PO untuk query berdasarkan category_param
-                    if ($category_param === 'outgoing') {
-                      $category_po = 'masuk';
-                    } else {
-                      $category_po = 'keluar';
-                    }
-                    
-                    $conditions = "kategori = ?";
-
-                    // Panggil fungsi selectData untuk mengambil data pesanan pembelian dengan kategori yang disimpan dalam variabel
-                    $po = selectData("pesanan_pembelian", $conditions, "", "", array(array('type' => 's', 'value' => $category_po)));
-                    
-                    // Loop melalui hasil query dan tampilkan dalam opsi dropdown
-                    foreach ($po as $row_po) {
-                      echo '<option value="' . $row_po['id_pesanan'] . '">' . $row_po['no_pesanan'] . '</option>';
-                    }
-                  ?>
-                </select>
-              </td>
               <td>
                 <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
                   <option value="" selected disabled>-- Pilih Produk --</option>
@@ -289,7 +277,7 @@ if (!empty($data)) {
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="3" rowspan="2" style="background-color: transparent;">
+              <td colspan="2" rowspan="2" style="background-color: transparent;">
                 <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
                   Baris</button>
               </td>
@@ -311,7 +299,7 @@ if (!empty($data)) {
             </tr>
 
             <tr>
-              <td colspan="3" style="background-color: transparent;"></td>
+              <td colspan="2" style="background-color: transparent;"></td>
               <td>PPN</td>
               <td>
                 <div class="input-group input-group-sm">
@@ -332,7 +320,7 @@ if (!empty($data)) {
             </tr>
 
             <tr>
-              <td colspan="3" style="background-color: transparent;"></td>
+              <td colspan="2" style="background-color: transparent;"></td>
               <td colspan="2">Total</td>
               <td colspan="2">
                 <span id="grand-total">0</span>
@@ -365,12 +353,14 @@ if (!empty($data)) {
             </div>
           </div>
 
-          <!-- Input Gambar Signature -->
+
+          <!-- Input Gambar Signature Outgoing-->
+          <?php if ($category_param === 'outgoing') {?>
           <div class="row justify-content-center mb-3">
             <div class="col-md-6 p-0 position-relative">
               <div id="signature-preview-container" class="position-relative">
                 <div class="d-flex flex-column justify-content-center align-items-center h-100">
-                  <img id="signature-preview" src="" alt="Preview Signature.">
+                  <img id="signature-preview" src="" alt="Preview Signature">
                 </div>
 
                 <button type="button" title="Hapus Tanda Tangan" class="position-absolute top-0 end-0 z-3"
@@ -395,9 +385,11 @@ if (!empty($data)) {
                 <input type="file" title="" class="form-control form-control-sm" id="signature" name="signature"
                   accept="image/*" onchange="previewAddSignature(event)">
               </div>
+              <!-- Hidden input untuk reset status -->
+              <input type="hidden" name="reset_signature" id="reset_signature" value="false">
             </div>
-            <!--  -->
           </div>
+          <?php } ?>
           <div class="row mb-3">
             <input type="text" class="form-control form-control-sm" id="signer-name" name="signer_name" required
               placeholder="Nama Lengkap">
@@ -494,30 +486,17 @@ $(document).ready(function() {
 
   // Event untuk menambahkan baris baru
   $(document).on('click', '.add-more-tr', function() {
-    var produkOptions = `<?php
-        $produk = selectData("produk");
-        foreach ($produk as $row_produk) {
-            echo '<option value="' . $row_produk['id_produk'] . '">' . addslashes($row_produk['nama_produk']) . '</option>';
-        }
-    ?>`;
-
-    var poOptions = `<?php
-        $po = selectData("pesanan_pembelian", $conditions, "", "", array(array('type' => 's', 'value' => $category_po)));
-        foreach ($po as $row_po) {
-            echo '<option value="' . $row_po['id_pesanan'] . '">' . addslashes($row_po['no_pesanan']) . '</option>';
-        }
-    ?>`;
+    var produkOptions = '<?php
+      $produk = selectData("produk");
+      foreach ($produk as $row_produk) {
+          echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
+      }
+      ?>';
 
     var rowCount = $('#detail-table tr.main-tr').length + 1; // Ambil jumlah baris saat ini dan tambahkan 1
     $('#detail-table').append(
       `<tr class="main-tr">
           <td>${rowCount}</td>
-          <td>
-            <select class="form-select form-select-sm" id="id_pesanan" name="id_pesanan[]" required>
-                <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
-                ${poOptions}
-            </select>
-          </td>
           <td>
             <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
               <option value="" selected disabled>-- Pilih Produk --</option>
@@ -617,7 +596,10 @@ $(document).ready(function() {
     $('#total-ppn').text(formatRupiah(totalPPN));
   }
 });
+</script>
 
+<?php if ($category_param === 'outgoing'): ?>
+<script>
 // Tampil Nomor Dokumen
 document.getElementById("tanggal").addEventListener("change", function() {
   var tanggalInput = document.getElementById("tanggal").value;
@@ -636,19 +618,19 @@ document.getElementById("tanggal").addEventListener("change", function() {
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         // Ubah nomor penawaran menjadi huruf kapital
-        var nomorFaktur = this.responseText.toUpperCase();
-        document.getElementById("no_faktur").value = nomorFaktur;
+        var nomorPenawaran = this.responseText.toUpperCase();
+        document.getElementById("no_penawaran").value = nomorPenawaran;
       }
     };
     xhttp.open("GET", "getDocumentNumber.php?month=" + month + "&year=" + year, true);
     xhttp.send();
   } else {
-    document.getElementById("no_faktur").value =
+    document.getElementById("no_penawaran").value =
       ""; // Kosongkan nilai nomor penawaran jika tanggal tidak diisi
   }
 });
 
-// Fungsi preview gambar
+// Penanganan logo
 // Panggil fungsi previewAddImage saat halaman dimuat pertama kali
 document.addEventListener('DOMContentLoaded', function() {
   // Ubah panggilan fungsi previewAddImage untuk menyertakan defaultLogoPath
@@ -701,11 +683,10 @@ function previewAddImage(imageURL) {
 
 // Fungsi untuk menghapus gambar
 function resetImage() {
-  var logoInput = document.getElementById('logo');
-  logoInput.value = ''; // Menghapus nilai input
-  document.getElementById('image-preview-container').style.display = 'none'; // Menyembunyikan kontainer preview gambar
-  document.getElementById('placeholder-container').style.display = 'block'; // Menampilkan kontainer placeholder
-  document.getElementById('cancelButton').style.display = 'none'; // Menyembunyikan tombol "Batal"
+  document.getElementById('logo-preview').src = '';
+  document.getElementById('logo-preview-container').style.display = 'none';
+  document.getElementById('logo').value = ''; // Kosongkan file input
+  document.getElementById('reset_logo').value = 'true'; // Tandai logo di reset
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -744,7 +725,7 @@ function toggleChangeImageButton(visible) {
 // Panggil fungsi previewAddSignature saat halaman dimuat pertama kali
 document.addEventListener('DOMContentLoaded', function() {
   // Ubah panggilan fungsi previewAddSignature untuk menyertakan defaultSignaturePath
-  var defaultSignaturePath = "<?php echo $defaultSignaturePath; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
+  var defaultSignaturePath = "<?= $defaultSignaturePath; ?>"; // Ubah menjadi nilai yang sesuai dari PHP
   previewAddSignature(defaultSignaturePath);
 });
 
@@ -793,13 +774,10 @@ function previewAddSignature(signatureURL) {
 
 // Fungsi untuk menghapus signature
 function resetSignature() {
-  var signatureInput = document.getElementById('signature');
-  signatureInput.value = ''; // Menghapus nilai input
-  document.getElementById('signature-preview-container').style.display =
-    'none'; // Menyembunyikan kontainer preview gambar
-  document.getElementById('signature-placeholder-container').style.display =
-    'block'; // Menampilkan kontainer placeholder
-  document.getElementById('cancelButton2').style.display = 'none'; // Menyembunyikan tombol "Batal"
+  document.getElementById('signature-preview').src = '';
+  document.getElementById('signature-preview-container').style.display = 'none';
+  document.getElementById('signature').value = ''; // Kosongkan file input
+  document.getElementById('reset_signature').value = 'true'; // Tandai signature di reset
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -833,6 +811,7 @@ function toggleChangeSignatureButton(visible) {
   }
 }
 </script>
+<?php endif; ?>
 
 <?php
 require '../../includes/footer.php';

@@ -373,81 +373,90 @@ function deleteData($table, $conditions) {
   mysqli_stmt_close($stmt);
   return $result;
 }
-
 // Fungsi untuk memeriksa apakah nilai sudah ada dalam tabel dan kolom tertentu
 function isValueExists($table, $column, $value, $excludeId = null, $idColumn = 'id') {
-  global $conn;
-
-  // Persiapkan query SQL
-  $sql = "SELECT COUNT(*) as count FROM $table WHERE $column = ?";
+    global $conn;
   
-  // Jika excludeId diberikan, tambahkan kondisi untuk mengecualikan id tertentu
-  if ($excludeId !== null) {
-      $sql .= " AND $idColumn != ?";
-  }
-
-  // Persiapkan statement
-  $stmt = mysqli_prepare($conn, $sql);
-
-  // Bind parameter
-  if ($excludeId !== null) {
-      mysqli_stmt_bind_param($stmt, "ss", $value, $excludeId);
-  } else {
-      mysqli_stmt_bind_param($stmt, "s", $value);
-  }
-
-  // Eksekusi statement
-  mysqli_stmt_execute($stmt);
-
-  // Ambil hasil
-  mysqli_stmt_bind_result($stmt, $count);
-  mysqli_stmt_fetch($stmt);
-
-  // Tutup statement
-  mysqli_stmt_close($stmt);
-
-  // Return true jika jumlah baris lebih dari 0 (nilai sudah ada), false jika tidak
-  return $count > 0;
-}
-
-// Fungsi untuk memeriksa apakah data yang akan dihapus sedang digunakan dalam tabel lain sebagai relasi
-function isDataInUse($column, $value, $otherTables = array()) {
-  global $conn;
-
-  // Inisialisasi variabel untuk menyimpan status penggunaan data
-  $dataInUse = false;
-
-  // Persiapkan query SQL untuk setiap tabel lain
-  foreach ($otherTables as $otherTable) {
-    // Persiapkan query SQL untuk mengecek relasi di tabel lain
-    $sql = "SELECT COUNT(*) as count FROM $otherTable WHERE $column = ?";
-
+    // Persiapkan query SQL
+    $sql = "SELECT COUNT(*) as count FROM $table WHERE $column = ?";
+    
+    // Jika excludeId diberikan, tambahkan kondisi untuk mengecualikan id tertentu
+    if ($excludeId !== null) {
+        $sql .= " AND $idColumn != ?";
+    }
+  
     // Persiapkan statement
     $stmt = mysqli_prepare($conn, $sql);
-
+  
     // Bind parameter
-    mysqli_stmt_bind_param($stmt, "s", $value);
-
+    if ($excludeId !== null) {
+        mysqli_stmt_bind_param($stmt, "ss", $value, $excludeId);
+    } else {
+        mysqli_stmt_bind_param($stmt, "s", $value);
+    }
+  
     // Eksekusi statement
     mysqli_stmt_execute($stmt);
-
+  
     // Ambil hasil
     mysqli_stmt_bind_result($stmt, $count);
     mysqli_stmt_fetch($stmt);
-
+  
     // Tutup statement
     mysqli_stmt_close($stmt);
-
-    // Jika jumlah baris lebih dari 0 (data sedang digunakan dalam tabel lain), set status menjadi true
-    if ($count > 0) {
-      $dataInUse = true;
-      // Hentikan loop karena data sudah ditemukan digunakan dalam salah satu tabel lain
-      break;
-    }
+  
+    // Return true jika jumlah baris lebih dari 0 (nilai sudah ada), false jika tidak
+    return $count > 0;
   }
 
-  // Return status penggunaan data
-  return $dataInUse;
+  function isDataInUse($value, $tableColumnPairs) {
+    global $conn;
+
+    // Inisialisasi variabel untuk menyimpan status penggunaan data
+    $dataInUse = false;
+
+    // Loop melalui setiap pasangan tabel-kolom
+    foreach ($tableColumnPairs as $tableColumns) {
+        $table = $tableColumns['table'];
+        $columns = $tableColumns['columns']; // Array of columns to check
+
+        // Buat bagian WHERE dari query SQL dengan banyak kolom
+        $whereClauses = [];
+        foreach ($columns as $column) {
+            $whereClauses[] = "$column = ?";
+        }
+        $whereClause = implode(' OR ', $whereClauses);
+
+        // Persiapkan query SQL untuk mengecek relasi di tabel lain
+        $sql = "SELECT COUNT(*) as count FROM $table WHERE $whereClause";
+
+        // Persiapkan statement
+        $stmt = mysqli_prepare($conn, $sql);
+
+        // Bind parameter
+        $params = array_fill(0, count($columns), $value);
+        mysqli_stmt_bind_param($stmt, str_repeat('s', count($columns)), ...$params);
+
+        // Eksekusi statement
+        mysqli_stmt_execute($stmt);
+
+        // Ambil hasil
+        mysqli_stmt_bind_result($stmt, $count);
+        mysqli_stmt_fetch($stmt);
+
+        // Tutup statement
+        mysqli_stmt_close($stmt);
+
+        // Jika jumlah baris lebih dari 0 (data sedang digunakan dalam tabel lain), set status menjadi true
+        if ($count > 0) {
+            $dataInUse = true;
+            // Hentikan loop karena data sudah ditemukan digunakan dalam salah satu tabel lain
+            break;
+        }
+    }
+
+    // Return status penggunaan data
+    return $dataInUse;
 }
 
 function getLastDocumentNumber($tabel, $column, $order_by, $prefix, $suffix, $month, $year) {

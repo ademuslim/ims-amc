@@ -13,18 +13,10 @@ if (isset($_POST['add'])) {
     $kategori = $_POST['kategori'];
 
     // Tentukan $category_param berdasarkan nilai $kategori
-    if ($kategori == "keluar") {
-        $category_param = "outgoing";
-    } elseif ($kategori == "masuk") {
-        $category_param = "incoming";
-    } else {
-        // Berikan penanganan jika nilai kategori tidak valid
-        die("Invalid category");
-    }
+    $category_param = $kategori === "keluar" ? "outgoing" : ($kategori === "masuk" ? "incoming" : die("Invalid category"));
 
-    // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath
-    $defaultLogoPath = "";
-    $defaultSignaturePath = "";
+    // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath untuk dokumen outgoing
+    $defaultLogoPath = $defaultSignaturePath = "";
 
     // Panggil fungsi selectData untuk mengambil path logo dan path signature dari tabel penawaran
     $order_by = "tanggal DESC"; // Urutkan berdasarkan tanggal secara descending
@@ -156,6 +148,7 @@ if (isset($_POST['add'])) {
         $id_produk = $_POST['id_produk'];
         $jumlah = $_POST['jumlah'];
         $harga_satuan = $_POST['harga_satuan'];
+        $id_pesanan = $_POST['id_pesanan'];
 
         // Loop untuk menyimpan setiap detail produk ke dalam database
         for ($i = 0; $i < count($id_produk); $i++) {
@@ -171,7 +164,8 @@ if (isset($_POST['add'])) {
                 'id_faktur' => $id_faktur,
                 'id_produk' => $id_produk[$i], // Menggunakan indeks yang sama untuk setiap array
                 'jumlah' => $jumlah[$i], // Menggunakan indeks yang sama untuk setiap array
-                'harga_satuan' => $harga_satuan_unformatted // Menggunakan nilai unformat untuk harga satuan
+                'harga_satuan' => $harga_satuan_unformatted, // Menggunakan nilai unformat untuk harga satuan
+                'id_pesanan' => $id_pesanan
             ];
 
             // Insert data detail produk ke dalam database

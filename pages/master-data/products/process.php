@@ -7,11 +7,11 @@ require '../../../includes/vendor/autoload.php';
 // exit();
 
 if (isset($_POST['add'])) {
-  // Ambil nilai-nlai langsung dari $_POST
   $no_produk = $_POST['no_produk'];
   $nama_produk = strtolower($_POST['nama_produk']);
-  $satuan = $_POST['satuan'];
+  $satuan = strtolower($_POST['satuan']);
   $harga = $_POST['harga'];
+  $keterangan = strtolower($_POST['keterangan']);
 
   // Periksa apakah nomor produk sudah ada
   if (isValueExists('produk', 'no_produk', $no_produk)) {
@@ -30,7 +30,8 @@ if (isset($_POST['add'])) {
       'nama_produk' => $nama_produk,
       'satuan' => $satuan,
       'harga' => $harga,
-      'status' => 'Baru' // Nilai default untuk status
+      'status' => 'draft', // Nilai default untuk status
+      'keterangan' => $keterangan // Nilai default untuk status
   ];
 
   // Panggil fungsi insertData untuk menambahkan data ke dalam tabel produk
@@ -52,6 +53,7 @@ if (isset($_POST['add'])) {
   $satuan = $_POST['satuan'];
   $harga = $_POST['harga'];
   $status = $_POST['status'];
+  $keterangan = strtolower($_POST['keterangan']);
 
   // Periksa apakah nomor produk sudah ada (kecuali untuk produk yang sedang diedit)
   if (isValueExists('produk', 'no_produk', $no_produk, $id_produk, 'id_produk')) {
@@ -66,7 +68,8 @@ if (isset($_POST['add'])) {
     'nama_produk' => $nama_produk,
     'satuan' => $satuan,
     'harga' => $harga,
-    'status' => $status
+    'status' => $status,
+    'keterangan' => $keterangan
   ];
 
   // Kondisi untuk menentukan produk mana yang akan diupdate

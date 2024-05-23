@@ -9,22 +9,26 @@ require '../../includes/header.php';
 
 // Validasi nilai kategori dan atur nilai deskriptif
 if ($category_param === 'outgoing') {
-    $category = 'keluar';
+  $category = 'keluar';
+  $sender = 'internal';
+  $receiver = 'customer';
 } elseif ($category_param === 'incoming') {
-    $category = 'masuk';
+  $category = 'masuk';
+  $sender = 'customer';
+  $receiver = 'internal';
 } else {
-    die("Kategori tidak valid");
+  die("Kategori tidak valid");
 }
 
 $mainTable = 'pesanan_pembelian';
 $joinTables = [
-    ['kontak_internal', 'pesanan_pembelian.id_pengirim = kontak_internal.id_pengirim'], 
-    ['pelanggan', 'pesanan_pembelian.id_penerima = pelanggan.id_pelanggan'],
-    ['ppn', 'pesanan_pembelian.id_ppn = ppn.id_ppn']
+  ["kontak pengirim", "pesanan_pembelian.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
+  ["kontak penerima", "pesanan_pembelian.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
+  ['ppn', 'pesanan_pembelian.id_ppn = ppn.id_ppn']
 ];
 
 // Kolom-kolom yang ingin diambil dari tabel utama dan tabel-tabel yang di-join
-$columns = 'pesanan_pembelian.*, kontak_internal.nama_pengirim AS nama_pengirim, pelanggan.nama_pelanggan AS nama_penerima, ppn.jenis_ppn AS jenis_ppn';
+$columns = 'pesanan_pembelian.*, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, ppn.jenis_ppn';
 
 // Kondisi tambahan untuk seleksi data (opsional)
 $conditions = "pesanan_pembelian.kategori = '$category'";
@@ -38,14 +42,14 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Purchase Order</h1>
-  <a href="add.php?category=<?= $category_param ?>" class="btn btn-primary btn-lg btn-icon btn-add">Buat Purchase
-    Order</a>
+  <a href="add.php?category=<?= $category_param ?>" class="btn btn-primary btn-lg btn-icon btn-add">
+    <?= $category_param === 'incoming' ? 'Tambah Purchase Order' : 'Buat Purchase Order' ?>
+  </a>
 </div>
 <table id="example" class="table nowrap table-hover" style="width:100%">
   <thead>
     <tr>
       <th class="text-start">No.</th>
-      <!-- <th>ID Penawaran</th> -->
       <th>Nomor PO</th>
       <th>Tanggal</th>
       <th>Penerima</th>
@@ -96,11 +100,13 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
       <td><?= ucfirst($po['catatan']); ?></td>
       <td>
         <div class="btn-group">
-          <a href="detail.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>" class="btn-act btn-view"
+          <a href="detail.php?category=<?= $category_param ?>&id=<?= $ph['id_pesanan']; ?>" class="btn-act btn-view"
             title="Lihat Detail"></a>
-          <a href="edit.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>" class="btn-act btn-edit"
+          <a href="edit.php?category=<?= $category_param ?>&id=<?= $ph['id_pesanan']; ?>" class="btn-act btn-edit"
             title="Ubah Data"></a>
-          <a href="del.php?id=<?= $po['id_pesanan']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
+          <a href="javascript:void(0);"
+            onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $ph['id_pesanan']; ?>', 'Apakah Anda yakin ingin menghapus data penawaran ini? Semua detail penawaran terkait juga akan dihapus.')"
+            class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
     </tr>

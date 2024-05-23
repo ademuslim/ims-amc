@@ -10,21 +10,25 @@ require '../../includes/header.php';
 // Validasi nilai kategori dan atur nilai deskriptif
 if ($category_param === 'outgoing') {
     $category = 'keluar';
+    $sender = 'internal';
+    $receiver = 'customer';
 } elseif ($category_param === 'incoming') {
     $category = 'masuk';
+    $sender = 'customer';
+    $receiver = 'internal';
 } else {
     die("Kategori tidak valid");
 }
 
 $mainTable = 'penawaran_harga';
 $joinTables = [
-    ['kontak_internal', 'penawaran_harga.id_pengirim = kontak_internal.id_pengirim'], 
-    ['pelanggan', 'penawaran_harga.id_penerima = pelanggan.id_pelanggan'],
+    ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
+    ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
     ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
 ];
 
 // Kolom-kolom yang ingin diambil dari tabel utama dan tabel-tabel yang di-join
-$columns = 'penawaran_harga.*, kontak_internal.nama_pengirim AS nama_pengirim, pelanggan.nama_pelanggan AS nama_penerima, ppn.jenis_ppn AS jenis_ppn';
+$columns = 'penawaran_harga.*, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, ppn.jenis_ppn';
 
 // Kondisi tambahan untuk seleksi data (opsional)
 $conditions = "penawaran_harga.kategori = '$category'";
@@ -45,7 +49,6 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
   <thead>
     <tr>
       <th class="text-start">No.</th>
-      <!-- <th>ID Penawaran</th> -->
       <th>Nomor Penawaran</th>
       <th>Tanggal</th>
       <th>Penerima</th>
@@ -69,7 +72,6 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
     <?php foreach ($data_penawaran_harga as $ph) : ?>
     <tr>
       <td class="text-start"><?= $no; ?></td>
-      <!-- <td><?= $ph['id_penawaran']; ?></td> -->
       <td><?= strtoupper($ph['no_penawaran']); ?></td>
       <td><?= dateID($ph['tanggal']); ?></td>
       <td><?= ucwords($ph['nama_penerima']); ?></td>
@@ -102,7 +104,9 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
             title="Lihat Detail"></a>
           <a href="edit.php?category=<?= $category_param ?>&id=<?= $ph['id_penawaran']; ?>" class="btn-act btn-edit"
             title="Ubah Data"></a>
-          <a href="del.php?id=<?= $ph['id_penawaran']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
+          <a href="javascript:void(0);"
+            onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $ph['id_penawaran']; ?>', 'Apakah Anda yakin ingin menghapus data penawaran ini? Semua detail penawaran terkait juga akan dihapus.')"
+            class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
     </tr>

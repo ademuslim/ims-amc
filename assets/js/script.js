@@ -5,7 +5,6 @@
 //     $("#overlay").fadeOut(); // Menghilangkan overlay secara perlahan
 //   }, 1500); // Waktu penundaan dalam milidetik (di sini: 1500 ms = 1.5 detik)
 // });
-
 // DataTables JS
 $(document).ready(function () {
   var table = $("#example").DataTable({

@@ -25,6 +25,17 @@ if (isset($_SESSION['error_message'])) {
   unset($_SESSION['error_message']);
 }
 
+// Validasi nilai kategori dan atur nilai deskriptif
+if ($category_param === 'outgoing') {
+  $sender = 'internal';
+  $receiver = 'customer';
+} elseif ($category_param === 'incoming') {
+  $sender = 'customer';
+  $receiver = 'internal';
+} else {
+  die("Kategori tidak valid");
+}
+
 // Variabel untuk menyimpan data penawaran harga dan detail
 $data_penawaran_harga = [];
 $data_penawaran_harga_detail = [];
@@ -36,11 +47,13 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
   $id_penawaran = $_GET['id'];
   $mainTable = 'penawaran_harga';
   $joinTables = [
-      ['kontak_internal', 'penawaran_harga.id_pengirim = kontak_internal.id_pengirim'], 
-      ['pelanggan', 'penawaran_harga.id_penerima = pelanggan.id_pelanggan'],
+      ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
+      ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
       ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
   ];
-  $columns = 'penawaran_harga.*, kontak_internal.*, pelanggan.nama_pelanggan AS nama_penerima, pelanggan.alamat, ppn.jenis_ppn, ppn.tarif';
+  // Kolom-kolom yang ingin diambil dari tabel utama dan tabel-tabel yang di-join
+  $columns = 'penawaran_harga.*, pengirim.nama_kontak AS nama_pengirim, pengirim.alamat AS alamat_pengirim, pengirim.telepon AS telepon_pengirim, pengirim.email AS email_pengirim, penerima.nama_kontak AS nama_penerima, penerima.alamat AS alamat_penerima, ppn.*';
+
   $conditions = "penawaran_harga.id_penawaran = '$id_penawaran'";
 
   // Panggil fungsi selectDataJoin dengan ORDER BY
@@ -100,9 +113,11 @@ if ($error_message): ?>
     <div class="row">
       <!-- Logo -->
       <div class="col-md-6 p-0">
+        <?php if (!empty($data['logo'])): ?>
         <div>
           <img class="image" src="<?= $data['logo'] ?>" alt="Detail Logo">
         </div>
+        <?php endif; ?>
       </div>
       <!-- Judul Dokumen -->
       <div class="col-md-6 p-0">
@@ -115,7 +130,7 @@ if ($error_message): ?>
       <div class="col-md-7 p-0 mt-3">
         <p><?= strtoupper($data['nama_pengirim']) ?></p>
         <p><?= ucwords($data['alamat_pengirim']) ?></p>
-        <p><?= "Telp: " . $data['telepon'] . " Email: " . $data['email']?></p>
+        <p><?= "Telp: " . $data['telepon_pengirim'] . " Email: " . $data['email_pengirim']?></p>
       </div>
       <!-- Info Dokumen -->
       <div class="col-md-5 p-0">
@@ -153,7 +168,7 @@ if ($error_message): ?>
     <div class="row">
       <p class="p-0">Kepada Yth,</p>
       <p class="p-0"><?= strtoupper($data['nama_penerima']) ?></p>
-      <p class="p-0"><?= ucwords($data['alamat']) ?></p>
+      <p class="p-0"><?= ucwords($data['alamat_penerima']) ?></p>
     </div>
     <?php endif; ?>
 
@@ -172,8 +187,8 @@ if ($error_message): ?>
         <thead>
           <tr class="fw-bolder">
             <td>No.</td>
-            <td>No. Produk</td>
-            <td>Nama Produk</td>
+            <!-- <td>No. Produk</td> -->
+            <td>Deskripsi</td>
             <td colspan="2">Kuantitas</td>
             <td>Harga</td>
             <td>Total Harga</td>
@@ -193,7 +208,7 @@ if ($error_message): ?>
           ?>
           <tr>
             <td><?= $no ?></td>
-            <td><?= strtoupper($detail['no_produk']); ?></td>
+            <!-- <td><?= strtoupper($detail['no_produk']); ?></td> -->
             <td><?= strtoupper($detail['nama_produk']); ?></td>
             <td><?= $detail['jumlah']; ?></td>
             <td><?= strtoupper($detail['satuan']); ?></td>
@@ -220,32 +235,32 @@ if ($error_message): ?>
           ?>
           <?php if ($tampil_subtotal): ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
-            <td colspan="3">Subtotal</td>
-            <td colspan="2"><?= formatRupiah($subtotal) ?></td>
+            <td colspan="2" class="bg-transparent"></td>
+            <td colspan=" 3">Subtotal</td>
+            <td><?= formatRupiah($subtotal) ?></td>
           </tr>
           <?php endif; ?>
           <?php if ($diskon > 0): ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
+            <td colspan="2" class="bg-transparent"></td>
             <td colspan="2">Diskon</td>
             <td><?= $data['diskon'] . " %" ?></td>
-            <td colspan="2"><?= formatRupiah($nilai_diskon) ?></td>
+            <td><?= formatRupiah($nilai_diskon) ?></td>
           </tr>
           <?php endif; ?>
           <?php if ($tarif_ppn > 0): ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
+            <td colspan="2" class="bg-transparent"></td>
             <td colspan="2">PPN</td>
             <td><?= $data['jenis_ppn'] . " (" . $tarif_ppn . " %)" ?></td>
             <td><?= formatRupiah($nilai_ppn); ?></td>
           </tr>
           <?php endif; ?>
           <tr>
-            <td colspan="3" style="background-color: transparent;"></td>
+            <td colspan="2" class="bg-transparent"></td>
             <td colspan="3">Total</td>
             <!-- <td colspan="2">Dari DB: <?= $data['total'] ?></td> -->
-            <td colspan="2"><?= formatRupiah($total_setelah_ppn); ?></td>
+            <td><?= formatRupiah($total_setelah_ppn); ?></td>
           </tr>
         </tfoot>
       </table>
@@ -278,7 +293,11 @@ if ($error_message): ?>
           <p class="col-auto">Hormat Kami,</p>
         </div>
         <div class="row justify-content-center mb-3">
+          <?php if (!empty($signatureDetails['Path'])) {?>
           <img class="image" src="<?= $signatureDetails['Path'] ?>" alt="Preview Signature.">
+          <?php }else { ?>
+          <div style="width: 100px; height: 100px"></div>
+          <?php } ?>
         </div>
         <div class="row justify-content-center mb-3">
           <div class="col-auto"><?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?></div>
@@ -295,13 +314,13 @@ if ($error_message): ?>
 
   <div class="row justify-content-end mt-5 mb-4">
     <div class="col-auto">
-      <a href="edit.php?id=<?= $id_penawaran ?>">
+      <a href="edit.php?category=<?= $category_param ?>&id=<?= $id_penawaran ?>">
         <button type="button" class="btn btn-warning btn-lg">Ubah Penawaran Harga</button>
       </a>
     </div>
 
     <div class="col-auto">
-      <a href="index.php">
+      <a href="index.php?category=<?= $category_param ?>">
         <button type="button" class="btn btn-secondary btn-lg">Kembali</button>
       </a>
     </div>

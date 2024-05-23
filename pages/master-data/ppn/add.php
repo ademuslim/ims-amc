@@ -27,8 +27,8 @@
           <div class="row mb-3">
             <label for="keterangan" class="col-sm-3 col-form-label">Keterangan:</label>
             <div class="col-sm-9">
-              <textarea class="form-control form-control-sm" id="keterangan" name="keterangan"
-                rows="3">Opsional</textarea>
+              <textarea class="form-control form-control-sm" id="keterangan" name="keterangan" rows="2"
+                placeholder="Opsional."></textarea>
             </div>
           </div>
       </div>
