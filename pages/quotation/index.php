@@ -7,23 +7,12 @@ $page_title = $category_param === 'outgoing' ? 'Quotation Outgoing' : 'Quotation
 
 require '../../includes/header.php';
 
-// Validasi nilai kategori dan atur nilai deskriptif
-if ($category_param === 'outgoing') {
-    $category = 'keluar';
-    $sender = 'internal';
-    $receiver = 'customer';
-} elseif ($category_param === 'incoming') {
-    $category = 'masuk';
-    $sender = 'customer';
-    $receiver = 'internal';
-} else {
-    die("Kategori tidak valid");
-}
+$category = ($category_param === 'outgoing') ? 'keluar' : (($category_param === 'incoming') ? 'masuk' : die("Kategori tidak valid"));
 
 $mainTable = 'penawaran_harga';
 $joinTables = [
-    ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
-    ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
+    ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak"], 
+    ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak"],
     ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
 ];
 
@@ -52,11 +41,11 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
       <th>Nomor Penawaran</th>
       <th>Tanggal</th>
       <th>Penerima</th>
-      <th>U.P.</th>
+      <th>Status</th>
       <th>Total</th>
       <th>PPN</th>
       <th>Diskon</th>
-      <th>Status</th>
+      <th>U.P.</th>
       <th>Pengirim</th>
       <th>Catatan</th>
       <th>Aksi</th>
@@ -67,18 +56,12 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
     <tr>
       <td colspan="11">Tidak ada data</td>
     </tr>
-    <?php else : ?>
-    <?php $no = 1; ?>
-    <?php foreach ($data_penawaran_harga as $ph) : ?>
+    <?php else: $no = 1; foreach ($data_penawaran_harga as $ph): ?>
     <tr>
       <td class="text-start"><?= $no; ?></td>
       <td><?= strtoupper($ph['no_penawaran']); ?></td>
       <td><?= dateID($ph['tanggal']); ?></td>
-      <td><?= ucwords($ph['nama_penerima']); ?></td>
-      <td><?= ucwords($ph['up']); ?></td>
-      <td><?= $ph['total']; ?></td>
-      <td><?= ucwords($ph['jenis_ppn']); ?></td>
-      <td><?= $ph['diskon']; ?></td>
+      <td class="text-wrap"><?= ucwords($ph['nama_penerima']); ?></td>
       <td>
         <?php
         // Tentukan kelas bootstrap berdasarkan nilai status
@@ -95,9 +78,17 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
         ?>
         <span class="badge <?= $status_class ?>"><?= strtoupper($ph['status']) ?></span>
       </td>
-      <td><img class="me-3" src="<?= base_url($ph['logo']); ?>" alt="Logo"
-          width="50"><?= ucwords($ph['nama_pengirim']); ?></td>
-      <td><?= ucfirst($ph['catatan']); ?></td>
+      <td><?= formatRupiah($ph['total']); ?></td>
+      <td><?= ucwords($ph['jenis_ppn']); ?></td>
+      <td><?= $ph['diskon'] != 0 ? $ph['diskon'] : "-"; ?></td>
+      <td><?= !empty($ph['up']) ? ucwords($ph['up']) : "-"; ?></td>
+      <td>
+        <?php if (!empty($ph['logo'])) : ?>
+        <img class="me-3" src="<?= base_url($ph['logo']); ?>" alt="Logo" width="50">
+        <?php endif; ?>
+        <?= ucwords($ph['nama_pengirim']); ?>
+      </td>
+      <td><?= !empty($ph['catatan']) ? ucfirst($ph['catatan']) : "-"; ?></td>
       <td>
         <div class="btn-group">
           <a href="detail.php?category=<?= $category_param ?>&id=<?= $ph['id_penawaran']; ?>" class="btn-act btn-view"
@@ -110,11 +101,10 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
         </div>
       </td>
     </tr>
-    <?php $no++; ?>
-    <?php endforeach; ?>
-    <?php endif; ?>
+    <?php $no++; endforeach; endif; ?>
   </tbody>
 </table>
+
 <script>
 $(document).ready(function() {
   // Tangkap klik pada setiap tombol di dalam .btn-group
@@ -125,6 +115,4 @@ $(document).ready(function() {
 });
 </script>
 
-<?php
-require '../../includes/footer.php';
-?>
+<?php require '../../includes/footer.php'; ?>

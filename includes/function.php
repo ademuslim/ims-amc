@@ -537,3 +537,30 @@ function handleLogoUpload($file, $allowed_types, $max_file_size, $upload_path)
 function formatRupiah($number) {
     return 'Rp ' . number_format($number, 0, ',', '.');
 }
+
+// Fungsi untuk mendapatkan opsi enum dari kolom
+function getEnum($column_name, $table_name) {
+    global $conn; // Menggunakan variabel koneksi global
+
+    $enum_values = [];
+
+    // Buat kueri untuk mendapatkan informasi tentang kolom
+    $query = "SHOW COLUMNS FROM $table_name LIKE '$column_name'";
+
+    // Jalankan kueri
+    $result = mysqli_query($conn, $query);
+
+    // Periksa apakah kueri berhasil
+    if ($result) {
+        // Ambil informasi kolom
+        $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+        
+        // Periksa apakah tipe kolom adalah ENUM
+        if (isset($row['Type']) && strpos($row['Type'], 'enum') !== false) {
+            // Ekstrak nilai-nilai ENUM
+            $enum_values = explode(",", str_replace("'", "", substr($row['Type'], 5, -1)));
+        }
+    }
+
+    return $enum_values;
+}

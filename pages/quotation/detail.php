@@ -52,7 +52,14 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
       ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
   ];
   // Kolom-kolom yang ingin diambil dari tabel utama dan tabel-tabel yang di-join
-  $columns = 'penawaran_harga.*, pengirim.nama_kontak AS nama_pengirim, pengirim.alamat AS alamat_pengirim, pengirim.telepon AS telepon_pengirim, pengirim.email AS email_pengirim, penerima.nama_kontak AS nama_penerima, penerima.alamat AS alamat_penerima, ppn.*';
+  $columns =  'penawaran_harga.*, 
+              pengirim.nama_kontak AS nama_pengirim,
+              pengirim.alamat AS alamat_pengirim, 
+              pengirim.telepon AS telepon_pengirim, 
+              pengirim.email AS email_pengirim, 
+              penerima.nama_kontak AS nama_penerima, 
+              penerima.alamat AS alamat_penerima, 
+              ppn.*';
 
   $conditions = "penawaran_harga.id_penawaran = '$id_penawaran'";
 
@@ -132,6 +139,7 @@ if ($error_message): ?>
         <p><?= ucwords($data['alamat_pengirim']) ?></p>
         <p><?= "Telp: " . $data['telepon_pengirim'] . " Email: " . $data['email_pengirim']?></p>
       </div>
+
       <!-- Info Dokumen -->
       <div class="col-md-5 p-0">
         <div class="row justify-content-end">
@@ -175,7 +183,7 @@ if ($error_message): ?>
     <div class="row mb-3">
       <div class="col-sm-2 p-0">U.P.</div>
       <div class="col-auto">
-        <p><?= ": " . ucwords($data['up']) ?></p>
+        <p><?= ": " . (!empty($data['up']) ? ucwords($data['up']) : "_") ?></p>
       </div>
     </div>
 
@@ -197,10 +205,10 @@ if ($error_message): ?>
         <tbody id="detail-table">
           <?php
           $subtotal = 0;
-          if (!empty($data_penawaran_detail)): ?>
-          <?php $no = 1; ?>
-          <?php foreach ($data_penawaran_detail as $detail): ?>
-          <?php
+          if (!empty($data_penawaran_detail)): 
+            $no = 1; 
+            foreach ($data_penawaran_detail as $detail): 
+          
             // Hitung total harga untuk setiap baris
             $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
             // Tambahkan total harga ke subtotal
@@ -215,9 +223,7 @@ if ($error_message): ?>
             <td><?= formatRupiah($detail['harga_satuan']); ?></td>
             <td><?= formatRupiah($total_harga); ?></td>
           </tr>
-          <?php $no++ ?>
-          <?php endforeach; ?>
-          <?php endif; ?>
+          <?php $no++; endforeach; endif; ?>
         </tbody>
         <tfoot>
           <?php
@@ -266,12 +272,14 @@ if ($error_message): ?>
       </table>
     </div>
 
+    <?php if (!empty($data['catatan'])): ?>
     <div class="row mb-3">
       <div class="col-md-5">
         <p>Keterangan:</p>
         <p><?= ucfirst($data['catatan']) ?></p>
       </div>
     </div>
+    <?php endif; ?>
 
     <div class="row mb-3">
       <p>Kami berharap penawaran ini dapat memenuhi kebutuhan yang Bapak/Ibu miliki. Apabila terdapat pertanyaan atau
@@ -292,6 +300,7 @@ if ($error_message): ?>
         <div class="row justify-content-center mb-3">
           <p class="col-auto">Hormat Kami,</p>
         </div>
+
         <div class="row justify-content-center mb-3">
           <?php if (!empty($signatureDetails['Path'])) {?>
           <img class="image" src="<?= $signatureDetails['Path'] ?>" alt="Preview Signature.">
@@ -299,6 +308,7 @@ if ($error_message): ?>
           <div style="width: 100px; height: 100px"></div>
           <?php } ?>
         </div>
+
         <div class="row justify-content-center mb-3">
           <div class="col-auto"><?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?></div>
         </div>
@@ -308,24 +318,22 @@ if ($error_message): ?>
         </div>
       </div>
     </div>
-  </div>
-  <?php endif; ?>
-  <?php endif; ?>
+    <?php endif; endif; ?>
 
-  <div class="row justify-content-end mt-5 mb-4">
-    <div class="col-auto">
-      <a href="edit.php?category=<?= $category_param ?>&id=<?= $id_penawaran ?>">
-        <button type="button" class="btn btn-warning btn-lg">Ubah Penawaran Harga</button>
-      </a>
-    </div>
+    <div class="row justify-content-end mt-5 mb-4">
+      <div class="col-auto">
+        <a href="edit.php?category=<?= $category_param ?>&id=<?= $id_penawaran ?>">
+          <button type="button" class="btn btn-warning btn-lg">Ubah Penawaran Harga</button>
+        </a>
+      </div>
 
-    <div class="col-auto">
-      <a href="index.php?category=<?= $category_param ?>">
-        <button type="button" class="btn btn-secondary btn-lg">Kembali</button>
-      </a>
+      <div class="col-auto">
+        <a href="index.php?category=<?= $category_param ?>">
+          <button type="button" class="btn btn-secondary btn-lg">Kembali</button>
+        </a>
+      </div>
     </div>
   </div>
-</div>
 </div>
 <?php
 require '../../includes/footer.php';

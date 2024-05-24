@@ -215,93 +215,122 @@ if (isset($_POST['add'])) {
     $diskon = isset($_POST['diskon']) ? $_POST['diskon'] : 0;
     $jenis_ppn = $_POST['jenis_ppn'];
     $kategori = $_POST['kategori'];
+    $status = $_POST['status'];
 
     // Tentukan $category_param berdasarkan nilai $kategori
-    if ($kategori == "keluar") {
-        $category_param = "outgoing";
-    } elseif ($kategori == "masuk") {
-        $category_param = "incoming";
-    } else {
-        // Berikan penanganan jika nilai kategori tidak valid
-        die("Invalid category");
-    }
+    $category_param = $kategori === "keluar" ? "outgoing" : ($kategori === "masuk" ? "incoming" : die("Invalid category"));
 
-    // Variabel untuk menyimpan path logo
-    $logoPath = '';
+    if ($category_param === 'outgoing') {
+        // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath untuk dokumen outgoing
+        $defaultLogoPath = $defaultSignaturePath = null;
+        
+        // Cek apakah nilai-nilai ini ada di POST
+        $defaultLogoPath = isset($_POST['default_logo_path']) ? $_POST['default_logo_path'] : null;
+        $signature_info = isset($_POST['signature_info']) ? $_POST['signature_info'] : '';
 
-    // Periksa apakah logo diunggah baru atau menggunakan default
-    if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-        // Logo baru diunggah, proses seperti biasa
-        $file_tmp = $_FILES['logo']['tmp_name'];
-        $file_type = $_FILES['logo']['type'];
-        $file_size = $_FILES['logo']['size'];
-        $max_file_size = 20 * 1024 * 1024; // 20MB
-        $allowed_extensions = array('jpeg', 'jpg', 'png', 'gif');
-
-        // Pastikan jenis file dan ukuran file sesuai
-        if (in_array($file_type, array('image/jpeg', 'image/png', 'image/gif')) && $file_size <= $max_file_size) {
-            // Menghasilkan nama file acak dan unik
-            $file_extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
-            $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-            $file_destination = "../../assets/image/uploads/logo/" . $file_name;
-
-            // Pindahkan file dari temp ke lokasi tujuan
-            if (move_uploaded_file($file_tmp, $file_destination)) {
-                // Gunakan path logo yang baru diunggah
-                $logoPath = $file_destination;
-            } else {
-                // Gagal memindahkan file
-                $error_message = "Gagal menyimpan file gambar logo baru.";
+        // Pisahkan data signature_info berdasarkan koma (,) untuk mendapatkan setiap elemen
+        $signature_info_parts = explode(", ", $signature_info);
+        
+        // Loop melalui setiap elemen untuk mencari bagian 'Path'
+        foreach ($signature_info_parts as $part) {
+            // Pecah setiap elemen menjadi pasangan kunci dan nilai
+            $pair = explode(": ", $part);
+            
+            // Jika pasangan kunci dan nilai sesuai dengan 'Path', simpan nilainya
+            if ($pair[0] == 'Path') {
+                $defaultSignaturePath = $pair[1];
+                break; // Keluar dari loop setelah menemukan path
             }
-        } else {
-            // Jenis file tidak diizinkan atau ukuran file melebihi batas maksimal
-            $error_message = "Ukuran file yang diunggah melebihi batas maksimal (20MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
         }
-    } else {
-        // Gunakan path default logo jika tidak ada logo baru yang diunggah
-        $defaultLogoPath = isset($_POST['defaultLogoPath']) ? $_POST['defaultLogoPath'] : '';
-        $logoPath = $defaultLogoPath;
-    }
-    // Variabel untuk menyimpan path signature
-    $signaturePath = '';
+        
+        // Inisialisasi variabel $file_destination_logo dan $file_destination_signature
+        $file_destination_logo = $file_destination_signature = null;
+        
+        // Memeriksa apakah user menghapus logo
+        if (isset($_POST['remove_logo']) && $_POST['remove_logo'] === 'true') {
+            // Jika user menghapus logo, jangan menetapkan path logo
+            $file_destination_logo = null;
+        } else {
+            // Jika user tidak menghapus logo, periksa apakah ada file logo yang diunggah
+            if (!empty($_FILES['logo']['name'])) {
+                // Proses upload logo baru
+                $file_tmp = $_FILES['logo']['tmp_name'];
+                $file_type = $_FILES['logo']['type'];
+                $file_size = $_FILES['logo']['size'];
+                $max_file_size = 2 * 1024 * 1024; // 2MB
 
-    // Periksa apakah signature diunggah baru atau menggunakan default
-    if (isset($_FILES['signature']) && $_FILES['signature']['error'] === UPLOAD_ERR_OK) {
-        // Signature baru diunggah, proses seperti biasa
-        $file_tmp = $_FILES['signature']['tmp_name'];
-        $file_type = $_FILES['signature']['type'];
-        $file_size = $_FILES['signature']['size'];
-        $max_file_size = 20 * 1024 * 1024; // 20MB
-        $allowed_extensions = array('jpeg', 'jpg', 'png', 'gif');
+                // Pastikan jenis file dan ukuran file sesuai
+                if (in_array($file_type, array('image/jpeg', 'image/png', 'image/gif')) && $file_size <= $max_file_size) {
+                    // Generate nama file acak dan unik
+                    $file_extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+                    $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
+                    $file_destination_logo = "../../assets/image/uploads/logo/" . $file_name;
 
-        // Pastikan jenis file dan ukuran file sesuai
-        if (in_array($file_type, array('image/jpeg', 'image/png', 'image/gif')) && $file_size <= $max_file_size) {
-            // Menghasilkan nama file acak dan unik
-            $file_extension = pathinfo($_FILES['signature']['name'], PATHINFO_EXTENSION);
-            $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-            $file_destination = "../../assets/image/uploads/signature/" . $file_name;
-
-            // Pindahkan file dari temp ke lokasi tujuan
-            if (move_uploaded_file($file_tmp, $file_destination)) {
-                // Gunakan path signature yang baru diunggah
-                $signaturePath = $file_destination;
+                    // Pindahkan file dari temp ke lokasi tujuan
+                    if (move_uploaded_file($file_tmp, $file_destination_logo)) {
+                        // File logo berhasil diunggah dan dipindahkan
+                    } else {
+                        $_SESSION['error_message'] = "Gagal menyimpan file gambar logo.";
+                        // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                    }
+                } else {
+                    $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
+                    // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                }
             } else {
-                // Gagal memindahkan file
-                $error_message = "Gagal menyimpan file gambar signature baru.";
+                // Jika input file logo kosong dan logo tidak dihapus
+                // Set nilai file_destination_logo sesuai dengan default logo path
+                $file_destination_logo = $defaultLogoPath;
             }
-        } else {
-            // Jenis file tidak diizinkan atau ukuran file melebihi batas maksimal
-            $error_message = "Ukuran file yang diunggah melebihi batas maksimal (20MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
         }
-    } else {
-        // Gunakan path default signature jika tidak ada signature baru yang diunggah
-        $defaultSignaturePath = isset($_POST['defaultSignaturePath']) ? $_POST['defaultSignaturePath'] : '';
-        $signaturePath = $defaultSignaturePath;
+
+        // Memeriksa apakah user menghapus signature
+        if (isset($_POST['remove_signature']) && $_POST['remove_signature'] === 'true') {
+            // Jika user menghapus signature, jangan menetapkan path signature
+            $file_destination_signature = null;
+        } else {
+            // Jika user tidak menghapus signature, periksa apakah ada file signature yang diunggah
+            if (!empty($_FILES['signature']['name'])) {
+                // Proses upload signature baru
+                $file_tmp = $_FILES['signature']['tmp_name'];
+                $file_type = $_FILES['signature']['type'];
+                $file_size = $_FILES['signature']['size'];
+                $max_file_size = 2 * 1024 * 1024; // 2MB
+
+                // Pastikan jenis file dan ukuran file sesuai
+                if (in_array($file_type, array('image/jpeg', 'image/png', 'image/gif')) && $file_size <= $max_file_size) {
+                    // Generate nama file acak dan unik
+                    $file_extension = pathinfo($_FILES['signature']['name'], PATHINFO_EXTENSION);
+                    $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
+                    $file_destination_signature = "../../assets/image/uploads/signature/" . $file_name;
+
+                    // Pindahkan file dari temp ke lokasi tujuan
+                    if (move_uploaded_file($file_tmp, $file_destination_signature)) {
+                        // File logo berhasil diunggah dan dipindahkan
+                    } else {
+                        $_SESSION['error_message'] = "Gagal menyimpan file signature.";
+                        // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                    }
+                } else {
+                    $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
+                    // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                }
+            } else {
+                // Jika input file signature kosong dan signature tidak dihapus
+                // Set nilai file_destination_signature sesuai dengan default signature path
+                $file_destination_signature = $defaultSignaturePath;
+            }
+        }
     }
 
-    // Bangun data signature untuk diperbarui dalam signature_info
-    $signatureInfo = "Location: " . $_POST['signing_location'] . ", Date: " . $_POST['signing_date'] . ", Name: " . $_POST['signer_name'] . ", Position: " . $_POST['signer_position'] . ", Path: " . $signaturePath;
+    // Ambil nilai-nilai dari input signature info
+    $signing_location = strtolower($_POST['signing_location']);
+    $signing_date = $_POST['signing_date'];
+    $signer_name = strtolower($_POST['signer_name']);
+    $signer_position = strtolower($_POST['signer_position']);
 
+    // Susun data signature info sebagai string
+    $signature_info = "Location: $signing_location, Date: $signing_date, Name: $signer_name, Position: $signer_position, Path: $file_destination_signature";
 
     // Bangun data untuk pembaruan penawaran_harga
     $data = [
@@ -314,8 +343,10 @@ if (isset($_POST['add'])) {
         'up' => $up,
         'diskon' => $diskon,
         'id_ppn' => $jenis_ppn,
-        'logo' => $logoPath, // tambahkan lokasi file logo ke dalam data yang akan diupdate
-        'signature_info' => $signatureInfo
+        'logo' => $file_destination_logo, // tambahkan lokasi file logo ke dalam data yang akan diupdate
+        'signature_info' => $signature_info,
+        'kategori' => $kategori,
+        'status' => $status
     ];
     
     $conditions = "id_penawaran = '$id_penawaran'";

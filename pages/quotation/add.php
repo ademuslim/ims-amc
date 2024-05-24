@@ -62,7 +62,7 @@ if ($category_param === 'outgoing') {
           <input type="hidden" id="removeLogoInput" name="remove_logo" value="false">
           <div id="image-preview-container" class="position-relative">
             <div class="d-flex flex-column justify-content-center align-items-center h-100">
-              <img id="logo-preview" src="" alt="Preview Logo">
+              <img id="logo-preview" src="" alt="Tanpa Logo">
             </div>
             <button type="button" title="Hapus Logo" class="position-absolute top-0 end-0 z-3" id="cancelButton"
               onclick="removeLogo()"></button>
@@ -85,7 +85,6 @@ if ($category_param === 'outgoing') {
           </div>
         </div>
 
-
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
           <p class="fs-2 text-end">Penawaran Harga</p>
@@ -99,41 +98,31 @@ if ($category_param === 'outgoing') {
         <!-- Input Pengirim -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
-
             <label for="pengirim" class="col-sm-3 col-form-label">Pengirim</label>
             <div class="col-sm-9">
               <select class="form-select form-select-sm" id="pengirim" name="pengirim" required>
+                <option value="" selected disabled>-- Pilih Pengirim --</option>
                 <?php
-                // Tambahkan opsi kosong untuk mencegah opsi terpilih secara otomatis pada 'incoming'
-                if ($category_param == 'incoming') {
-                    echo '<option value="" selected disabled>Pilih pengirim</option>';
-                }
-
-                // Ambil data kontak sesuai dengan kategori sender
-                $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
-                
-                foreach ($kontak_pengirim as $row_pengirim) {
-                    $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
-
-                    // Tentukan pengirim mana yang akan menjadi default berdasarkan kategori
-                    if ($category_param == 'outgoing' && strtolower($row_pengirim['nama_kontak']) == "pt. mitra tehno gemilang") {
-                        $selected = "selected";
-                    }
-                    echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
-                }
+                  // Ambil data kontak sesuai dengan kategori sender
+                  $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                  foreach ($kontak_pengirim as $row_pengirim) {
+                    // Jika kategori adalah 'outgoing' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
+                    $selected = ($category_param == 'outgoing' && $row_pengirim['nama_kontak'] == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                      echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
+                  }
                 ?>
               </select>
               <div class="invalid-feedback">
                 Harap pilih pengirim.
               </div>
             </div>
-
           </div>
         </div>
+
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
+          <!-- input no invoice outgoing -->
           <div class="row mb-3">
-            <!-- input no invoice outgoing -->
             <?php if ($category_param == 'outgoing') { ?>
             <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
@@ -156,6 +145,7 @@ if ($category_param === 'outgoing') {
             <?php } ?>
           </div>
 
+          <!-- Tanggal -->
           <div class="row mb-3">
             <label for="tanggal" class="col-sm-3 col-form-label">Tanggal</label>
             <div class="col-auto">
@@ -171,48 +161,30 @@ if ($category_param === 'outgoing') {
       <hr class="row mb-5 border border-secondary border-1 opacity-25">
 
       <div class="row">
+        <!-- Input penerima -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
             <label for="penerima" class="col-sm-3 col-form-label">Penerima</label>
             <div class="col-sm-9">
-              <?php if ($category_param == 'incoming') {
-                // Panggil fungsi selectData untuk mengambil data penerima dengan kategori 'internal'
-                $penerima = selectData("kontak", "kategori = 'internal' AND nama_kontak = 'pt. mitra tehno gemilang'", "", "", array());
-
-                // Periksa apakah ada hasil dari query
-                if (!empty($penerima)) {
-                  // Jika ada hasil, ambil ID penerima pertama dari hasil query
-                  $id_penerima_mitra = $penerima[0]['id_kontak'];
-                } else {
-                  // Jika tidak ada hasil, atur ID penerima menjadi kosong atau sesuai kebutuhan
-                  $id_penerima_mitra = "";
-                } 
-              ?>
-              <!-- Jika kategori adalah 'incoming', gunakan input tersembunyi untuk menyimpan ID penerima -->
-              <input type="hidden" id="penerima" name="penerima" value="<?= $id_penerima_mitra ?>">
-              <input type="text" class="form-control form-control-sm" value="PT. Mitra Tehno Gemilang" readonly>
-
-              <?php } elseif ($category_param == 'outgoing') { ?>
-              <!-- Jika kategori adalah 'outgoing', tampilkan dropdown untuk memilih penerima -->
               <select class="form-select form-select-sm" id="penerima" name="penerima" required>
                 <option value="" selected disabled>-- Pilih Penerima --</option>
                 <?php
                   // Ambil data kontak dengan kategori 'customer'
-                  $kontak_penerima = selectData("kontak", "kategori = 'customer'");
+                  $kontak_penerima = selectData("kontak", "kategori = '$receiver'");
                   foreach ($kontak_penerima as $row_penerima) {
-                    echo '<option value="' . $row_penerima['id_kontak'] . '">' . ucwords($row_penerima['nama_kontak']) . '</option>';
+                      // Jika kategori adalah 'incoming' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
+                      $selected = ($category_param == 'incoming' && $row_penerima['nama_kontak'] == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                      echo '<option value="' . $row_penerima['id_kontak'] . '" ' . $selected . '>' . ucwords($row_penerima['nama_kontak']) . '</option>';
                   }
                 ?>
               </select>
               <div class="invalid-feedback">
                 Harap pilih penerima.
               </div>
-              <?php } ?>
             </div>
           </div>
         </div>
       </div>
-
 
       <div class="row">
         <div class="col-md-5 p-0">
@@ -248,7 +220,7 @@ if ($category_param === 'outgoing') {
                   <?php
                     $produk = selectData("produk");
                     foreach ($produk as $row_produk) {
-                        echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
+                        echo '<option value="' . $row_produk['id_produk'] . '">' . strtoupper($row_produk['nama_produk']) . '</option>';
                     }
                   ?>
                 </select>
@@ -269,7 +241,7 @@ if ($category_param === 'outgoing') {
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="2" rowspan="2" style="background-color: transparent;">
+              <td colspan="2" rowspan="2" class="bg-transparent">
                 <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
                   Baris</button>
               </td>
@@ -278,7 +250,6 @@ if ($category_param === 'outgoing') {
             </tr>
 
             <tr>
-              <!-- <td colspan="2" style="background-color: transparent;"></td> -->
               <td>Diskon</td>
               <td>
                 <div class="input-group input-group-sm">
@@ -291,7 +262,7 @@ if ($category_param === 'outgoing') {
             </tr>
 
             <tr>
-              <td colspan="2" style="background-color: transparent;"></td>
+              <td colspan="2" class="bg-transparent"></td>
               <td>PPN</td>
               <td>
                 <div class="input-group input-group-sm">
@@ -312,7 +283,7 @@ if ($category_param === 'outgoing') {
             </tr>
 
             <tr>
-              <td colspan="2" style="background-color: transparent;"></td>
+              <td colspan="2" class="bg-transparent"></td>
               <td colspan="2">Total</td>
               <td colspan="2">
                 <span id="grand-total">0</span>
@@ -351,6 +322,7 @@ if ($category_param === 'outgoing') {
           <div class="row justify-content-center mb-3">
             <div class="col-md-6 p-0 position-relative">
               <input type="hidden" name="remove_signature" id="removeSignatureInput" value="false">
+
               <div id="signature-preview-container" class="position-relative">
                 <div class="d-flex flex-column justify-content-center align-items-center h-100">
                   <img id="signature-preview" src="" alt="Preview Signature">
@@ -359,6 +331,7 @@ if ($category_param === 'outgoing') {
                   id="cancelButtonSignature" onclick="removeSignature()"></button>
                 <span class="position-absolute top-0 start-0" id="changeSignature">Ubah Tanda Tangan.</span>
               </div>
+
               <div id="signature-placeholder-container">
                 <div class="d-flex flex-column justify-content-center align-items-center h-100">
                   <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
@@ -378,6 +351,7 @@ if ($category_param === 'outgoing') {
             </div>
           </div>
           <?php } ?>
+
           <div class="row mb-3">
             <input type="text" class="form-control form-control-sm" id="signer-name" name="signer_name" required
               placeholder="Nama Lengkap">
@@ -814,8 +788,4 @@ function toggleChangeSignatureButton(visible) {
   }
 }
 </script>
-<?php endif; ?>
-
-<?php
-require '../../includes/footer.php';
-?>
+<?php endif; require '../../includes/footer.php'; ?>

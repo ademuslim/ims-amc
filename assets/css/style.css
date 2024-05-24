@@ -118,6 +118,7 @@ body {
   flex-grow: 1;
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden !important;
   padding: 2rem 3rem;
   background-color: #f2fafd;
 }
