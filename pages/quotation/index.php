@@ -48,6 +48,7 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
       <th>U.P.</th>
       <th>Pengirim</th>
       <th>Catatan</th>
+      <th>Detail</th>
       <th>Aksi</th>
     </tr>
   </thead>
@@ -72,7 +73,7 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
             $status_class = 'text-bg-info';
         } elseif ($ph['status'] == 'ditolak') {
             $status_class = 'text-bg-danger';
-        } elseif ($ph['status'] == 'dibayar') {
+        } elseif ($ph['status'] == 'disetujui') {
             $status_class = 'text-bg-success';
         }
         ?>
@@ -89,6 +90,55 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
         <?= ucwords($ph['nama_pengirim']); ?>
       </td>
       <td><?= !empty($ph['catatan']) ? ucfirst($ph['catatan']) : "-"; ?></td>
+
+      <!-- Detail PH -->
+      <td>
+        <?php
+        $id_penawaran = $ph['id_penawaran'];
+        $data_penawaran_harga_detail = [];
+        $mainDetailTable = 'detail_penawaran';
+        $joinDetailTables = [
+            ['penawaran_harga', 'detail_penawaran.id_penawaran = penawaran_harga.id_penawaran'], 
+            ['produk', 'detail_penawaran.id_produk = produk.id_produk']
+        ];
+        $columns = 'detail_penawaran.*, produk.*';
+        $conditions = "detail_penawaran.id_penawaran = '$id_penawaran'";
+
+        // Panggil fungsi selectDataJoin dengan ORDER BY
+        $data_penawaran_harga_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
+
+        $subtotal = 0;
+        if (!empty($data_penawaran_harga_detail)): ?>
+
+        <div class="row fw-bold border-bottom">
+          <div class="col">No.</div>
+          <div class="col">Deskripsi</div>
+          <div class="col">Kuantitas</div>
+          <div class="col">Harga</div>
+          <div class="col">Total Harga</div>
+        </div>
+        <?php
+            $no = 1; 
+            foreach ($data_penawaran_harga_detail as $detail): 
+            
+            // Hitung total harga untuk setiap baris
+            $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
+            // Tambahkan total harga ke subtotal
+            $subtotal += $total_harga;
+        ?>
+        <div class="row border-bottom">
+          <div class="col"><?= $no ?></div>
+          <div class="col"><?= strtoupper($detail['nama_produk']); ?></div>
+          <div class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></div>
+          <div class="col"><?= formatRupiah($detail['harga_satuan']); ?></div>
+          <div class="col"><?= formatRupiah($total_harga); ?></div>
+        </div>
+        <?php $no++; endforeach; ?>
+        <?php else: ?>
+        <span class="text-center">-</span>
+        <?php endif; ?>
+      </td>
+
       <td>
         <div class="btn-group">
           <a href="detail.php?category=<?= $category_param ?>&id=<?= $ph['id_penawaran']; ?>" class="btn-act btn-view"

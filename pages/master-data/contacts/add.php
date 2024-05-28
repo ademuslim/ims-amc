@@ -49,7 +49,7 @@
             </div>
           </div>
           <!-- Tambahkan input hidden untuk menyimpan kategori -->
-          <input type="hidden" name="category" value="<?php echo $category; ?>">
+          <input type="hidden" name="category" value="<?= $category; ?>">
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

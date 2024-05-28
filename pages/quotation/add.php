@@ -38,7 +38,13 @@ if ($category_param === 'outgoing') {
         
         // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
         if ($pair[0] == 'Path') {
-          $default_signature_path = $pair[1];
+          // Jika nilai Path tidak kosong, gunakan nilai tersebut
+          if (!empty($pair[1])) {
+            $default_signature_path = $pair[1];
+          } else {
+            // Jika nilai Path kosong, set default path
+            $default_signature_path = "../../assets/image/uploads/signature/no_signature.png";
+          }
           break; // Keluar dari loop setelah menemukan path
         }
       }

@@ -358,31 +358,35 @@ function updateData($table, $data, $conditions) {
   return $result;
 }
 
-// Fungsi hapus data
-function deleteData($table, $conditions) {
-  global $conn;
-  // Bangun pernyataan SQL
-  $sql = "DELETE FROM $table WHERE $conditions";
-  // Persiapkan statement
-  $stmt = mysqli_prepare($conn, $sql);
-  // Eksekusi statement
-  mysqli_stmt_execute($stmt);
-  // Ambil hasil
-  $result = mysqli_stmt_affected_rows($stmt);
-  // Tutup statement
-  mysqli_stmt_close($stmt);
-  return $result;
+// Fungsi untuk menghapus data
+function deleteData($table, $condition) {
+    global $conn;
+
+    // Query SQL untuk menghapus data
+    $sql = "DELETE FROM $table WHERE $condition";
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if ($stmt === false) {
+        return 0;
+    }
+
+    mysqli_stmt_execute($stmt);
+    $affectedRows = mysqli_stmt_affected_rows($stmt);
+    mysqli_stmt_close($stmt);
+
+    return $affectedRows;
 }
+
 // Fungsi untuk memeriksa apakah nilai sudah ada dalam tabel dan kolom tertentu
-function isValueExists($table, $column, $value, $excludeId = null, $idColumn = 'id') {
+function isValueExists($tableName, $columnName, $valueToCheck, $excludeId = null, $idColumnName = 'id') {
     global $conn;
   
     // Persiapkan query SQL
-    $sql = "SELECT COUNT(*) as count FROM $table WHERE $column = ?";
+    $sql = "SELECT COUNT(*) as count FROM $tableName WHERE $columnName = ? AND $columnName IS NOT NULL";
     
     // Jika excludeId diberikan, tambahkan kondisi untuk mengecualikan id tertentu
     if ($excludeId !== null) {
-        $sql .= " AND $idColumn != ?";
+        $sql .= " AND $idColumnName != ?";
     }
   
     // Persiapkan statement
@@ -390,9 +394,9 @@ function isValueExists($table, $column, $value, $excludeId = null, $idColumn = '
   
     // Bind parameter
     if ($excludeId !== null) {
-        mysqli_stmt_bind_param($stmt, "ss", $value, $excludeId);
+        mysqli_stmt_bind_param($stmt, "ss", $valueToCheck, $excludeId);
     } else {
-        mysqli_stmt_bind_param($stmt, "s", $value);
+        mysqli_stmt_bind_param($stmt, "s", $valueToCheck);
     }
   
     // Eksekusi statement
@@ -407,24 +411,82 @@ function isValueExists($table, $column, $value, $excludeId = null, $idColumn = '
   
     // Return true jika jumlah baris lebih dari 0 (nilai sudah ada), false jika tidak
     return $count > 0;
-  }
+}
 
-  function isDataInUse($value, $tableColumnPairs) {
+// // Fungsi untuk memeriksa apakah nilai sedang digunakan di tabel lain
+// function isDataInUse($valueToCheck, $tableColumnMap, $additionalColumns = []) {
+//     global $conn;
+
+//     // Inisialisasi variabel untuk menyimpan status penggunaan nilai
+//     $dataInUse = false;
+
+//     // Loop melalui setiap pasangan tabel-kolom
+//     foreach ($tableColumnMap as $table => $columns) {
+//         // Buat bagian WHERE dari query SQL dengan banyak kolom
+//         $whereClauses = [];
+//         foreach ($columns as $column) {
+//             $whereClauses[] = "$column = ?";
+//         }
+
+//         // Tambahkan kolom-kolom tambahan ke dalam klausa WHERE
+//         foreach ($additionalColumns as $additionalColumn) {
+//             $whereClauses[] = "$additionalColumn = ?";
+//         }
+
+//         $whereClause = implode(' OR ', $whereClauses);
+
+//         // Persiapkan query SQL untuk mengecek relasi di tabel lain
+//         $sql = "SELECT COUNT(*) as count FROM $table WHERE $whereClause";
+
+//         // Persiapkan statement
+//         $stmt = mysqli_prepare($conn, $sql);
+
+//         // Bind parameter
+//         $params = array_fill(0, count($columns) + count($additionalColumns), $valueToCheck);
+//         mysqli_stmt_bind_param($stmt, str_repeat('s', count($columns) + count($additionalColumns)), ...$params);
+
+//         // Eksekusi statement
+//         mysqli_stmt_execute($stmt);
+
+//         // Ambil hasil
+//         mysqli_stmt_bind_result($stmt, $count);
+//         mysqli_stmt_fetch($stmt);
+
+//         // Tutup statement
+//         mysqli_stmt_close($stmt);
+
+//         // Jika jumlah baris lebih dari 0 (data sedang digunakan dalam tabel lain), set status menjadi true
+//         if ($count > 0) {
+//             $dataInUse = true;
+//             // Hentikan loop karena data sudah ditemukan digunakan dalam salah satu tabel lain
+//             break;
+//         }
+//     }
+
+//     // Return status penggunaan data
+//     return $dataInUse;
+// }
+
+// Fungsi untuk memeriksa apakah nilai sedang digunakan di tabel lain
+function isDataInUse($valueToCheck, $tableColumnMap, $additionalColumns = []) {
     global $conn;
 
-    // Inisialisasi variabel untuk menyimpan status penggunaan data
+    // Inisialisasi variabel untuk menyimpan status penggunaan nilai
     $dataInUse = false;
 
     // Loop melalui setiap pasangan tabel-kolom
-    foreach ($tableColumnPairs as $tableColumns) {
-        $table = $tableColumns['table'];
-        $columns = $tableColumns['columns']; // Array of columns to check
-
+    foreach ($tableColumnMap as $table => $columns) {
         // Buat bagian WHERE dari query SQL dengan banyak kolom
         $whereClauses = [];
         foreach ($columns as $column) {
             $whereClauses[] = "$column = ?";
         }
+
+        // Tambahkan kolom-kolom tambahan ke dalam klausa WHERE
+        foreach ($additionalColumns as $additionalColumn) {
+            $whereClauses[] = "$additionalColumn = ?";
+        }
+
         $whereClause = implode(' OR ', $whereClauses);
 
         // Persiapkan query SQL untuk mengecek relasi di tabel lain
@@ -434,8 +496,8 @@ function isValueExists($table, $column, $value, $excludeId = null, $idColumn = '
         $stmt = mysqli_prepare($conn, $sql);
 
         // Bind parameter
-        $params = array_fill(0, count($columns), $value);
-        mysqli_stmt_bind_param($stmt, str_repeat('s', count($columns)), ...$params);
+        $params = array_fill(0, count($columns) + count($additionalColumns), $valueToCheck);
+        mysqli_stmt_bind_param($stmt, str_repeat('s', count($columns) + count($additionalColumns)), ...$params);
 
         // Eksekusi statement
         mysqli_stmt_execute($stmt);
@@ -449,6 +511,7 @@ function isValueExists($table, $column, $value, $excludeId = null, $idColumn = '
 
         // Jika jumlah baris lebih dari 0 (data sedang digunakan dalam tabel lain), set status menjadi true
         if ($count > 0) {
+            var_dump($table, $columns, $sql, $params); // Menambahkan debug tambahan
             $dataInUse = true;
             // Hentikan loop karena data sudah ditemukan digunakan dalam salah satu tabel lain
             break;
@@ -459,44 +522,45 @@ function isValueExists($table, $column, $value, $excludeId = null, $idColumn = '
     return $dataInUse;
 }
 
+
 function getLastDocumentNumber($tabel, $column, $order_by, $prefix, $suffix, $month, $year) {
-  global $conn;
+    global $conn;
 
-  // Query untuk mengambil nomor dokumen terbaru dari tabel tertentu berdasarkan kolom tertentu
-  // dan berdasarkan bulan dan tahun yang disediakan
-  $query = "SELECT $column FROM $tabel WHERE YEAR($order_by) = $year AND MONTH($order_by) = $month AND kategori = 'keluar' ORDER BY $column DESC LIMIT 1";
+    // Query untuk mengambil nomor dokumen terbaru dari tabel tertentu berdasarkan kolom tertentu
+    // dan berdasarkan bulan dan tahun yang disediakan
+    $query = "SELECT $column FROM $tabel WHERE YEAR($order_by) = $year AND MONTH($order_by) = $month AND kategori = 'keluar' ORDER BY $column DESC LIMIT 1";
 
-  // Eksekusi query
-  $result = mysqli_query($conn, $query);
+    // Eksekusi query
+    $result = mysqli_query($conn, $query);
 
-  // Periksa apakah query berhasil dieksekusi
-  if (!$result) {
-      die("Error: " . mysqli_error($conn));
-  }
+    // Periksa apakah query berhasil dieksekusi
+    if (!$result) {
+        die("Error: " . mysqli_error($conn));
+    }
 
-  // Inisialisasi nomor dokumen terbaru
-  $new_doc_number = '';
+    // Inisialisasi nomor dokumen terbaru
+    $new_doc_number = '';
 
-  // Periksa apakah ada hasil dari query
-  if (mysqli_num_rows($result) > 0) {
-      // Ambil nomor dokumen terbaru
-      $row = mysqli_fetch_assoc($result);
-      $last_number = $row[$column];
+    // Periksa apakah ada hasil dari query
+    if (mysqli_num_rows($result) > 0) {
+        // Ambil nomor dokumen terbaru
+        $row = mysqli_fetch_assoc($result);
+        $last_number = $row[$column];
 
-      // Split nomor dokumen terbaru untuk mendapatkan nomor
-      $doc_parts = explode('/', $last_number);
-      $last_doc_digits = intval($doc_parts[0]);
+        // Split nomor dokumen terbaru untuk mendapatkan nomor
+        $doc_parts = explode('/', $last_number);
+        $last_doc_digits = intval($doc_parts[0]);
 
-      // Tambahkan 1 pada nomor dokumen terbaru
-      $new_doc_digits = sprintf('%03d', $last_doc_digits + 1);
-      $new_doc_number = $new_doc_digits . '/' . $prefix . '/' . $suffix . '/' . $month . '/' . $year;
-  } else {
-      // Jika tidak ada nomor dokumen terbaru untuk bulan dan tahun yang sama,
-      // buat nomor dokumen baru dimulai dari 001
-      $new_doc_number = '001/' . $prefix . '/' . $suffix . '/' . $month . '/' . $year;
-  }
+        // Tambahkan 1 pada nomor dokumen terbaru
+        $new_doc_digits = sprintf('%03d', $last_doc_digits + 1);
+        $new_doc_number = $new_doc_digits . '/' . $prefix . '/' . $suffix . '/' . $month . '/' . $year;
+    } else {
+        // Jika tidak ada nomor dokumen terbaru untuk bulan dan tahun yang sama,
+        // buat nomor dokumen baru dimulai dari 001
+        $new_doc_number = '001/' . $prefix . '/' . $suffix . '/' . $month . '/' . $year;
+    }
 
-  return $new_doc_number;
+    return $new_doc_number;
 }
 
 // Fungsi menangani upload gambar
@@ -534,8 +598,12 @@ function handleLogoUpload($file, $allowed_types, $max_file_size, $upload_path)
     }
 }
 
+// function formatRupiah($number) {
+//     return 'Rp ' . number_format($number, 0, ',', '.');
+// }
+
 function formatRupiah($number) {
-    return 'Rp ' . number_format($number, 0, ',', '.');
+    return '<div class="d-flex justify-content-between"><span>Rp.</span><span>' . number_format($number, 0, ',', '.') . '</span></div>';
 }
 
 // Fungsi untuk mendapatkan opsi enum dari kolom
@@ -563,4 +631,9 @@ function getEnum($column_name, $table_name) {
     }
 
     return $enum_values;
+}
+
+// Fungsi untuk mengubah format Rupiah ke dalam bentuk integer
+function unformatRupiah($rupiah) {
+    return (int) preg_replace('/[^0-9]/', '', $rupiah);
 }

@@ -1,29 +1,26 @@
 <?php // master-data/product/del
 require '../../../includes/function.php';
 
+$category_param = isset($_GET['category']) ? $_GET['category'] : '';
+
 if (isset($_GET['id'])) {
     // Ambil ID produk yang akan dihapus
-    $id_kontak = $_GET['id'];
-
-    // Ambil nilai kategori dari parameter URL
-    $category_param = isset($_GET['category']) ? $_GET['category'] : '';
+    $id = $_GET['id'];
 
     // Pengecekan apakah data sedang digunakan dalam tabel lain
-    $isInUse = isDataInUse(
-        $id_kontak, 
-        [
-            ['table' => 'faktur', 'columns' => ['id_pengirim', 'id_penerima']],
-            ['table' => 'penawaran_harga', 'columns' => ['id_pengirim', 'id_penerima']],
-            ['table' => 'pesanan_pembelian', 'columns' => ['id_pengirim', 'id_penerima']]
-        ]
-    );
+    $tableColumnMap = [
+        'faktur' => ['id_pengirim', 'id_penerima'],
+        'pesanan_pembelian' => ['id_pengirim', 'id_penerima'],
+        'penawaran_harga' => ['id_pengirim', 'id_penerima']
+    ];
+    $isInUse = isDataInUse($id, $tableColumnMap);
 
     if ($isInUse) {
         // Jika data digunakan dalam tabel lain, tampilkan pesan error
         $_SESSION['error_message'] = "Data kontak sedang digunakan dalam tabel lain dan tidak dapat dihapus.";
     } else {
         // Jika data tidak digunakan dalam tabel lain, hapus data dari tabel kontak
-        $result = deleteData('kontak', "id_kontak = '$id_kontak'");
+        $result = deleteData('kontak', "id_kontak = '$id'");
 
         if ($result > 0) {
             // Jika berhasil menghapus, tampilkan pesan sukses

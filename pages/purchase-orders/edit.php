@@ -1,6 +1,6 @@
 <?php
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
-$page_title = $category_param === 'outgoing' ? 'Edit Invoice Outgoing' : 'Edit Invoice Incoming';
+$page_title = $category_param === 'outgoing' ? 'Edit Purchase Order Outgoing' : 'Edit Purchase Order Incoming';
 require '../../includes/header.php';
 
 // Set kategori halaman (Outgoing / Incoming)
@@ -44,8 +44,8 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
   $id_pesanan = $_GET['id'];
   $mainTable = 'pesanan_pembelian';
   $joinTables = [
-    ["kontak pengirim", "pesanan_pembelian.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
-    ["kontak penerima", "pesanan_pembelian.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
+    ["kontak pengirim", "pesanan_pembelian.id_pengirim = pengirim.id_kontak"],
+    ["kontak penerima", "pesanan_pembelian.id_penerima = penerima.id_kontak"],
     ['ppn', 'pesanan_pembelian.id_ppn = ppn.id_ppn']
   ];
   $columns = 'pesanan_pembelian.*, pengirim.id_kontak AS id_pengirim, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, penerima.id_kontak AS id_penerima, ppn.jenis_ppn';
@@ -188,7 +188,7 @@ if ($error_message): ?>
             <label for="no_po" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
               <input type="text" class="form-control form-control-sm" name="no_po"
-                value="<?= strtoupper($data['no_po']) ?>" required>
+                value="<?= strtoupper($data['no_pesanan']) ?>" required>
               <div class="invalid-feedback">
                 No PO tidak boleh kosong.
               </div>
@@ -300,17 +300,36 @@ if ($error_message): ?>
             <tr class="main-tr">
               <td><?= $no ?></td>
               <input type="hidden" name="id_detail_pesanan[]" value="<?= $detail['id_detail_pesanan'] ?>">
+
               <td>
-                <select class="form-select form-select-sm" name="id_penawaran[]" required>
+                <select class="form-select form-select-sm" id="id_penawaran" name="id_penawaran[]" required>
+                  <option value="" selected disabled>-- Pilih Penawaran Harga. --</option>
                   <?php
-                    $ph = selectData("penawaran_harga");
-                    foreach ($ph as $row_ph) {
-                        $selected = ($row_ph['id_penawaran'] == $detail['id_penawaran']) ? "selected" : "";
-                        echo '<option value="' . $row_ph['id_penawaran'] . '" ' . $selected . '>' . strtoupper($row_ph['no_penawaran']) . '</option>';
+                  // Tentukan kategori PH untuk query berdasarkan category_param
+                  $mainTable = 'penawaran_harga';
+                  $joinTables = [
+                    ['detail_penawaran', 'penawaran_harga.id_penawaran = detail_penawaran.id_penawaran'],
+                    ['produk', 'detail_penawaran.id_produk = produk.id_produk']
+                  ];
+                  $columns = 'penawaran_harga.id_penawaran, penawaran_harga.no_penawaran, produk.nama_produk'; // Gunakan DISTINCT untuk menghindari duplikat
+                  $conditions = "penawaran_harga.kategori = '$category_ph'";
+
+                  // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
+                  $ph = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
+                  // Loop melalui hasil query dan tampilkan dalam opsi dropdown
+                  foreach ($ph as $row_ph) {
+                    $selected = "";
+                    if ($row_ph['id_penawaran'] == $detail['id_penawaran']) {
+                      $selected = "selected";
                     }
-                  ?>
+                    echo '<option value="' . $row_ph['id_penawaran'] . '" ' . $selected . '>' . $row_ph['no_penawaran'] . " (" . $row_ph['nama_produk'] . ")" . '</option>';
+                  }
+                ?>
                 </select>
+
               </td>
+
               <td>
                 <select class="form-select form-select-sm" name="id_produk[]" required>
                   <?php
@@ -599,9 +618,20 @@ $(document).ready(function() {
       ?>';
 
     var phOptions = '<?php
-        $ph = selectData("penawaran_harga","kategori = '$category_ph'" );
+        $mainTable = 'penawaran_harga';
+        $joinTables = [
+          ['detail_penawaran', 'penawaran_harga.id_penawaran = detail_penawaran.id_penawaran'],
+          ['produk', 'detail_penawaran.id_produk = produk.id_produk'] // Perbaiki join ke tabel produk
+        ];
+        $columns = 'penawaran_harga.id_penawaran, penawaran_harga.no_penawaran, produk.nama_produk'; // Gunakan DISTINCT untuk menghindari duplikat
+        $conditions = "penawaran_harga.kategori = '$category_ph'";
+
+        // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
+        $ph = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
+        // Loop melalui hasil query dan tampilkan dalam opsi dropdown
         foreach ($ph as $row_ph) {
-            echo '<option value="' . $row_ph['id_penawaran'] . '">' . $row_ph['no_penawaran'] . '</option>';
+          echo '<option value="' . $row_ph['id_penawaran'] . '">' . $row_ph['no_penawaran'] . " (" . $row_ph['nama_produk'] . ")" . '</option>';
         }
     ?>';
 
@@ -613,7 +643,7 @@ $(document).ready(function() {
           <input type="hidden" name="id_detail_pesanan[]" value="${newIdDetail}">
           <td>
             <select class="form-select form-select-sm" id="id_penawaran" name="id_penawaran[]" required>
-                <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
+                <option value="" selected disabled>-- Pilih No PH. --</option>
                 ${phOptions}
             </select>
           </td>

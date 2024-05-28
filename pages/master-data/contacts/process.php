@@ -1,11 +1,9 @@
-<?php // master-data/contacts/process
+<?php
 require '../../../includes/function.php';
 require '../../../includes/vendor/autoload.php';
 
-// Tentukan tabel kontak
 $table_name = 'kontak';
 
-// Proses penambahan data
 if (isset($_POST['add'])) {
     $nama_kontak = strtolower($_POST['nama_kontak']);
     $email = $_POST['email'];
@@ -14,11 +12,17 @@ if (isset($_POST['add'])) {
     $keterangan = strtolower($_POST['keterangan']);
     $kategori = strtolower($_POST['category']);
 
-    // Periksa apakah nomor HP sudah ada, jika nomor HP tidak kosong
-    if (!empty($telepon) && isValueExists('kontak', 'telepon', $telepon)) {
-      $_SESSION['error_message'] = "Nomor handphone sudah ada dalam database.";
-      header("Location: index.php?category=$kategori");
-      exit();
+    // Periksa apakah email atau nomor HP sudah ada, jika tidak kosong
+    if (!empty($email) && isValueExists($table_name, 'email', $email)) {
+        $_SESSION['error_message'] = "Email sudah ada dalam database.";
+        header("Location: index.php?category=$kategori");
+        exit();
+    }
+    
+    if (!empty($telepon) && isValueExists($table_name, 'telepon', $telepon)) {
+        $_SESSION['error_message'] = "Nomor handphone sudah ada dalam database.";
+        header("Location: index.php?category=$kategori");
+        exit();
     }
     
   // Generate UUID untuk kolom id_pengirim
@@ -35,17 +39,18 @@ if (isset($_POST['add'])) {
       'kategori' => $kategori
   ];
 
-  // Panggil fungsi insertData untuk menambahkan data ke dalam tabel produk
+  // Panggil fungsi insertData untuk menambahkan data ke dalam tabel kontak
   $result = insertData($table_name, $data);
 
   // Periksa apakah data berhasil ditambahkan
   if ($result > 0) {
-      // Jika berhasil, simpan pesan sukses ke dalam session
-      $_SESSION['success_message'] = "Kontak internal berhasil ditambahkan!";
+      $_SESSION['success_message'] = "Kontak berhasil ditambahkan!";
   } else {
-      // Jika gagal, simpan pesan error ke dalam session
-      $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan kontak internal.";
+      $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan kontak.";
   }
+
+  header("Location: index.php?category=$kategori");
+  exit();
 }elseif (isset($_POST['edit'])) {
   $id_kontak = $_POST['id_kontak'];
   $nama_kontak = strtolower($_POST['nama_kontak']);
@@ -55,8 +60,14 @@ if (isset($_POST['add'])) {
   $keterangan = strtolower($_POST['keterangan']);
   $kategori = strtolower($_POST['category']);
 
-  // Periksa apakah nomor hp sudah ada
-  if (isValueExists($table_name, 'telepon', $telepon, $id_kontak, 'id_kontak')) {
+  // Periksa apakah email atau nomor HP sudah ada, jika tidak kosong dan bukan milik kontak yang sedang diedit
+  if (!empty($email) && isValueExists($table_name, 'email', $email, $id_kontak, 'id_kontak')) {
+    $_SESSION['error_message'] = "Email sudah ada dalam database.";
+    header("Location: index.php?category=$kategori");
+    exit();
+  }
+
+  if (!empty($telepon) && isValueExists($table_name, 'telepon', $telepon, $id_kontak, 'id_kontak')) {
       $_SESSION['error_message'] = "Nomor handphone sudah ada dalam database.";
       header("Location: index.php?category=$kategori");
       exit();
@@ -73,26 +84,25 @@ if (isset($_POST['add'])) {
 
   // Kondisi untuk menentukan kontak mana yang akan diupdate
   $conditions = "id_kontak = '$id_kontak'";
-
-  // Panggil fungsi updateData untuk mengupdate data di tabel
+  // Panggil fungsi updateData untuk mengupdate data di tabel kontak
   $result = updateData($table_name, $data, $conditions);
 
   // Periksa apakah data berhasil diupdate
   if ($result > 0) {
-      // Jika berhasil, simpan pesan sukses ke dalam session
-      $_SESSION['success_message'] = "Kontak internal berhasil diupdate!";
+      $_SESSION['success_message'] = "Kontak berhasil diupdate!";
   } else {
-      // Jika gagal, simpan pesan error ke dalam session
-      $_SESSION['error_message'] = "Terjadi kesalahan saat mengupdate kontak internal.";
+      $_SESSION['error_message'] = "Terjadi kesalahan saat mengupdate kontak.";
   }
+
+  header("Location: index.php?category=$kategori");
+  exit();
 } else {
-// Jika tidak ada permintaan tambah atau edit, simpan pesan error ke dalam session
-$_SESSION['error_message'] = "Permintaan tidak valid!";
+  // Jika tidak ada permintaan tambah atau edit, simpan pesan error ke dalam session
+  $_SESSION['error_message'] = "Permintaan tidak valid!";
+  header("Location: index.php?category=$kategori");
+  exit();
 }
 
 // Tutup koneksi ke database
 mysqli_close($conn);
-
-// Redirect kembali ke index.php setelah proses selesai
-header("Location: index.php?category=$kategori");
-exit();
+?>

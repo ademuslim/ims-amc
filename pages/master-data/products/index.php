@@ -1,6 +1,7 @@
 <?php
 $page_title = "Products";
 require '../../../includes/header.php';
+
 $data_produk = selectData('produk');
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -14,11 +15,11 @@ $data_produk = selectData('produk');
   <thead>
     <tr>
       <th>No.</th>
-      <th>Nomor Produk</th>
+      <th>No. Produk</th>
       <th>Nama Produk</th>
-      <th>Satuan</th>
-      <th>Harga</th>
       <th>Status</th>
+      <th>Harga</th>
+      <th>Satuan</th>
       <th>Keterangan</th>
       <th>Aksi</th>
     </tr>
@@ -35,9 +36,7 @@ $data_produk = selectData('produk');
       <td class="text-start"><?= $no; ?></td>
       <td class="text-primary"><?= strtoupper($produk['no_produk']); ?></td>
       <td><?= ucwords($produk['nama_produk']); ?></td>
-      <td><?= strtoupper($produk['satuan']); ?></td>
-      <td><?= "Rp " . $produk['harga']; ?></td>
-      <td>
+      <td class="text-center">
         <?php
         // Tentukan kelas bootstrap berdasarkan nilai status
         $status_class = '';
@@ -53,12 +52,16 @@ $data_produk = selectData('produk');
         ?>
         <span class="badge <?= $status_class ?>"><?= ucwords($produk['status']); ?></span>
       </td>
+      <td><?= formatRupiah($produk['harga']); ?></td>
+      <td><?= strtoupper($produk['satuan']); ?></td>
       <td><?= ucwords($produk['keterangan']) ?></td>
       <td>
         <div class="btn-group">
           <button type="button" class="btn-act btn-edit bg-transparent" data-bs-toggle="modal"
             data-bs-target="#editModal<?= $produk['id_produk']; ?>" title="Ubah Data"></button>
-          <a href="del.php?id=<?= $produk['id_produk']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
+          <a href="javascript:void(0);"
+            onclick="confirmDelete('del.php?id=<?= $produk['id_produk']; ?>', 'Apakah Anda yakin ingin menghapus data ini? Data yang sudah dihapus tidak dapat dikembalikan.')"
+            class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
     </tr>

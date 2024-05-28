@@ -149,10 +149,83 @@ function checkSidebarWidth() {
 }
 
 function confirmDelete(url, message) {
-  if (confirm(message)) {
-    window.location.href = url;
-  }
+  console.log(url); // Tambahkan ini untuk debugging
+  Swal.fire({
+    title: 'Konfirmasi',
+    text: message,
+    position: "top",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, Hapus!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = url;
+    }
+  });
 }
+
+window.addEventListener('DOMContentLoaded', function() {
+  var loader = document.getElementById('loader');
+  var rsContent = document.querySelector('.rs-content');
+
+  // Tampilkan loader saat halaman dimuat
+  loader.style.display = 'block';
+
+  // Mencegah pengguliran halaman saat loader ditampilkan
+  rsContent.style.overflow = 'hidden';
+
+  window.addEventListener('load', function() {
+    // Sembunyikan loader setelah halaman selesai dimuat
+    loader.style.display = 'none';
+
+    // Mengembalikan pengaturan overflow halaman
+    rsContent.style.overflow = 'auto';
+  });
+});
+
+// Sweetalert
+document.addEventListener('DOMContentLoaded', function() {
+  // Tampilkan pesan sukses jika ada
+  if ('<?= $success_message ?>' !== '') {
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "success",
+      title: "Berhasil",
+      text: "<?= $success_message ?>",
+      showConfirmButton: false,
+      timer: 7000,
+      timerProgressBar: true,
+      showCloseButton: true,
+    });
+  }
+
+  // Tampilkan pesan error jika ada
+  if ('<?= $error_message ?>' !== '') {
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "error",
+      title: "Gagal",
+      text: "<?= $error_message ?>",
+      showConfirmButton: false,
+      timer: 7000,
+      timerProgressBar: true,
+      showCloseButton: true,
+    });
+  }
+});
+
+// Bootstrap Tooltip
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+});
 </script>
 </body>
 

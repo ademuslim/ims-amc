@@ -27,7 +27,6 @@ require '../../../includes/header.php';
 // Ambil data kontak sesuai dengan kategori yang dipilih
 $conditions = "kontak.kategori = '$category'";
 $data_kontak = selectData('kontak', $conditions);
-
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -68,8 +67,9 @@ $data_kontak = selectData('kontak', $conditions);
         <div class="btn-group">
           <button type="button" class="btn-act btn-edit bg-transparent" data-bs-toggle="modal"
             data-bs-target="#editModal<?= $kontak['id_kontak']; ?>" title="Ubah Data"></button>
-          <a href="del.php?category=<?= $category_param ?>&id=<?= $kontak['id_kontak']; ?>" class="btn-act btn-del"
-            title="Hapus Data"></a>
+          <a href="javascript:void(0);"
+            onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $kontak['id_kontak']; ?>', 'Apakah Anda yakin ingin menghapus data ini? Data yang sudah dihapus tidak dapat dikembalikan.')"
+            class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
     </tr>

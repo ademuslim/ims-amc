@@ -2,10 +2,6 @@
 require '../../../includes/function.php';
 require '../../../includes/vendor/autoload.php';
 
-// echo var_dump($_POST);
-// Memberhentikan eksekusi setelah var_dump
-// exit();
-
 if (isset($_POST['add'])) {
   $no_produk = $_POST['no_produk'];
   $nama_produk = strtolower($_POST['nama_produk']);

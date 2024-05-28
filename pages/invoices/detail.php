@@ -3,35 +3,6 @@ $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'Detail Invoice Outgoing' : 'Detail Invoice Incoming';
 require '../../includes/header.php';
 
-// Tampilkan pesan sukses jika ada
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-
-// Tampilkan pesan error jika ada
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
-// Validasi nilai kategori dan atur nilai deskriptif
-if ($category_param === 'outgoing') {
-  $sender = 'internal';
-  $receiver = 'customer';
-} elseif ($category_param === 'incoming') {
-  $sender = 'customer';
-  $receiver = 'internal';
-} else {
-  die("Kategori tidak valid");
-}
-
 // Variabel untuk menyimpan data faktur dan detail
 $data_faktur = [];
 $data_faktur_detail = [];
@@ -43,8 +14,8 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
   $id_faktur = $_GET['id'];
   $mainTable = 'faktur';
   $joinTables = [
-    ["kontak pengirim", "faktur.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
-    ["kontak penerima", "faktur.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
+    ["kontak pengirim", "faktur.id_pengirim = pengirim.id_kontak"], 
+    ["kontak penerima", "faktur.id_penerima = penerima.id_kontak"],
     ['ppn', 'faktur.id_ppn = ppn.id_ppn']
   ];
   $columns =  'faktur.*, 
@@ -81,18 +52,46 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
       }
     }
 
-    // Jika data penawaran harga ditemukan lanjut mengambil detail penawaran berdasarkan id
     $mainDetailTable = 'detail_faktur';
     $joinDetailTables = [
         ['faktur', 'detail_faktur.id_faktur = faktur.id_faktur'], 
-        ['produk', 'detail_faktur.id_produk = produk.id_produk']
+        ['produk', 'detail_faktur.id_produk = produk.id_produk'],
+        ['pesanan_pembelian', 'detail_faktur.id_pesanan = pesanan_pembelian.id_pesanan']
     ];
-    $columns = 'detail_faktur.*, produk.*';
+    $columns = 'detail_faktur.*, produk.*, pesanan_pembelian.no_pesanan';
     $conditions = "detail_faktur.id_faktur = '$id_faktur'";
 
     // Panggil fungsi selectDataJoin dengan ORDER BY
     $data_faktur_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
+    // var_dump($data_faktur_detail);
     
+    // Array untuk menyimpan no_pesanan tanpa duplikasi
+    $no_pesanan_list = [];
+
+    if (!empty($data_faktur_detail)) {
+        foreach ($data_faktur_detail as $detail) {
+            if (!in_array($detail['no_pesanan'], $no_pesanan_list)) {
+                $no_pesanan_list[] = $detail['no_pesanan'];
+            }
+        }
+    }
+    
+    // Gabungkan no_pesanan yang difilter menjadi satu string dengan <br> sebagai pemisah
+    $no_pesanan_info = implode("<br>", array_map('htmlspecialchars', $no_pesanan_list));
+
+    // Gabungkan data berdasarkan id_produk
+    $mergedData = [];
+    foreach ($data_faktur_detail as $detail) {
+        $id_produk = $detail['id_produk'];
+        if (isset($mergedData[$id_produk])) {
+            // Jika id_produk sudah ada, gabungkan data
+            $mergedData[$id_produk]['jumlah'] += $detail['jumlah'];
+        } else {
+            // Jika id_produk belum ada, tambahkan data baru
+            $mergedData[$id_produk] = $detail;
+        }
+    }
+
   } else {
       echo "Faktur tidak ditemukan.";
   }
@@ -140,25 +139,37 @@ if ($error_message): ?>
       <div class="col-md-5 p-0">
         <div class="row justify-content-end">
           <div class="col-auto">
-            <p>No.</p>
-            <p>Tanggal</p>
-            <p>Status</p>
-          </div>
-          <div class="col-auto">
-            <p><?= ": " . strtoupper($data['no_faktur']) ?></p>
-            <p><?= ": " . dateID(date('Y-m-d', strtotime($data['tanggal']))) ?></p>
-            <?php
-            // Tentukan kelas bootstrap berdasarkan nilai status
-            $status_class = '';
-            if ($data['status'] == 'draft') {
-                $status_class = 'text-bg-warning';
-            } elseif ($data['status'] == 'belum dibayar') {
-                $status_class = 'text-bg-info';
-            } elseif ($data['status'] == 'dibayar') {
-                $status_class = 'text-bg-success';
-            }
-            ?>
-            <span class="badge <?= $status_class ?>"><?= strtoupper($data['status']) ?></span>
+            <table class="table table-light table-striped">
+              <tr>
+                <th>No.</th>
+                <td><?= strtoupper($data['no_faktur']) ?></td>
+              </tr>
+              <tr>
+                <th>Tanggal</th>
+                <td><?= dateID(date('Y-m-d', strtotime($data['tanggal']))) ?></td>
+              </tr>
+              <tr>
+                <th>No. PO</th>
+                <td><?= strtoupper($no_pesanan_info) ?></td>
+              </tr>
+              <tr>
+                <th>Status</th>
+                <td>
+                  <?php
+                  // Tentukan kelas bootstrap berdasarkan nilai status
+                  $status_class = '';
+                  if ($data['status'] == 'draft') {
+                      $status_class = 'text-bg-warning';
+                  } elseif ($data['status'] == 'terkirim' || $data['status'] == 'belum dibayar') {
+                      $status_class = 'text-bg-info';
+                  } elseif ($data['status'] == 'dibayar') {
+                      $status_class = 'text-bg-success';
+                  }
+                  ?>
+                  <span class="badge <?= $status_class ?>"><?= strtoupper($data['status']) ?></span>
+                </td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -176,7 +187,7 @@ if ($error_message): ?>
 
     <div class="row">
       <!-- Tampil detail produk -->
-      <table class="table table-light table-striped">
+      <table class="table table-light table-striped" style="width: 100%;">
         <thead>
           <tr class="fw-bolder">
             <td>No.</td>
@@ -189,9 +200,9 @@ if ($error_message): ?>
         <tbody id="detail-table">
           <?php
           $subtotal = 0;
-          if (!empty($data_faktur_detail)):
+          if (!empty($mergedData)):
             $no = 1; 
-            foreach ($data_faktur_detail as $detail): 
+            foreach ($mergedData as $detail): 
             
             // Hitung total harga untuk setiap baris
             $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
@@ -200,7 +211,7 @@ if ($error_message): ?>
           ?>
           <tr>
             <td><?= $no ?></td>
-            <td><?= strtoupper($detail['nama_produk']); ?></td>
+            <td class="text-wrap"><?= strtoupper($detail['nama_produk']); ?></td>
             <td><?= $detail['jumlah']; ?></td>
             <td><?= strtoupper($detail['satuan']); ?></td>
             <td><?= formatRupiah($detail['harga_satuan']); ?></td>
@@ -276,7 +287,8 @@ if ($error_message): ?>
         </div>
 
         <div class="row justify-content-center mb-3">
-          <div class="col-auto"><?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?></div>
+          <div class="col-auto"><?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?>
+          </div>
         </div>
         <div class="row justify-content-center mb-3">
           <div class="col-auto">

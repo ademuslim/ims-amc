@@ -21,30 +21,19 @@ if (isset($_SESSION['error_message'])) {
   unset($_SESSION['error_message']);
 }
 
-// Validasi nilai kategori dan atur nilai deskriptif
-if ($category_param === 'outgoing') {
-  $sender = 'internal';
-  $receiver = 'customer';
-} elseif ($category_param === 'incoming') {
-  $sender = 'customer';
-  $receiver = 'internal';
-} else {
-  die("Kategori tidak valid");
-}
-
-// Variabel untuk menyimpan data penawaran harga dan detail
+// Variabel untuk menyimpan data PO dan detail
 $data_pesanan_pembelian = [];
 $data_pesanan_pembelian_detail = [];
 $signatureDetails = []; // Array untuk menyimpan detail signature info
 $error_message = '';
 
-// Ambil Data Penawaran Harga berdasarkan id
+// Ambil Data PO berdasarkan id
 if (isset($_GET['id']) && $_GET['id'] !== '') {
   $id_pesanan = $_GET['id'];
   $mainTable = 'pesanan_pembelian';
   $joinTables = [
-    ["kontak pengirim", "pesanan_pembelian.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
-    ["kontak penerima", "pesanan_pembelian.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
+    ["kontak pengirim", "pesanan_pembelian.id_pengirim = pengirim.id_kontak"], 
+    ["kontak penerima", "pesanan_pembelian.id_penerima = penerima.id_kontak"],
     ['ppn', 'pesanan_pembelian.id_ppn = ppn.id_ppn']
   ];
   $columns =  'pesanan_pembelian.*, 
@@ -105,7 +94,7 @@ if ($error_message): ?>
 <?php else: ?>
 <?php if (!empty($data_pesanan_pembelian)): ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="fs-5 mb-4">Detail Penawaran Harga</h1>
+  <h1 class="fs-5 mb-4">Detail Purchase Order</h1>
   <!-- Tombol untuk memicu cetak -->
   <button onclick="printContent()">Cetak Dokumen</button>
 </div>

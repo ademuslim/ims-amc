@@ -1,12 +1,17 @@
-<?php // master-data/product/del
+<?php
 require '../../../includes/function.php';
 
 if (isset($_GET['id'])) {
     // Ambil ID ppn yang akan dihapus
-    $id_ppn = $_GET['id'];
+    $id = $_GET['id'];
 
     // Pengecekan apakah data sedang digunakan dalam tabel lain
-    $isInUse = isDataInUse('id_ppn', $id_ppn, ['faktur', 'penawaran_harga', 'pesanan_pembelian']);
+    $tableColumnMap = [
+        'faktur' => ['id_ppn'],
+        'penawaran' => ['id_ppn'],
+        'pesanan' => ['id_ppn']
+    ];
+    $isInUse = isDataInUse($id, $tableColumnMap);
 
     if ($isInUse) {
         // Jika data digunakan dalam tabel lain, tampilkan pesan error

@@ -16,6 +16,9 @@ if (isset($_POST['add'])) {
     // Tentukan $category_param berdasarkan nilai $kategori
     $category_param = $kategori === "keluar" ? "outgoing" : ($kategori === "masuk" ? "incoming" : die("Invalid category"));
 
+    // Inisialisasi variabel $file_destination_logo dan $file_destination_signature
+    $file_destination_logo = $file_destination_signature = null;
+    
     if ($category_param === 'outgoing') {
 
         // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath untuk dokumen outgoing
@@ -45,9 +48,6 @@ if (isset($_POST['add'])) {
             }
         }
         
-        // Inisialisasi variabel $file_destination_logo dan $file_destination_signature
-        $file_destination_logo = $file_destination_signature = null;
-        
         // Memeriksa apakah user menghapus logo
         if (isset($_POST['remove_logo']) && $_POST['remove_logo'] === 'true') {
             // Jika user menghapus logo, jangan menetapkan path logo
@@ -74,10 +74,12 @@ if (isset($_POST['add'])) {
                     } else {
                         $_SESSION['error_message'] = "Gagal menyimpan file gambar logo.";
                         // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                        header("Location: add.php?category=$category_param");
                     }
                 } else {
                     $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
                     // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                    header("Location: add.php?category=$category_param");
                 }
             } else {
                 // Jika input file logo kosong dan logo tidak dihapus
@@ -112,10 +114,12 @@ if (isset($_POST['add'])) {
                     } else {
                         $_SESSION['error_message'] = "Gagal menyimpan file signature.";
                         // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                        header("Location: add.php?category=$category_param");
                     }
                 } else {
                     $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
                     // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                        header("Location: add.php?category=$category_param");
                 }
             } else {
                 // Jika input file signature kosong dan signature tidak dihapus
@@ -154,13 +158,9 @@ if (isset($_POST['add'])) {
         'status' => 'draft'
     ];
 
-    // Lakukan insert data
     $result = insertData('pesanan_pembelian', $data);
 
     // Lanjut insert data detail jika insert data po berhasil
-    function unformatRupiah($rupiah) {
-        return (int) preg_replace('/[^0-9]/', '', $rupiah);
-    }
 
     if ($result) {
         $id_produk = $_POST['id_produk'];
@@ -168,6 +168,8 @@ if (isset($_POST['add'])) {
         $harga_satuan = $_POST['harga_satuan'];
         $id_penawaran = $_POST['id_penawaran'];
 
+        // Penanganan PO Open
+        $jumlah_dikirim = 0;
 
         // Loop untuk menyimpan setiap detail produk ke dalam database
         for ($i = 0; $i < count($id_produk); $i++) {
@@ -181,28 +183,29 @@ if (isset($_POST['add'])) {
             $detail_produk = [
                 'id_detail_pesanan' => $id_detail_pesanan,
                 'id_pesanan' => $id_pesanan,
-                'id_produk' => $id_produk[$i], // Menggunakan indeks yang sama untuk setiap array
-                'jumlah' => $jumlah[$i], // Menggunakan indeks yang sama untuk setiap array
-                'harga_satuan' => $harga_satuan_unformatted, // Menggunakan nilai unformat untuk harga satuan
+                'id_produk' => $id_produk[$i], // Menggunakan untuk mencegah masalah
+                'jumlah' => $jumlah[$i],
+                'harga_satuan' => $harga_satuan_unformatted,
+                
+                'jumlah_dikirim' => $jumlah_dikirim,
+                'sisa_pesanan' => $jumlah[$i], // Set default karena belum ada pengiriman maka sisa = jumlah
                 'id_penawaran' => $id_penawaran[$i]
             ];
 
-            // Insert data detail produk ke dalam database
-            $detail_result = insertData('detail_pesanan', $detail_produk);
-
-            // Jika gagal menyimpan,
-            if (!$detail_result) {
-                $_SESSION['error_message'] = "Gagal menyimpan data detail produk.";
-                header("Location: add.php");
+            try {
+                insertData('detail_pesanan', $detail_produk);
+            } catch (mysqli_sql_exception $e) {
+                $_SESSION['error_message'] = "Gagal menyimpan data detail produk: " . $e->getMessage();
+                header("Location: add.php?category=$category_param");
                 exit();
             }
         }
-        // Jika berhasil disimpan, arahkan pengguna ke halaman detail
-        header("Location: detail.php?category=" . $category_param . "&id=" . $id_pesanan);
+        header("Location: detail.php?category=$category_param&id=$id_pesanan");
         exit();
     } else {
-        // Gagal memindahkan file
-        $_SESSION['error_message'] = "Gagal menyimpan file gambar logo.";
+        $_SESSION['error_message'] = "Gagal menyimpan data pesanan pembelian.";
+        header("Location: add.php?category=$category_param");
+        exit();
     }
 // Edit Data
 } elseif (isset($_POST['edit'])) {
@@ -221,6 +224,9 @@ if (isset($_POST['add'])) {
 
     // Tentukan $category_param berdasarkan nilai $kategori
     $category_param = $kategori === "keluar" ? "outgoing" : ($kategori === "masuk" ? "incoming" : die("Invalid category"));
+
+    // Inisialisasi variabel $file_destination_logo dan $file_destination_signature
+    $file_destination_logo = $file_destination_signature = null;
 
     if ($category_param === 'outgoing') {
         // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath untuk dokumen outgoing
@@ -244,9 +250,6 @@ if (isset($_POST['add'])) {
                 break; // Keluar dari loop setelah menemukan path
             }
         }
-        
-        // Inisialisasi variabel $file_destination_logo dan $file_destination_signature
-        $file_destination_logo = $file_destination_signature = null;
         
         // Memeriksa apakah user menghapus logo
         if (isset($_POST['remove_logo']) && $_POST['remove_logo'] === 'true') {
@@ -274,10 +277,12 @@ if (isset($_POST['add'])) {
                     } else {
                         $_SESSION['error_message'] = "Gagal menyimpan file gambar logo.";
                         // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                        header("Location: add.php?category=$category_param");
                     }
                 } else {
                     $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
                     // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                    header("Location: add.php?category=$category_param");
                 }
             } else {
                 // Jika input file logo kosong dan logo tidak dihapus
@@ -312,10 +317,12 @@ if (isset($_POST['add'])) {
                     } else {
                         $_SESSION['error_message'] = "Gagal menyimpan file signature.";
                         // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                        header("Location: add.php?category=$category_param");
                     }
                 } else {
                     $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
                     // Handle error, misalnya redirect ke halaman add.php dengan pesan error
+                    header("Location: add.php?category=$category_param");
                 }
             } else {
                 // Jika input file signature kosong dan signature tidak dihapus
@@ -359,15 +366,11 @@ if (isset($_POST['add'])) {
     if (!$result) {
         // Jika gagal, tampilkan pesan kesalahan atau arahkan pengguna kembali ke halaman edit
         $_SESSION['error_message'] = "Gagal memperbarui pesanan harga.";
-        // header("Location: edit.php?id=$id_pesanan");
+        header("Location: index.php?category=$category_param");
         exit();
     }
     
     // Lanjutkan edit detail
-    // Fungsi untuk mengubah format Rupiah ke dalam bentuk integer
-    function unformatRupiah($rupiah) {
-        return (int) preg_replace('/[^0-9]/', '', $rupiah);
-    }
     // Peroleh nilai-nilai dari detail pesanan
     $id_detail = $_POST['id_detail_pesanan'];
     $id_produk = $_POST['id_produk'];
@@ -469,11 +472,11 @@ if (isset($_POST['add'])) {
     // echo "Operasi tambah dan ubah data selesai.";
 
     // Redirect ke halaman detail setelah proses edit selesai
-    header("Location: detail.php?category=" . $category_param . "&id=" . $id_pesanan);
+    header("Location: detail.php?category=$category_param&id=$id_pesanan");
     exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php
-    header("Location: index.php");
+    header("Location: index.php?category=" . $category_param);
     exit();
 }
 

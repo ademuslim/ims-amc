@@ -1,6 +1,7 @@
 <?php
-$page_title = "Products";
+$page_title = "PPN";
 require '../../../includes/header.php';
+
 $data_ppn = selectData('ppn');
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -23,7 +24,7 @@ $data_ppn = selectData('ppn');
   <tbody>
     <?php if (empty($data_ppn)) : ?>
     <tr>
-      <td colspan="5">Tidak ada data</td>
+      <td colspan="9">Tidak ada data</td>
     </tr>
     <?php else : ?>
     <?php $no = 1; ?>
@@ -37,7 +38,9 @@ $data_ppn = selectData('ppn');
         <div class="btn-group">
           <button type="button" class="btn-act btn-edit bg-transparent" data-bs-toggle="modal"
             data-bs-target="#editModal<?= $ppn['id_ppn']; ?>" title="Ubah Data"></button>
-          <a href="del.php?id=<?= $ppn['id_ppn']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
+          <a href="javascript:void(0);"
+            onclick="confirmDelete('del.php?id=<?= $ppn['id_ppn']; ?>', 'Apakah Anda yakin ingin menghapus data ini? Data yang sudah dihapus tidak dapat dikembalikan.')"
+            class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
     </tr>

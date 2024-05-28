@@ -39,6 +39,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
       <th>Diskon</th>
       <th>Pengirim</th>
       <th>Catatan</th>
+      <th>Detail</th>
       <th>Aksi</th>
     </tr>
   </thead>
@@ -59,7 +60,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
         $status_class = '';
         if ($faktur['status'] == 'draft') {
             $status_class = 'text-bg-warning';
-        } elseif ($faktur['status'] == 'belum dibayar') {
+        } elseif ($faktur['status'] == 'terkirim' || $faktur['status'] == 'belum dibayar') {
             $status_class = 'text-bg-info';
         } elseif ($faktur['status'] == 'dibayar') {
             $status_class = 'text-bg-success';
@@ -74,9 +75,64 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
         <?php if (!empty($faktur['logo'])) : ?>
         <img class="me-3" src="<?= base_url($faktur['logo']); ?>" alt="Logo" width="50">
         <?php endif; ?>
+
         <?= ucwords($faktur['nama_pengirim']); ?>
       </td>
       <td><?= !empty($faktur['catatan']) ? ucfirst($faktur['catatan']) : "-"; ?></td>
+
+      <!-- Detail Faktur -->
+      <td>
+        <?php
+        $id_faktur = $faktur['id_faktur'];
+        $data_faktur_detail = [];
+        $mainDetailTable = 'detail_faktur';
+        $joinDetailTables = [
+            ['faktur', 'detail_faktur.id_faktur = faktur.id_faktur'], 
+            ['pesanan_pembelian', 'detail_faktur.id_pesanan = pesanan_pembelian.id_pesanan'],
+            ['produk', 'detail_faktur.id_produk = produk.id_produk']
+        ];
+        $columns = 'detail_faktur.*, produk.*, pesanan_pembelian.no_pesanan';
+        $conditions = "detail_faktur.id_faktur = '$id_faktur'";
+
+        // Panggil fungsi selectDataJoin dengan ORDER BY
+        $data_faktur_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
+
+        $subtotal = 0;
+        if (!empty($data_faktur_detail)): ?>
+
+        <div class="row fw-bold border-bottom">
+          <div class="col">No.</div>
+          <div class="col">Deskripsi</div>
+          <div class="col">Kuantitas</div>
+          <div class="col">Harga</div>
+          <div class="col">Total Harga</div>
+          <!-- faktur Open -->
+          <div class="col">No. PO</div>
+        </div>
+        <?php
+            $no = 1; 
+            foreach ($data_faktur_detail as $detail): 
+            
+            // Hitung total harga untuk setiap baris
+            $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
+            // Tambahkan total harga ke subtotal
+            $subtotal += $total_harga;
+        ?>
+        <div class="row border-bottom">
+          <div class="col"><?= $no ?></div>
+          <div class="col"><?= ucwords($detail['nama_produk']); ?></div>
+          <div class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></div>
+          <div class="col"><?= formatRupiah($detail['harga_satuan']); ?></div>
+          <div class="col"><?= formatRupiah($total_harga); ?></div>
+
+          <div class="col" style="font-size: .7rem;"><?= strtoupper($detail['no_pesanan']); ?></div>
+        </div>
+        <?php $no++; endforeach; ?>
+        <?php else: ?>
+        <span class="text-center">-</span>
+        <?php endif; ?>
+      </td>
+
       <td>
         <div class="btn-group">
           <a href="detail.php?category=<?= $category_param ?>&id=<?= $faktur['id_faktur'] ?>" class="btn-act btn-view"

@@ -1,6 +1,7 @@
 <?php
 $page_title = "Users";
 require '../../../includes/header.php';
+
 $data_pengguna = selectData('pengguna');
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -23,7 +24,7 @@ $data_pengguna = selectData('pengguna');
   <tbody>
     <?php if (empty($data_pengguna)) : ?>
     <tr>
-      <td colspan="4">Tidak ada data</td>
+      <td colspan="5">Tidak ada data</td>
     </tr>
     <?php else : ?>
     <?php $no = 1; ?>

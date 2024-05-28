@@ -18,28 +18,10 @@ if ($category_param === 'outgoing') {
   die("Kategori tidak valid");
 }
 
-// Tampilkan pesan sukses jika ada
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-
-// Tampilkan pesan error jika ada
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
 // Khusus Outgoing
 if ($category_param === 'outgoing') {
   $default_logo_path = "";
-  $default_signature_path = "";
+  $default_signature_path = ""; // Default path signature
   
   // Ambil path logo dan path signature terbaru dari tabel penawaran_harga (Kategori = keluar)
   $data = selectData("penawaran_harga", "kategori = 'keluar' AND logo IS NOT NULL AND logo != ''", "tanggal DESC", "1");
@@ -58,7 +40,13 @@ if ($category_param === 'outgoing') {
         
         // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
         if ($pair[0] == 'Path') {
-          $default_signature_path = $pair[1];
+          // Jika nilai Path tidak kosong, gunakan nilai tersebut
+          if (!empty($pair[1])) {
+            $default_signature_path = $pair[1];
+          } else {
+            // Jika nilai Path kosong, set default path
+            $default_signature_path = "../../assets/image/uploads/signature/no_signature.png";
+          }
           break; // Keluar dari loop setelah menemukan path
         }
       }
@@ -148,7 +136,7 @@ if ($category_param === 'outgoing') {
             <div class="col-sm-9">
               <input type="text" class="form-control form-control-sm" id="no_faktur" name="no_faktur" readonly required>
               <div class="invalid-feedback">
-                Sistem error, nomor penawaran gagal dimuat.
+                Sistem error, nomor invoice gagal dimuat.
               </div>
             </div>
 
@@ -214,37 +202,60 @@ if ($category_param === 'outgoing') {
           <thead>
             <tr class="fw-bolder">
               <td>No.</td>
-              <td>No. Pesanan Pembelian</td>
-              <td>Nama Produk</td>
-              <td>Kuantitas</td>
-              <td>Harga (Rp)</td>
+              <td>No. PO.<a href="#" class="link-danger link-offset-2 link-underline-opacity-0" data-bs-toggle="tooltip"
+                  data-bs-custom-class="custom-tooltip" data-bs-title="PO yang tersedia">*</a></td>
+              <td>Nama Produk<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Pilih produk sesuai PO">*</a></td>
+              <td>Kuantitas<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Masukan kuantitas tidak melebihi kuantitas PO">*</a></td>
+              <td>Harga</td>
               <td colspan="2">Jumlah</td>
             </tr>
           </thead>
           <tbody id="detail-table">
             <tr class="main-tr">
               <td>1</td>
+
               <td>
-                <select class="form-select form-select-sm" id="id_pesanan" name="id_pesanan[]" required>
-                  <option value="" selected disabled>-- Pilih PO. --</option>
+                <select class="form-select form-select-sm id_pesanan_info" id="id_pesanan" name="id_pesanan[]" required>
+                  <option value="" selected disabled>-- Pilih No. PO. --</option>
                   <?php
-                    // Tentukan kategori PO untuk query berdasarkan category_param
-                    $po = selectData("pesanan_pembelian","kategori = '$category_po'" );
-                    
-                    // Loop melalui hasil query dan tampilkan dalam opsi dropdown
+                    $mainTable = 'pesanan_pembelian';
+                    $joinTables = [
+                        ['detail_pesanan', 'pesanan_pembelian.id_pesanan = detail_pesanan.id_pesanan'],
+                        ['produk', 'detail_pesanan.id_produk = produk.id_produk']
+                    ];
+                    $columns = 'pesanan_pembelian.id_pesanan, pesanan_pembelian.no_pesanan, produk.nama_produk, produk.id_produk';
+                    $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0";
+                    $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
                     foreach ($po as $row_po) {
-                      echo '<option value="' . $row_po['id_pesanan'] . '">' . $row_po['no_pesanan'] . '</option>';
+                        echo '<option value="' . $row_po['id_pesanan'] . '" data-id-produk="' . $row_po['id_produk'] . '">' 
+                            . strtoupper($row_po['no_pesanan']) . " (" . ucwords($row_po['nama_produk']) . ")" 
+                            . '</option>';
                     }
                   ?>
                 </select>
+                <div class="pesanan-info">
+                  <!-- Info di_pesanan yang terpilih akan ditampilkan di sini -->
+                </div>
               </td>
               <td>
                 <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
                   <option value="" selected disabled>-- Pilih Produk --</option>
                   <?php
-                    $produk = selectData("produk");
+                    $mainTable = 'produk';
+                    $joinTables = [
+                        ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
+                    ];
+                    $columns = 'produk.id_produk, produk.nama_produk';
+                    $conditions = "detail_pesanan.sisa_pesanan > 0";
+                    $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
                     foreach ($produk as $row_produk) {
-                        echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
+                      echo '<option value="' . $row_produk['id_produk'] . '">' . ucwords($row_produk['nama_produk']) . '</option>';
                     }
                   ?>
                 </select>
@@ -256,7 +267,7 @@ if ($category_param === 'outgoing') {
                 <input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
               </td>
               <td class="total">0</td>
-              <td class="align-middle text-center">
+              <td class="text-center">
                 <div class="d-flex justify-content-center align-items-center">
                   <button type="button" class="remove-btn btn-cancel m-0"></button>
                 </div>
@@ -265,16 +276,18 @@ if ($category_param === 'outgoing') {
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="3" rowspan="4" class="bg-transparent">
+              <td colspan="4" rowspan="4" class="bg-transparent">
                 <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
                   Baris</button>
               </td>
-              <td colspan="2">Subtotal</td>
+              <td class="fw-bolder" colspan="2">Subtotal</td>
               <td colspan="2" id="total-harga">0</td>
             </tr>
 
             <tr>
-              <td>Diskon</td>
+              <td class="fw-bolder">Diskon<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Diskon dalam persen, isi 0 jika tanpa diskon.">*</a></td>
               <td>
                 <div class="input-group input-group-sm">
                   <input type="number" class="form-control" id="diskon" name="diskon" min="0" step="0.01" value="0"
@@ -286,7 +299,9 @@ if ($category_param === 'outgoing') {
             </tr>
 
             <tr>
-              <td>PPN</td>
+              <td class="fw-bolder">PPN<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="PPN dalam persen, pilih 'Tanpa PPN' jika tanpa PPN.">*</a></td>
               <td>
                 <div class="input-group input-group-sm">
                   <select class="form-select form-select-sm" id="jenis_ppn" name="jenis_ppn" required
@@ -306,7 +321,7 @@ if ($category_param === 'outgoing') {
             </tr>
 
             <tr>
-              <td colspan="2">Total</td>
+              <td class="fw-bolder" colspan="2">Total</td>
               <td colspan="2">
                 <span id="grand-total">0</span>
                 <!-- Input tersembunyi untuk menyimpan grand total -->
@@ -470,17 +485,37 @@ $(document).ready(function() {
   // Event untuk menambahkan baris baru
   $(document).on('click', '.add-more-tr', function() {
     var produkOptions = '<?php
-      $produk = selectData("produk");
+      $mainTable = 'produk';
+      $joinTables = [
+          ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
+      ];
+      $columns = 'produk.id_produk, produk.nama_produk';
+      $conditions = "detail_pesanan.sisa_pesanan > 0";
+      $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
       foreach ($produk as $row_produk) {
-          echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
+        echo '<option value="' . $row_produk['id_produk'] . '">' . ucwords($row_produk['nama_produk']) . '</option>';
       }
     ?>';
 
     var poOptions = '<?php
-        $po = selectData("pesanan_pembelian","kategori = '$category_po'" );
+        $mainTable = 'pesanan_pembelian';
+        $joinTables = [
+          ['detail_pesanan', 'pesanan_pembelian.id_pesanan = detail_pesanan.id_pesanan'],
+          ['produk', 'detail_pesanan.id_produk = produk.id_produk']
+        ];
+        $columns = 'pesanan_pembelian.id_pesanan, pesanan_pembelian.no_pesanan, produk.nama_produk, produk.id_produk';
+        $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0";
+
+        // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
+        $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
+        // Loop melalui hasil query dan tampilkan dalam opsi dropdown
         foreach ($po as $row_po) {
-            echo '<option value="' . $row_po['id_pesanan'] . '">' . $row_po['no_pesanan'] . '</option>';
-        }
+          echo '<option value="' . $row_po['id_pesanan'] . '" data-id-produk="' . $row_po['id_produk'] . '">' 
+              . strtoupper($row_po['no_pesanan']) . " (" . ucwords($row_po['nama_produk']) . ")" 
+              . '</option>';
+          }
     ?>';
 
     var rowCount = $('#detail-table tr.main-tr').length + 1; // Ambil jumlah baris saat ini dan tambahkan 1
@@ -488,10 +523,12 @@ $(document).ready(function() {
       `<tr class="main-tr">
           <td>${rowCount}</td>
           <td>
-            <select class="form-select form-select-sm" id="id_pesanan" name="id_pesanan[]" required>
+              <select class="form-select form-select-sm id_pesanan_info" id="id_pesanan" name="id_pesanan[]" required>
                 <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
                 ${poOptions}
-            </select>
+              </select>
+              <div class="pesanan-info">
+              </div>
           </td>
           <td>
             <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
@@ -506,7 +543,7 @@ $(document).ready(function() {
             <input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
           </td>
           <td class="total">0</td>
-          <td class="align-middle text-center">
+          <td class="text-center">
             <div class="d-flex justify-content-center align-items-center">
               <button type="button" class="remove-btn btn-cancel m-0"></button>
             </div>
@@ -591,6 +628,30 @@ $(document).ready(function() {
     // Memperbarui teks nilai total PPN pada elemen dengan id "total-ppn"
     $('#total-ppn').text(formatRupiah(totalPPN));
   }
+
+  $(document).on('change', '.id_pesanan_info', function() {
+    var id_pesanan = $(this).val();
+    var id_produk = $(this).find(':selected').data(
+      'id-produk'); // Mengambil data-id-produk dari opsi yang dipilih
+    var infoCell = $(this).closest('tr').find('.pesanan-info');
+
+    $.ajax({
+      url: 'getPesananInfo.php',
+      method: 'POST',
+      data: {
+        id_pesanan: id_pesanan,
+        id_produk: id_produk // Jika diperlukan untuk request AJAX
+      },
+      success: function(response) {
+        infoCell.html(response);
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX error:', status, error);
+        infoCell.html('<p>Gagal memuat data.</p>');
+      }
+    });
+  });
+
 });
 </script>
 
@@ -746,12 +807,22 @@ function previewAddSignature(event) {
     cancelButtonSignature.style.display = "block";
   } else {
     let default_signature_path = "<?= $default_signature_path; ?>";
-    signElement.src = default_signature_path;
-    signElement.style.display = "block";
-    signaturePlaceholderContainer.style.display = "none";
-    signaturePreviewContainer.style.display = "block";
-    cancelButtonSignature.style.display = "block";
-    console.log("No file selected. Using default signature.");
+
+    if (default_signature_path.trim() !== "") { // Pengecekan jika default_signature_path tidak kosong
+      signElement.src = default_signature_path;
+      signElement.style.display = "block";
+      signaturePlaceholderContainer.style.display = "none";
+      signaturePreviewContainer.style.display = "block";
+      cancelButtonSignature.style.display = "block";
+      console.log("No file selected. Using default signature.");
+    } else {
+      // Hide preview if default_signature_path is empty
+      signElement.style.display = "none";
+      signaturePlaceholderContainer.style.display = "block";
+      signaturePreviewContainer.style.display = "none";
+      cancelButtonSignature.style.display = "none";
+      console.log("No default signature path provided. Signature preview not displayed.");
+    }
   }
   console.log("Signature preview updated.");
 }

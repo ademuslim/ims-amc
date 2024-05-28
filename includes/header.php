@@ -14,6 +14,22 @@ if (isset($_SESSION['nama_pengguna'])) {
 } else {
   $nama_pengguna = ''; // Jika tidak ada sesi atau cookie, atur nama pengguna ke string kosong
 }
+
+// Tampilkan pesan sukses jika ada
+if (isset($_SESSION['success_message'])) {
+  $success_message = $_SESSION['success_message'];
+  unset($_SESSION['success_message']);
+} else {
+  $success_message = '';
+}
+
+// Tampilkan pesan error jika ada
+if (isset($_SESSION['error_message'])) {
+  $error_message = $_SESSION['error_message'];
+  unset($_SESSION['error_message']);
+} else {
+  $error_message = '';
+}
 ?>
 
 <!DOCTYPE html>
@@ -32,6 +48,11 @@ if (isset($_SESSION['nama_pengguna'])) {
   <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.css'); ?>">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
+  <!-- SweetAlert2 CSS -->
+  <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2.min.css'); ?>">
+  <!-- SweetAlert2 JS -->
+  <script src="<?= base_url('assets/js/sweetalert2.all.min.js'); ?>"></script>
+
 
   <style>
   .show-immediate {
@@ -43,15 +64,71 @@ if (isset($_SESSION['nama_pengguna'])) {
   .no-transition .accordion-button:not(.collapsed)::after {
     transition: none !important;
   }
+
+  .loader-container {
+    display: none;
+    /* Awalnya sembunyikan loader */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+    background-color: #f2fafd;
+    /* Transparan */
+    z-index: 9999;
+    /* Pastikan loader di atas konten lain */
+  }
+
+  .loader {
+    border: 8px solid #f3f3f3;
+    /* Warna loader */
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    /* Warna loader */
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+    /* Animasi putaran */
+    position: absolute;
+    left: 50%;
+    top: 100px;
+    transform: translateX(-50%);
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Custom sweetalert */
+  .swal2-popup {
+    font-size: 0.8rem;
+    /* Ubah ukuran font */
+    width: 300px;
+    /* Ubah lebar */
+    background: #0077b6 !important;
+    /* Ubah warna background */
+    color: white;
+  }
+
+  .swal2-content {
+    color: white !important;
+    /* Ubah warna teks isi pesan menjadi putih */
+  }
+
+  .swal2-close {
+    font-size: 1rem;
+    /* Ubah ukuran tombol close */
+  }
   </style>
 </head>
 
 <body>
-  <!-- Loader -->
-  <!-- <div id="overlay">
-    <div class="spinner"></div>
-  </div> -->
-
   <div class="sb-cover">
     <div class="sidebar">
       <div class="resizer"></div>
@@ -350,4 +427,7 @@ if (isset($_SESSION['nama_pengguna'])) {
     </div>
   </div>
 
-  <div class="rs-content">
+  <div class="rs-content" style="position: relative;">
+    <!-- <div id="loader" class="loader-container">
+      <div class="loader"></div>
+    </div> -->

@@ -8,13 +8,6 @@ if ($_SESSION['peran_pengguna'] !== 'superadmin' && $_SESSION['peran_pengguna'] 
   exit();
 }
 
-// Periksa apakah ada pesan login berhasil dalam session
-if (isset($_SESSION['login_success'])) {
-  ?>
-<div id="myAlert" class="alert alert-success" role="alert"><?= $_SESSION['login_success'] ?></div>
-<?php
-    unset($_SESSION['login_success']);
-  }
 ?>
 
 <h1>pages/dashboard</h1>

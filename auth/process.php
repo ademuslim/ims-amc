@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['nama_pengguna'] = $user['nama_pengguna'];
 
             // Set pesan login berhasil
-            $_SESSION['login_success'] = "Login berhasil! Selamat datang, " . ucwords($user['nama_pengguna']) . ".";
+            $_SESSION['success_message'] = "Login berhasil! Selamat datang, " . ucwords($user['nama_pengguna']) . ".";
     
             // Jika dicentang, set cookie "ingat akun" dengan ID pengguna
             if (isset($_POST['remember_me'])) {

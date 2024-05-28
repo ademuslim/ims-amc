@@ -415,6 +415,7 @@ if (isset($_POST['add'])) {
     $id_produk = $_POST['id_produk'];
     $jumlah = $_POST['jumlah'];
     $harga_satuan = $_POST['harga_satuan'];
+
     $id_pesanan = $_POST['id_pesanan'];
 
     $deleted_rows = isset($_POST['deleted_rows']) ? $_POST['deleted_rows'] : [];
@@ -505,9 +506,6 @@ if (isset($_POST['add'])) {
             // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
         ];
         updateData('detail_faktur', $data, "id_detail_faktur = '{$detail['id_detail_faktur']}'");
-
-        // Perbarui jumlah dikirim dan sisa pesanan di tabel detail_pesanan
-        updateDetailPesanan($detail['id_produk'], $detail['id_pesanan'], $all_details);
     }
 
     // echo "Operasi tambah dan ubah data selesai.";
@@ -515,36 +513,6 @@ if (isset($_POST['add'])) {
     // Redirect ke halaman detail setelah proses edit selesai
     header("Location: detail.php?category=$category_param&id=$id_faktur");
     exit();
-
-    function updateDetailPesanan($id_produk, $id_pesanan, $all_details) {
-        // Ambil data detail pesanan berdasarkan id_produk dan id_pesanan
-        $detail_pesanan = selectData('detail_pesanan', "id_produk = '$id_produk' AND id_pesanan = '$id_pesanan'");
-        if (!empty($detail_pesanan)) {
-            // Hitung jumlah dikirim total baru
-            $jumlah_dikirim_baru = array_sum(array_column($all_details, 'jumlah')); // Jumlah yang dikirim baru
-            $jumlah_dikirim_sebelumnya = $detail_pesanan[0]['jumlah_dikirim']; // Jumlah yang dikirim sebelumnya
-            $jumlah_dikirim_total = $jumlah_dikirim_sebelumnya + $jumlah_dikirim_baru;
-    
-            // Hitung sisa pesanan baru
-            $jumlah_pesanan = $detail_pesanan[0]['jumlah']; // Jumlah pesanan
-            $sisa_pesanan = $jumlah_pesanan - $jumlah_dikirim_total;
-    
-            // Pastikan sisa pesanan tidak negatif
-            if ($sisa_pesanan < 0) {
-                $sisa_pesanan = 0;
-            }
-    
-            // Lakukan update pada tabel detail_pesanan
-            $update_data = [
-                'jumlah_dikirim' => $jumlah_dikirim_total,
-                'sisa_pesanan' => $sisa_pesanan
-            ];
-    
-            // Lakukan update menggunakan fungsi updateData dari library Anda
-            updateData('detail_pesanan', $update_data, "id_produk = '$id_produk' AND id_pesanan = '$id_pesanan'");
-        }
-    }
-
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php
     header("Location: index.php?category=" . $category_param);

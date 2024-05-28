@@ -39,6 +39,7 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
       <th>U.P.</th>
       <th>Pengirim</th>
       <th>Catatan</th>
+      <th>Detail</th>
       <th>Aksi</th>
     </tr>
   </thead>
@@ -75,9 +76,65 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
         <?php if (!empty($po['logo'])) : ?>
         <img class="me-3" src="<?= base_url($po['logo']); ?>" alt="Logo" width="50">
         <?php endif; ?>
+
         <?= ucwords($po['nama_pengirim']); ?>
       </td>
       <td><?= !empty($po['catatan']) ? ucfirst($po['catatan']) : "-"; ?></td>
+
+      <!-- Detail PO -->
+      <td>
+        <?php
+        $id_pesanan = $po['id_pesanan'];
+        $data_pesanan_pembelian_detail = [];
+        $mainDetailTable = 'detail_pesanan';
+        $joinDetailTables = [
+            ['pesanan_pembelian', 'detail_pesanan.id_pesanan = pesanan_pembelian.id_pesanan'], 
+            ['produk', 'detail_pesanan.id_produk = produk.id_produk']
+        ];
+        $columns = 'detail_pesanan.*, produk.*';
+        $conditions = "detail_pesanan.id_pesanan = '$id_pesanan'";
+
+        // Panggil fungsi selectDataJoin dengan ORDER BY
+        $data_pesanan_pembelian_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
+
+        $subtotal = 0;
+        if (!empty($data_pesanan_pembelian_detail)): ?>
+
+        <div class="row fw-bold border-bottom">
+          <div class="col">No.</div>
+          <div class="col">Deskripsi</div>
+          <div class="col">Kuantitas</div>
+          <div class="col">Harga</div>
+          <div class="col">Total Harga</div>
+          <!-- PO Open -->
+          <div class="col">Pesanan Terkirim</div>
+          <div class="col">Sisa Pesanan</div>
+        </div>
+        <?php
+            $no = 1; 
+            foreach ($data_pesanan_pembelian_detail as $detail): 
+            
+            // Hitung total harga untuk setiap baris
+            $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
+            // Tambahkan total harga ke subtotal
+            $subtotal += $total_harga;
+        ?>
+        <div class="row border-bottom">
+          <div class="col"><?= $no ?></div>
+          <div class="col"><?= strtoupper($detail['nama_produk']); ?></div>
+          <div class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></div>
+          <div class="col"><?= formatRupiah($detail['harga_satuan']); ?></div>
+          <div class="col"><?= formatRupiah($total_harga); ?></div>
+
+          <div class="col"><?= $detail['jumlah_dikirim']; ?></div>
+          <div class="col"><?= $detail['sisa_pesanan']; ?></div>
+        </div>
+        <?php $no++; endforeach; ?>
+        <?php else: ?>
+        <span class="text-center">-</span>
+        <?php endif; ?>
+      </td>
+
       <td>
         <div class="btn-group">
           <a href="detail.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>" class="btn-act btn-view"

@@ -18,24 +18,6 @@ if ($category_param === 'outgoing') {
   die("Kategori tidak valid");
 }
 
-// Tampilkan pesan sukses jika ada
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-
-// Tampilkan pesan error jika ada
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
 // Khusus Outgoing
 if ($category_param === 'outgoing') {
   $default_logo_path = "";
@@ -58,7 +40,13 @@ if ($category_param === 'outgoing') {
         
         // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
         if ($pair[0] == 'Path') {
-          $default_signature_path = $pair[1];
+          // Jika nilai Path tidak kosong, gunakan nilai tersebut
+          if (!empty($pair[1])) {
+            $default_signature_path = $pair[1];
+          } else {
+            // Jika nilai Path kosong, set default path
+            $default_signature_path = "../../assets/image/uploads/signature/no_signature.png";
+          }
           break; // Keluar dari loop setelah menemukan path
         }
       }
@@ -141,18 +129,18 @@ if ($category_param === 'outgoing') {
 
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
-          <!-- input no invoice outgoing -->
+          <!-- input no PO outgoing -->
           <div class="row mb-3">
             <?php if ($category_param == 'outgoing') { ?>
             <label for="no_po" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
               <input type="text" class="form-control form-control-sm" id="no_po" name="no_po" readonly required>
               <div class="invalid-feedback">
-                Sistem error, nomor penawaran gagal dimuat.
+                Sistem error, nomor pesanan pembelian gagal dimuat.
               </div>
             </div>
 
-            <!-- input no invoice incoming -->
+            <!-- input no PO incoming -->
             <?php } elseif ($category_param == 'incoming') { ?>
             <label for="no_po" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
@@ -206,6 +194,7 @@ if ($category_param === 'outgoing') {
         </div>
       </div>
 
+      <!-- U.P. -->
       <div class="row">
         <div class="col-md-5 p-0">
           <div class="row mb-3">
@@ -235,20 +224,31 @@ if ($category_param === 'outgoing') {
           <tbody id="detail-table">
             <tr class="main-tr">
               <td>1</td>
+
               <td>
                 <select class="form-select form-select-sm" id="id_penawaran" name="id_penawaran[]" required>
-                  <option value="" selected disabled>-- Pilih Penawaran Harga. --</option>
+                  <option value="" selected disabled>-- Pilih No. Penawaran Harga. --</option>
                   <?php
-                    // Tentukan kategori PH untuk query berdasarkan category_param
-                    $ph = selectData("penawaran_harga","kategori = '$category_ph'" );
-                    
-                    // Loop melalui hasil query dan tampilkan dalam opsi dropdown
-                    foreach ($ph as $row_ph) {
-                      echo '<option value="' . $row_ph['id_penawaran'] . '">' . $row_ph['no_penawaran'] . '</option>';
-                    }
-                  ?>
+                  // Tentukan kategori PH untuk query berdasarkan category_param
+                  $mainTable = 'penawaran_harga';
+                  $joinTables = [
+                    ['detail_penawaran', 'penawaran_harga.id_penawaran = detail_penawaran.id_penawaran'],
+                    ['produk', 'detail_penawaran.id_produk = produk.id_produk']
+                  ];
+                  $columns = 'penawaran_harga.id_penawaran, penawaran_harga.no_penawaran, produk.nama_produk'; // Gunakan DISTINCT untuk menghindari duplikat
+                  $conditions = "penawaran_harga.kategori = '$category_ph'";
+
+                  // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
+                  $ph = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
+                  // Loop melalui hasil query dan tampilkan dalam opsi dropdown
+                  foreach ($ph as $row_ph) {
+                    echo '<option value="' . $row_ph['id_penawaran'] . '">' . strtoupper($row_ph['no_penawaran']) . " (" . ucwords($row_ph['nama_produk']) . ")" . '</option>';
+                  }
+                ?>
                 </select>
               </td>
+
               <td>
                 <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
                   <option value="" selected disabled>-- Pilih Produk --</option>
@@ -488,9 +488,20 @@ $(document).ready(function() {
     ?>';
 
     var phOptions = '<?php
-        $ph = selectData("penawaran_harga","kategori = '$category_ph'" );
+        $mainTable = 'penawaran_harga';
+        $joinTables = [
+          ['detail_penawaran', 'penawaran_harga.id_penawaran = detail_penawaran.id_penawaran'],
+          ['produk', 'detail_penawaran.id_produk = produk.id_produk'] // Perbaiki join ke tabel produk
+        ];
+        $columns = 'penawaran_harga.id_penawaran, penawaran_harga.no_penawaran, produk.nama_produk'; // Gunakan DISTINCT untuk menghindari duplikat
+        $conditions = "penawaran_harga.kategori = '$category_ph'";
+
+        // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
+        $ph = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
+        // Loop melalui hasil query dan tampilkan dalam opsi dropdown
         foreach ($ph as $row_ph) {
-            echo '<option value="' . $row_ph['id_penawaran'] . '">' . $row_ph['no_penawaran'] . '</option>';
+          echo '<option value="' . $row_ph['id_penawaran'] . '">' . $row_ph['no_penawaran'] . " (" . $row_ph['nama_produk'] . ")" . '</option>';
         }
     ?>';
 
@@ -499,8 +510,8 @@ $(document).ready(function() {
       `<tr class="main-tr">
           <td>${rowCount}</td>
           <td>
-            <select class="form-select form-select-sm" id="id_pesanan" name="id_pesanan[]" required>
-                <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
+            <select class="form-select form-select-sm" id="id_penawaran" name="id_penawaran[]" required>
+                <option value="" selected disabled>-- Pilih No PH. --</option>
                 ${phOptions}
             </select>
           </td>

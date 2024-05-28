@@ -3,22 +3,6 @@ $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'Edit Quotation Outgoing' : 'Edit Quotation Incoming';
 require '../../includes/header.php';
 
-// Notifikasi
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
 // Set kategori halaman (Outgoing / Incoming)
 if ($category_param === 'outgoing') {
   $category = 'keluar';
@@ -42,8 +26,8 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
   $id_penawaran = $_GET['id'];
   $mainTable = 'penawaran_harga';
   $joinTables = [
-    ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak AND pengirim.kategori = '$sender'"], 
-    ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak AND penerima.kategori = '$receiver'"],
+    ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak"], 
+    ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak"],
     ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
   ];
 
