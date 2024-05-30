@@ -40,13 +40,25 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
       <th class="text-start">No.</th>
       <th>Nomor Penawaran</th>
       <th>Tanggal</th>
+
+      <?php if ($category_param == 'outgoing') { ?>
       <th>Penerima</th>
+      <?php } elseif ($category_param == 'incoming') { ?>
+      <th>Pengirim</th>
+      <?php } ?>
+
       <th>Status</th>
       <th>Total</th>
       <th>PPN</th>
       <th>Diskon</th>
       <th>U.P.</th>
+
+      <?php if ($category_param == 'outgoing') { ?>
       <th>Pengirim</th>
+      <?php } elseif ($category_param == 'incoming') { ?>
+      <th>Penerima</th>
+      <?php } ?>
+
       <th>Catatan</th>
       <th>Detail</th>
       <th>Aksi</th>
@@ -62,7 +74,13 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
       <td class="text-start"><?= $no; ?></td>
       <td><?= strtoupper($ph['no_penawaran']); ?></td>
       <td><?= dateID($ph['tanggal']); ?></td>
+
+      <?php if ($category_param == 'outgoing') { ?>
       <td class="text-wrap"><?= ucwords($ph['nama_penerima']); ?></td>
+      <?php } elseif ($category_param == 'incoming') { ?>
+      <td class="text-wrap"><?= ucwords($ph['nama_pengirim']); ?></td>
+      <?php } ?>
+
       <td>
         <?php
         // Tentukan kelas bootstrap berdasarkan nilai status
@@ -86,9 +104,17 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
       <td>
         <?php if (!empty($ph['logo'])) : ?>
         <img class="me-3" src="<?= base_url($ph['logo']); ?>" alt="Logo" width="50">
-        <?php endif; ?>
-        <?= ucwords($ph['nama_pengirim']); ?>
+        <?php 
+          endif; 
+      
+          if ($category_param == 'outgoing') { 
+            echo ucwords($ph['nama_pengirim']);
+          } elseif ($category_param == 'incoming') {
+            echo ucwords($ph['nama_penerima']); 
+          } 
+        ?>
       </td>
+
       <td><?= !empty($ph['catatan']) ? ucfirst($ph['catatan']) : "-"; ?></td>
 
       <!-- Detail PH -->
@@ -118,7 +144,7 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
           <div class="col">Total Harga</div>
         </div>
         <?php
-            $no = 1; 
+            $no_detail = 1; 
             foreach ($data_penawaran_harga_detail as $detail): 
             
             // Hitung total harga untuk setiap baris
@@ -127,13 +153,13 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
             $subtotal += $total_harga;
         ?>
         <div class="row border-bottom">
-          <div class="col"><?= $no ?></div>
+          <div class="col"><?= $no_detail ?></div>
           <div class="col"><?= strtoupper($detail['nama_produk']); ?></div>
           <div class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></div>
           <div class="col"><?= formatRupiah($detail['harga_satuan']); ?></div>
           <div class="col"><?= formatRupiah($total_harga); ?></div>
         </div>
-        <?php $no++; endforeach; ?>
+        <?php $no_detail++; endforeach; ?>
         <?php else: ?>
         <span class="text-center">-</span>
         <?php endif; ?>

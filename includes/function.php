@@ -4,13 +4,13 @@ require_once 'config.php';
 
 // Fungsi untuk mendapatkan base URL
 function base_url($url = null) {
-  // Mengambil base URL dari variabel lingkungan jika tersedia, jika tidak, gunakan base URL default
-  $base_url = getenv('BASE_URL') ? getenv('BASE_URL') : "http://ims-amc.test";
-  if ($url != null) {
-      return rtrim($base_url, '/') . '/' . ltrim($url, '/');
-  } else {
-      return $base_url;
-  }
+    // Mengambil base URL dari variabel lingkungan jika tersedia, jika tidak, gunakan base URL default
+    $base_url = getenv('BASE_URL') ? getenv('BASE_URL') : "http://ims-amc.test";
+    if ($url != null) {
+        return rtrim($base_url, '/') . '/' . ltrim($url, '/');
+    } else {
+        return $base_url;
+    }
 }
 
 function dateID($date) {
@@ -196,37 +196,6 @@ function register($id_pengguna, $nama_pengguna, $email, $password, $tipe_penggun
   }
 }
 
-// // Fungsi tambah data
-// function insertData($table, $data) {
-//   global $conn;
-
-//   // Sanitasi data sebelum dimasukkan ke dalam database
-//   $sanitized_data = sanitizeInput($data);
-
-//   // Bangun pernyataan SQL
-//   $columns = implode(", ", array_keys($sanitized_data));
-//   $placeholders = implode(", ", array_fill(0, count($sanitized_data), "?"));
-//   $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
-
-//   // Persiapkan statement
-//   $stmt = mysqli_prepare($conn, $sql);
-
-//   // Bind parameter
-//   $types = str_repeat("s", count($sanitized_data));
-//   mysqli_stmt_bind_param($stmt, $types, ...array_values($sanitized_data));
-
-//   // Eksekusi statement
-//   mysqli_stmt_execute($stmt); //baris 220
-
-//   // Ambil hasil
-//   $result = mysqli_stmt_affected_rows($stmt);
-
-//   // Tutup statement
-//   mysqli_stmt_close($stmt);
-
-//   return $result;
-// }
-
 function insertData($table, $data) {
     global $conn;
 
@@ -263,42 +232,41 @@ function insertData($table, $data) {
     }
 }
 
-
 // Fungsi tampil data dengan kemampuan sorting, limit, dan parameter terikat untuk prepared statement
 function selectData($table, $conditions = "", $order_by = "", $limit = "", $bind_params = array()) {
-  global $conn;
-  // Bangun pernyataan SQL
-  $sql = "SELECT * FROM $table";
-  if (!empty($conditions)) {
-      $sql .= " WHERE $conditions";
-  }
-  if (!empty($order_by)) {
-      $sql .= " ORDER BY $order_by";
-  }
-  if (!empty($limit)) {
-      $sql .= " LIMIT $limit";
-  }
-  // Persiapkan statement
-  $stmt = mysqli_prepare($conn, $sql);
-  // Bind parameters jika ada
-  if (!empty($bind_params)) {
-      $types = "";
-      $bind_values = array();
-      foreach ($bind_params as $param) {
-          $types .= $param['type'];
-          $bind_values[] = $param['value'];
-      }
-      mysqli_stmt_bind_param($stmt, $types, ...$bind_values);
-  }
-  // Eksekusi query
-  mysqli_stmt_execute($stmt);
-  // Ambil hasil
-  $result = mysqli_stmt_get_result($stmt);
-  $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-  // Bebaskan hasil dan tutup statement
-  mysqli_free_result($result);
-  mysqli_stmt_close($stmt);
-  return $rows;
+    global $conn;
+    // Bangun pernyataan SQL
+    $sql = "SELECT * FROM $table";
+    if (!empty($conditions)) {
+        $sql .= " WHERE $conditions";
+    }
+    if (!empty($order_by)) {
+        $sql .= " ORDER BY $order_by";
+    }
+    if (!empty($limit)) {
+        $sql .= " LIMIT $limit";
+    }
+    // Persiapkan statement
+    $stmt = mysqli_prepare($conn, $sql);
+    // Bind parameters jika ada
+    if (!empty($bind_params)) {
+        $types = "";
+        $bind_values = array();
+        foreach ($bind_params as $param) {
+            $types .= $param['type'];
+            $bind_values[] = $param['value'];
+        }
+        mysqli_stmt_bind_param($stmt, $types, ...$bind_values);
+    }
+    // Eksekusi query
+    mysqli_stmt_execute($stmt);
+    // Ambil hasil
+    $result = mysqli_stmt_get_result($stmt);
+    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    // Bebaskan hasil dan tutup statement
+    mysqli_free_result($result);
+    mysqli_stmt_close($stmt);
+    return $rows;
 }
 
 // Fungsi tampil data dengan join tabel dan fitur order by
@@ -331,6 +299,44 @@ function selectDataJoin($mainTable, $joinTables = [], $columns = '*', $condition
   mysqli_free_result($result);
   
   return $rows;
+}
+
+// Fungsi untuk menjumlahkan nilai dari kolom tertentu dengan kondisi yang dinamis
+function getDynamicSum($table, $sumColumn, $conditions = "", $bind_params = array()) {
+    global $conn;
+
+    // Bangun pernyataan SQL untuk SUM
+    $sql = "SELECT SUM($sumColumn) as total_sum FROM $table";
+    if (!empty($conditions)) {
+        $sql .= " WHERE $conditions";
+    }
+
+    // Persiapkan statement
+    $stmt = mysqli_prepare($conn, $sql);
+
+    // Bind parameter jika ada
+    if (!empty($bind_params)) {
+        $types = "";
+        $bind_values = array();
+        foreach ($bind_params as $param) {
+            $types .= $param['type'];
+            $bind_values[] = $param['value'];
+        }
+        mysqli_stmt_bind_param($stmt, $types, ...$bind_values);
+    }
+
+    // Eksekusi query
+    mysqli_stmt_execute($stmt);
+
+    // Ambil hasil
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+
+    // Bebaskan hasil dan tutup statement
+    mysqli_free_result($result);
+    mysqli_stmt_close($stmt);
+
+    return $row['total_sum'];
 }
 
 // Fungsi ubah data
@@ -522,13 +528,12 @@ function isDataInUse($valueToCheck, $tableColumnMap, $additionalColumns = []) {
     return $dataInUse;
 }
 
-
 function getLastDocumentNumber($tabel, $column, $order_by, $prefix, $suffix, $month, $year) {
     global $conn;
 
     // Query untuk mengambil nomor dokumen terbaru dari tabel tertentu berdasarkan kolom tertentu
     // dan berdasarkan bulan dan tahun yang disediakan
-    $query = "SELECT $column FROM $tabel WHERE YEAR($order_by) = $year AND MONTH($order_by) = $month AND kategori = 'keluar' ORDER BY $column DESC LIMIT 1";
+    $query = "SELECT $column FROM $tabel WHERE YEAR($order_by) = $year AND kategori = 'keluar' ORDER BY $column DESC LIMIT 1";
 
     // Eksekusi query
     $result = mysqli_query($conn, $query);
@@ -636,4 +641,22 @@ function getEnum($column_name, $table_name) {
 // Fungsi untuk mengubah format Rupiah ke dalam bentuk integer
 function unformatRupiah($rupiah) {
     return (int) preg_replace('/[^0-9]/', '', $rupiah);
+}
+
+function updateDetailPesanan($id_produk, $id_pesanan, $jumlah_perubahan) {
+    global $conn;
+
+    // Ambil data detail_pesanan yang sesuai
+    $query = "SELECT jumlah_dikirim, sisa_pesanan FROM detail_pesanan WHERE id_produk = '$id_produk' AND id_pesanan = '$id_pesanan'";
+    $result = mysqli_query($conn, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $jumlah_dikirim = $row['jumlah_dikirim'] + $jumlah_perubahan;
+        $sisa_pesanan = $row['sisa_pesanan'] - $jumlah_perubahan;
+
+        // Update detail_pesanan
+        $query = "UPDATE detail_pesanan SET jumlah_dikirim = '$jumlah_dikirim', sisa_pesanan = '$sisa_pesanan' WHERE id_produk = '$id_produk' AND id_pesanan = '$id_pesanan'";
+        mysqli_query($conn, $query);
+    }
 }

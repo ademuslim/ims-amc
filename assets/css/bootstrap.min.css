@@ -3800,7 +3800,7 @@ fieldset:disabled .btn {
 .nav-underline {
   --bs-nav-underline-gap: 1rem;
   --bs-nav-underline-border-width: 0.125rem;
-  --bs-nav-underline-link-active-color: var(--bs-emphasis-color);
+  --bs-nav-underline-link-active-color: #0077b6;
   gap: var(--bs-nav-underline-gap);
 }
 .nav-underline .nav-link {
@@ -3815,8 +3815,9 @@ fieldset:disabled .btn {
 .nav-underline .nav-link.active,
 .nav-underline .show > .nav-link {
   font-weight: 700;
-  color: var(--bs-nav-underline-link-active-color);
+  color: #0077b6;
   border-bottom-color: currentcolor;
+  background-color: transparent;
 }
 .nav-fill .nav-item,
 .nav-fill > .nav-link {

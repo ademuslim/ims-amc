@@ -159,7 +159,7 @@ if (isset($_SESSION['error_message'])) {
             </a>
           </li>
 
-          <li>
+          <!-- <li>
             <a href="<?= base_url('pages/dashboard-views/index.php'); ?>"
               class="nav-link text-dark <?= setActivePage('pages/dashboard-views/index.php'); ?>">
               <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
@@ -170,7 +170,7 @@ if (isset($_SESSION['error_message'])) {
                 Dashboard Views
               </span>
             </a>
-          </li>
+          </li> -->
 
           <li>
             <div class="accordion accordion-flush" style="background-color: transparent;" id="accordionFlushMasterData">
@@ -409,7 +409,27 @@ if (isset($_SESSION['error_message'])) {
         <div class="dropdown">
           <a href="#" class="d-flex align-items-center text-dark text-decoration-none nav-link"
             data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="" width="18" height="18" class="rounded-circle">
+            <span class="rounded-circle bg-secondary text-white"
+              style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+              <?php
+                // Ubah nama pengguna menjadi huruf besar untuk memastikan konsistensi
+                
+                // Memisahkan nama pengguna menjadi kata-kata terpisah
+                $kata = explode(" ", $nama_pengguna);
+
+                // Inisialisasi variabel untuk menyimpan inisial
+                $inisial = '';
+
+                // Iterasi melalui setiap kata dalam nama pengguna
+                foreach ($kata as $kata_satu) {
+                    // Ambil huruf pertama dari setiap kata dan tambahkan ke inisial
+                    $inisial .= substr($kata_satu, 0, 1);
+                }
+
+                // Tampilkan inisial
+                echo strtoupper($inisial);
+                ?>
+            </span>
             <span class="text-link"><?= ucwords($nama_pengguna); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
@@ -428,6 +448,6 @@ if (isset($_SESSION['error_message'])) {
   </div>
 
   <div class="rs-content" style="position: relative;">
-    <!-- <div id="loader" class="loader-container">
+    <div id="loader" class="loader-container">
       <div class="loader"></div>
-    </div> -->
+    </div>

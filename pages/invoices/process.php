@@ -171,7 +171,7 @@ if (isset($_POST['add'])) {
             // Unformat harga satuan sebelum menyimpan ke database
             $harga_satuan_unformatted = unformatRupiah($harga_satuan[$i]);
 
-            // Data untuk disimpan
+            // Data detail untuk disimpan
             $detail_produk = [
                 'id_detail_faktur' => $id_detail_faktur,
                 'id_faktur' => $id_faktur,
@@ -183,6 +183,7 @@ if (isset($_POST['add'])) {
             ];
 
             try {
+                // Tambah detail faktur
                 insertData('detail_faktur', $detail_produk);
             } catch (mysqli_sql_exception $e) {
                 $_SESSION['error_message'] = "Gagal menyimpan data detail produk: " . $e->getMessage();
@@ -206,16 +207,15 @@ if (isset($_POST['add'])) {
 
             // Ambil data detail pesanan pembelian berdasarkan id pesanan dan id produk
             $detail_pesanan = selectData('detail_pesanan', "id_pesanan = '$id_pesanan' AND id_produk = '$id_produk_faktur'");
+            
             if (!empty($detail_pesanan)) {
-                // Debugging: Periksa data detail pesanan yang diambil
-                print_r($detail_pesanan);
 
                 // Update tabel detail_pesanan
                 $jumlah_pesanan = $detail_pesanan[0]['jumlah']; // Asumsi jumlah dari indeks pertama
                 $jumlah_dikirim_sebelumnya = $detail_pesanan[0]['jumlah_dikirim']; // Asumsi jumlah dikirim sebelumnya dari indeks pertama
 
                 // Debugging: Periksa jumlah pesanan dan jumlah dikirim sebelumnya
-                echo "Jumlah Pesanan: $jumlah_pesanan, Jumlah Dikirim Sebelumnya: $jumlah_dikirim_sebelumnya<br>";
+                // echo "Jumlah Pesanan: $jumlah_pesanan, Jumlah Dikirim Sebelumnya: $jumlah_dikirim_sebelumnya<br>";
 
                 $jumlah_dikirim_total = $jumlah_dikirim_sebelumnya + $jumlah_dikirim_baru; // Jumlah total yang telah dikirim
                 $sisa_pesanan = $jumlah_pesanan - $jumlah_dikirim_total; // Hitung sisa pesanan
@@ -391,8 +391,8 @@ if (isset($_POST['add'])) {
         'id_penerima' => $penerima,
         'diskon' => $diskon,
         'id_ppn' => $jenis_ppn,
-        'logo' => $logoPath, // tambahkan lokasi file logo ke dalam data yang akan diupdate
-        'signature_info' => $signatureInfo,
+        'logo' => $file_destination_logo, // tambahkan lokasi file logo ke dalam data yang akan diupdate
+        'signature_info' => $signature_info,
         'kategori' => $kategori,
         'status' => $status
     ];
@@ -431,24 +431,23 @@ if (isset($_POST['add'])) {
         ];
     }
 
-    // // Tampilkan isi dari array $all_details untuk debugging
-    // echo "Isi dari all_details sebelum penghapusan:";
-    // echo "<pre>";
-    // var_dump($all_details);
-    // echo "</pre>";
-    // // exit();
-
-    // // Tampilkan isi dari array $deleted_rows untuk debugging
-    // echo "Isi dari deleted_rows:";
-    // echo "<pre>";
-    // var_dump($deleted_rows);
-    // echo "</pre>";
-    // // exit();
-
     // Hapus baris yang ada dalam deleted_rows
     foreach ($deleted_rows as $deleted_row) {
         // Hanya hapus baris jika id_detail_faktur tidak mengandung "newId" di awal id-nya
         if (strpos($deleted_row, "newId") !== 0) {
+            // Ambil detail faktur sebelum dihapus
+            $query = "SELECT * FROM detail_faktur WHERE id_detail_faktur = '$deleted_row'";
+            $result = mysqli_query($conn, $query);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                $jumlah_dikirim = $row['jumlah'];
+                $id_produk = $row['id_produk'];
+                $id_pesanan = $row['id_pesanan'];
+
+                // Kembalikan jumlah_dikirim dan sisa_pesanan pada detail_pesanan
+                updateDetailPesanan($id_produk, $id_pesanan, -$jumlah_dikirim);
+            }
+
             deleteData('detail_faktur', "id_detail_faktur = '$deleted_row'");
         }
     }
@@ -468,17 +467,6 @@ if (isset($_POST['add'])) {
         }
     }
 
-    // // Tampilkan isi dari array $add_detail dan $update_detail untuk debugging
-    // echo "Isi dari add_detail (baris baru):";
-    // echo "<pre>";
-    // var_dump($add_detail);
-    // echo "</pre>";
-
-    // echo "Isi dari update_detail (baris yang harus diperbarui):";
-    // echo "<pre>";
-    // var_dump($update_detail);
-    // echo "</pre>";
-
     // Lakukan operasi tambah data
     foreach ($add_detail as $detail) {
         // Generate UUID untuk ID baru
@@ -493,21 +481,32 @@ if (isset($_POST['add'])) {
             'id_faktur' => $id_faktur,
         ];
         insertData('detail_faktur', $data);
+
+        // Update detail_pesanan untuk penambahan baru
+        updateDetailPesanan($detail['id_produk'], $detail['id_pesanan'], $detail['jumlah']);
     }
+    
 
     // Lakukan operasi ubah data
     foreach ($update_detail as $detail) {
-        $data = [
-            'id_produk' => $detail['id_produk'],
-            'jumlah' => $detail['jumlah'],
-            'harga_satuan' => $detail['harga_satuan'],
-            'id_pesanan' => $detail['id_pesanan'],
-            // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
-        ];
-        updateData('detail_faktur', $data, "id_detail_faktur = '{$detail['id_detail_faktur']}'");
+        $query = "SELECT jumlah FROM detail_faktur WHERE id_detail_faktur = '{$detail['id_detail_faktur']}'";
+        $result = mysqli_query($conn, $query);
+        if ($result && mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            $jumlah_sebelumnya = $row['jumlah'];
+            $perbedaan_jumlah = $detail['jumlah'] - $jumlah_sebelumnya;
 
-        // Perbarui jumlah dikirim dan sisa pesanan di tabel detail_pesanan
-        updateDetailPesanan($detail['id_produk'], $detail['id_pesanan'], $all_details);
+            $data = [
+                'id_produk' => $detail['id_produk'],
+                'jumlah' => $detail['jumlah'],
+                'harga_satuan' => $detail['harga_satuan'],
+                'id_pesanan' => $detail['id_pesanan'],
+            ];
+            updateData('detail_faktur', $data, "id_detail_faktur = '{$detail['id_detail_faktur']}'");
+
+            // Update jumlah dikirim dan sisa pesanan di tabel detail_pesanan
+            updateDetailPesanan($detail['id_produk'], $detail['id_pesanan'], $perbedaan_jumlah);
+        }
     }
 
     // echo "Operasi tambah dan ubah data selesai.";
@@ -515,35 +514,6 @@ if (isset($_POST['add'])) {
     // Redirect ke halaman detail setelah proses edit selesai
     header("Location: detail.php?category=$category_param&id=$id_faktur");
     exit();
-
-    function updateDetailPesanan($id_produk, $id_pesanan, $all_details) {
-        // Ambil data detail pesanan berdasarkan id_produk dan id_pesanan
-        $detail_pesanan = selectData('detail_pesanan', "id_produk = '$id_produk' AND id_pesanan = '$id_pesanan'");
-        if (!empty($detail_pesanan)) {
-            // Hitung jumlah dikirim total baru
-            $jumlah_dikirim_baru = array_sum(array_column($all_details, 'jumlah')); // Jumlah yang dikirim baru
-            $jumlah_dikirim_sebelumnya = $detail_pesanan[0]['jumlah_dikirim']; // Jumlah yang dikirim sebelumnya
-            $jumlah_dikirim_total = $jumlah_dikirim_sebelumnya + $jumlah_dikirim_baru;
-    
-            // Hitung sisa pesanan baru
-            $jumlah_pesanan = $detail_pesanan[0]['jumlah']; // Jumlah pesanan
-            $sisa_pesanan = $jumlah_pesanan - $jumlah_dikirim_total;
-    
-            // Pastikan sisa pesanan tidak negatif
-            if ($sisa_pesanan < 0) {
-                $sisa_pesanan = 0;
-            }
-    
-            // Lakukan update pada tabel detail_pesanan
-            $update_data = [
-                'jumlah_dikirim' => $jumlah_dikirim_total,
-                'sisa_pesanan' => $sisa_pesanan
-            ];
-    
-            // Lakukan update menggunakan fungsi updateData dari library Anda
-            updateData('detail_pesanan', $update_data, "id_produk = '$id_produk' AND id_pesanan = '$id_pesanan'");
-        }
-    }
 
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php

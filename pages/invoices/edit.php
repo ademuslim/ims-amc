@@ -18,28 +18,11 @@ if ($category_param === 'outgoing') {
   die("Kategori tidak valid");
 }
 
-// Notifikasi
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
 // Variabel data detail
 $data_detail = [];
 $signatureInfo = []; // Array detail signature info
 $error_message = '';
 
-// Ambil Data PO berdasarkan id
 if (isset($_GET['id']) && $_GET['id'] !== '') {
   $id_faktur = $_GET['id'];
   $mainTable = 'faktur';
@@ -172,7 +155,7 @@ if ($error_message): ?>
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
-            <!-- input no invoice outgoing -->
+            <!-- input edit no invoice outgoing -->
             <?php if ($category_param == 'outgoing') { ?>
             <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
@@ -183,7 +166,7 @@ if ($error_message): ?>
               </div>
             </div>
 
-            <!-- input no invoice incoming -->
+            <!-- input edit no invoice incoming -->
             <?php } elseif ($category_param == 'incoming') { ?>
             <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
@@ -199,8 +182,15 @@ if ($error_message): ?>
           <div class="row mb-3">
             <label for="tanggal" class="col-sm-3 col-form-label">Tanggal</label>
             <div class="col-sm-9">
+              <!-- input tgl invoice outgoing -->
+              <?php if ($category_param == 'outgoing') { ?>
+              <input type="datetime-local" class="form-control form-control-sm" id="tanggal" name="tanggal"
+                value="<?= $data['tanggal'] ?>" readonly required>
+              <!-- input tgl invoice incoming -->
+              <?php } elseif ($category_param == 'incoming') { ?>
               <input type="datetime-local" class="form-control form-control-sm" id="tanggal" name="tanggal"
                 value="<?= $data['tanggal'] ?>" required>
+              <?php } ?>
               <div class="invalid-feedback">
                 Harap pilih tanggal.
               </div>
@@ -264,9 +254,14 @@ if ($error_message): ?>
           <thead>
             <tr class="fw-bolder">
               <td>No.</td>
-              <td>No. PO</td>
-              <td>Nama Produk</td>
-              <td>Kuantitas</td>
+              <td>No. PO.<a href="#" class="link-danger link-offset-2 link-underline-opacity-0" data-bs-toggle="tooltip"
+                  data-bs-custom-class="custom-tooltip" data-bs-title="PO yang tersedia">*</a></td>
+              <td>Nama Produk<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Pilih produk sesuai PO">*</a></td>
+              <td>Kuantitas<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Masukan kuantitas tidak melebihi kuantitas PO">*</a></td>
               <td>Harga</td>
               <td colspan="2">Jumlah</td>
             </tr>
@@ -322,11 +317,14 @@ if ($error_message): ?>
                 <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
                   Baris</button>
               </td>
-              <td colspan="2">Subtotal</td>
+              <td class="fw-bolder" colspan="2">Subtotal</td>
               <td colspan="2" id="total-harga">0</td>
             </tr>
             <tr>
-              <td>Diskon</td>
+              <td class="fw-bolder">Diskon<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Diskon dalam persen, isi 0 jika tanpa diskon.">*</a></td>
+              <td>
               <td>
                 <div class="input-group input-group-sm">
                   <input type="number" class="form-control" id="diskon" name="diskon" min="0" max="99"
@@ -339,7 +337,10 @@ if ($error_message): ?>
 
             <tr>
               <td colspan="3" class="bg-transparent"></td>
-              <td>PPN</td>
+              <td class="fw-bolder">PPN<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="PPN dalam persen, pilih 'Tanpa PPN' jika tanpa PPN.">*</a></td>
+              <td>
               <td>
                 <div class="input-group input-group-sm">
                   <select class="form-select form-select-sm" id="jenis_ppn" name="jenis_ppn" required
@@ -361,7 +362,7 @@ if ($error_message): ?>
 
             <tr>
               <td colspan="3" class="bg-transparent"></td>
-              <td colspan="2">Total</td>
+              <td class="fw-bolder" colspan="2">Total</td>
               <td colspan="2">
                 <span id="grand-total">0</span>
                 <!-- Input tersembunyi untuk menyimpan grand total -->

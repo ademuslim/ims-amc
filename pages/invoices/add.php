@@ -7,11 +7,13 @@ require '../../includes/header.php';
 if ($category_param === 'outgoing') {
   $category = 'keluar';
   $sender = 'internal';
-  $receiver = 'customer';
+  $receiver1 = 'customer';
+  $receiver2 = 'supplier';
   $category_po = 'masuk';
 } elseif ($category_param === 'incoming') {
   $category = 'masuk';
-  $sender = 'customer';
+  $sender1 = 'customer';
+  $sender2 = 'supplier';
   $receiver = 'internal';
   $category_po = 'keluar';
 } else {
@@ -112,11 +114,20 @@ if ($category_param === 'outgoing') {
                 <option value="" selected disabled>-- Pilih Pengirim --</option>
                 <?php
                   // Ambil data kontak sesuai dengan kategori sender
-                  $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                  $kontak_pengirim = [];
+                  if ($category_param === 'outgoing') {
+                    $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                  } elseif ($category_param === 'incoming') {
+                    $kontak_pengirim = array_merge(
+                      selectData("kontak", "kategori = '$sender1'"),
+                      selectData("kontak", "kategori = '$sender2'")
+                    );
+                  }
+                  
                   foreach ($kontak_pengirim as $row_pengirim) {
                     // Jika kategori adalah 'outgoing' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
-                    $selected = ($category_param == 'outgoing' && $row_pengirim['nama_kontak'] == 'pt. mitra tehno gemilang') ? 'selected' : '';
-                      echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
+                    $selected = ($category_param == 'outgoing' && strtolower($row_pengirim['nama_kontak']) == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                    echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
                   }
                 ?>
               </select>
@@ -176,13 +187,21 @@ if ($category_param === 'outgoing') {
               <select class="form-select form-select-sm" id="penerima" name="penerima" required>
                 <option value="" selected disabled>-- Pilih Penerima --</option>
                 <?php
-                  // Ambil data kontak dengan kategori 'customer dan supplier'
-                  $receiver2 = "supplier";
-                  $kontak_penerima = selectData("kontak", "kategori = '$receiver' OR kategori = '$receiver2'");
+                  // Ambil data kontak sesuai dengan kategori receiver
+                  $kontak_penerima = [];
+                  if ($category_param === 'outgoing') {
+                    $kontak_penerima = array_merge(
+                      selectData("kontak", "kategori = '$receiver1'"),
+                      selectData("kontak", "kategori = '$receiver2'")
+                    );
+                  } elseif ($category_param === 'incoming') {
+                    $kontak_penerima = selectData("kontak", "kategori = '$receiver'");
+                  }
+
                   foreach ($kontak_penerima as $row_penerima) {
-                      // Jika kategori adalah 'incoming' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
-                      $selected = ($category_param == 'incoming' && $row_penerima['nama_kontak'] == 'pt. mitra tehno gemilang') ? 'selected' : '';
-                      echo '<option value="' . $row_penerima['id_kontak'] . '" ' . $selected . '>' . ucwords($row_penerima['nama_kontak']) . '</option>';
+                    // Jika kategori adalah 'incoming' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
+                    $selected = ($category_param == 'incoming' && strtolower($row_penerima['nama_kontak']) == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                    echo '<option value="' . $row_penerima['id_kontak'] . '" ' . $selected . '>' . ucwords($row_penerima['nama_kontak']) . '</option>';
                   }
                 ?>
               </select>
@@ -250,7 +269,7 @@ if ($category_param === 'outgoing') {
                     $joinTables = [
                         ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
                     ];
-                    $columns = 'produk.id_produk, produk.nama_produk';
+                    $columns = 'DISTINCT produk.id_produk, produk.nama_produk';
                     $conditions = "detail_pesanan.sisa_pesanan > 0";
                     $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 

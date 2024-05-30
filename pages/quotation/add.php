@@ -7,10 +7,12 @@ require '../../includes/header.php';
 if ($category_param === 'outgoing') {
   $category = 'keluar';
   $sender = 'internal';
-  $receiver = 'customer';
+  $receiver1 = 'customer';
+  $receiver2 = 'supplier';
 } elseif ($category_param === 'incoming') {
   $category = 'masuk';
-  $sender = 'customer';
+  $sender1 = 'customer';
+  $sender2 = 'supplier';
   $receiver = 'internal';
 } else {
   die("Kategori tidak valid");
@@ -110,11 +112,20 @@ if ($category_param === 'outgoing') {
                 <option value="" selected disabled>-- Pilih Pengirim --</option>
                 <?php
                   // Ambil data kontak sesuai dengan kategori sender
-                  $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                  $kontak_pengirim = [];
+                  if ($category_param === 'outgoing') {
+                    $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                  } elseif ($category_param === 'incoming') {
+                    $kontak_pengirim = array_merge(
+                      selectData("kontak", "kategori = '$sender1'"),
+                      selectData("kontak", "kategori = '$sender2'")
+                    );
+                  }
+                  
                   foreach ($kontak_pengirim as $row_pengirim) {
                     // Jika kategori adalah 'outgoing' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
-                    $selected = ($category_param == 'outgoing' && $row_pengirim['nama_kontak'] == 'pt. mitra tehno gemilang') ? 'selected' : '';
-                      echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
+                    $selected = ($category_param == 'outgoing' && strtolower($row_pengirim['nama_kontak']) == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                    echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
                   }
                 ?>
               </select>
@@ -175,12 +186,21 @@ if ($category_param === 'outgoing') {
               <select class="form-select form-select-sm" id="penerima" name="penerima" required>
                 <option value="" selected disabled>-- Pilih Penerima --</option>
                 <?php
-                  // Ambil data kontak dengan kategori 'customer'
-                  $kontak_penerima = selectData("kontak", "kategori = '$receiver'");
+                  // Ambil data kontak sesuai dengan kategori receiver
+                  $kontak_penerima = [];
+                  if ($category_param === 'outgoing') {
+                    $kontak_penerima = array_merge(
+                      selectData("kontak", "kategori = '$receiver1'"),
+                      selectData("kontak", "kategori = '$receiver2'")
+                    );
+                  } elseif ($category_param === 'incoming') {
+                    $kontak_penerima = selectData("kontak", "kategori = '$receiver'");
+                  }
+
                   foreach ($kontak_penerima as $row_penerima) {
-                      // Jika kategori adalah 'incoming' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
-                      $selected = ($category_param == 'incoming' && $row_penerima['nama_kontak'] == 'pt. mitra tehno gemilang') ? 'selected' : '';
-                      echo '<option value="' . $row_penerima['id_kontak'] . '" ' . $selected . '>' . ucwords($row_penerima['nama_kontak']) . '</option>';
+                    // Jika kategori adalah 'incoming' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
+                    $selected = ($category_param == 'incoming' && strtolower($row_penerima['nama_kontak']) == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                    echo '<option value="' . $row_penerima['id_kontak'] . '" ' . $selected . '>' . ucwords($row_penerima['nama_kontak']) . '</option>';
                   }
                 ?>
               </select>
@@ -211,9 +231,14 @@ if ($category_param === 'outgoing') {
           <thead>
             <tr class="fw-bolder">
               <td>No</td>
-              <td>Nama Produk</td>
-              <td>Kuantitas</td>
-              <td>Harga (Rp)</td>
+              <td>Nama Produk<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Pilih produk dari master data produk, tambahkan produk ke master data produk jika produk belum ada">*</a>
+              </td>
+              <td>Kuantitas<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Masukan kuantitas dengan valid, minimal = 1">*</a></td>
+              <td>Harga</td>
               <td colspan="2">Jumlah</td>
             </tr>
           </thead>
@@ -251,12 +276,14 @@ if ($category_param === 'outgoing') {
                 <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
                   Baris</button>
               </td>
-              <td colspan="2">Subtotal</td>
+              <td colspan="2" class="fw-bolder">Subtotal</td>
               <td colspan="2" id="total-harga">0</td>
             </tr>
 
             <tr>
-              <td>Diskon</td>
+              <td class="fw-bolder">Diskon<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Diskon dalam persen, isi 0 jika tanpa diskon.">*</a></td>
               <td>
                 <div class="input-group input-group-sm">
                   <input type="number" class="form-control" id="diskon" name="diskon" min="0" step="0.01" value="0"
@@ -269,7 +296,9 @@ if ($category_param === 'outgoing') {
 
             <tr>
               <td colspan="2" class="bg-transparent"></td>
-              <td>PPN</td>
+              <td class="fw-bolder">PPN<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="PPN dalam persen, pilih 'Tanpa PPN' jika tanpa PPN.">*</a></td>
               <td>
                 <div class="input-group input-group-sm">
                   <select class="form-select form-select-sm" id="jenis_ppn" name="jenis_ppn" required
@@ -290,7 +319,7 @@ if ($category_param === 'outgoing') {
 
             <tr>
               <td colspan="2" class="bg-transparent"></td>
-              <td colspan="2">Total</td>
+              <td colspan="2" class="fw-bolder">Total</td>
               <td colspan="2">
                 <span id="grand-total">0</span>
                 <!-- Input tersembunyi untuk menyimpan grand total -->

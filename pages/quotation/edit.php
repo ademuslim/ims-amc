@@ -156,19 +156,6 @@ if ($error_message): ?>
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
-            <!-- input no invoice outgoing -->
-            <?php if ($category_param == 'outgoing') { ?>
-            <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
-            <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" id="no_penawaran" name="no_penawaran"
-                value="<?= strtoupper($data['no_penawaran']) ?>" readonly required>
-              <div class="invalid-feedback">
-                Sistem error, nomor penawaran gagal dimuat.
-              </div>
-            </div>
-
-            <!-- input no invoice incoming -->
-            <?php } elseif ($category_param == 'incoming') { ?>
             <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
               <input type="text" class="form-control form-control-sm" name="no_penawaran"
@@ -177,7 +164,6 @@ if ($error_message): ?>
                 No penawaran harga tidak boleh kosong.
               </div>
             </div>
-            <?php } ?>
           </div>
 
           <div class="row mb-3">

@@ -32,12 +32,24 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
       <th class="text-start">No.</th>
       <th>No. Invoice</th>
       <th>Tanggal</th>
+
+      <?php if ($category_param == 'outgoing') { ?>
       <th>Penerima</th>
+      <?php } elseif ($category_param == 'incoming') { ?>
+      <th>Pengirim</th>
+      <?php } ?>
+
       <th>Status</th>
       <th>Total</th>
       <th>PPN</th>
       <th>Diskon</th>
+
+      <?php if ($category_param == 'outgoing') { ?>
       <th>Pengirim</th>
+      <?php } elseif ($category_param == 'incoming') { ?>
+      <th>Penerima</th>
+      <?php } ?>
+
       <th>Catatan</th>
       <th>Detail</th>
       <th>Aksi</th>
@@ -53,7 +65,13 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
       <td class="text-start"><?= $no; ?></td>
       <td><?= strtoupper($faktur['no_faktur']); ?></td>
       <td><?= dateID($faktur['tanggal']); ?></td>
+
+      <?php if ($category_param == 'outgoing') { ?>
       <td class="text-wrap"><?= ucwords($faktur['nama_penerima']); ?></td>
+      <?php } elseif ($category_param == 'incoming') { ?>
+      <td class="text-wrap"><?= ucwords($faktur['nama_pengirim']); ?></td>
+      <?php } ?>
+
       <td>
         <?php
         // Tentukan kelas bootstrap berdasarkan nilai status
@@ -74,10 +92,17 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
       <td>
         <?php if (!empty($faktur['logo'])) : ?>
         <img class="me-3" src="<?= base_url($faktur['logo']); ?>" alt="Logo" width="50">
-        <?php endif; ?>
-
-        <?= ucwords($faktur['nama_pengirim']); ?>
+        <?php 
+          endif; 
+      
+          if ($category_param == 'outgoing') { 
+            echo ucwords($faktur['nama_pengirim']);
+          } elseif ($category_param == 'incoming') {
+            echo ucwords($faktur['nama_penerima']); 
+          } 
+        ?>
       </td>
+
       <td><?= !empty($faktur['catatan']) ? ucfirst($faktur['catatan']) : "-"; ?></td>
 
       <!-- Detail Faktur -->
@@ -110,7 +135,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
           <div class="col">No. PO</div>
         </div>
         <?php
-            $no = 1; 
+            $no_detail = 1; 
             foreach ($data_faktur_detail as $detail): 
             
             // Hitung total harga untuk setiap baris
@@ -119,7 +144,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
             $subtotal += $total_harga;
         ?>
         <div class="row border-bottom">
-          <div class="col"><?= $no ?></div>
+          <div class="col"><?= $no_detail ?></div>
           <div class="col"><?= ucwords($detail['nama_produk']); ?></div>
           <div class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></div>
           <div class="col"><?= formatRupiah($detail['harga_satuan']); ?></div>
@@ -127,7 +152,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
 
           <div class="col" style="font-size: .7rem;"><?= strtoupper($detail['no_pesanan']); ?></div>
         </div>
-        <?php $no++; endforeach; ?>
+        <?php $no_detail++; endforeach; ?>
         <?php else: ?>
         <span class="text-center">-</span>
         <?php endif; ?>
@@ -140,7 +165,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
           <a href="edit.php?category=<?= $category_param ?>&id=<?= $faktur['id_faktur'] ?>" class="btn-act btn-edit"
             title="Ubah Data"></a>
           <a href="javascript:void(0);"
-            onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $faktur['id_faktur']; ?>', 'Apakah Anda yakin ingin menghapus data penawaran ini? Semua detail penawaran terkait juga akan dihapus.')"
+            onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $faktur['id_faktur']; ?>', 'Apakah Anda yakin ingin menghapus data invoice ini? Semua detail invoice terkait juga akan dihapus dan tidak dapat dikembalikan.')"
             class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
