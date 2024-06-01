@@ -6,14 +6,12 @@ if (!checkLoginStatus()) {
     exit();
 }
 
-// Periksa apakah ada sesi nama_pengguna, jika tidak, coba ambil dari cookie
-if (isset($_SESSION['nama_pengguna'])) {
-  $nama_pengguna = $_SESSION['nama_pengguna'];
-} elseif (isset($_COOKIE['nama_pengguna'])) {
-  $nama_pengguna = $_COOKIE['nama_pengguna'];
-} else {
-  $nama_pengguna = ''; // Jika tidak ada sesi atau cookie, atur nama pengguna ke string kosong
-}
+
+// Ambil id_pengguna dari sesi atau cookie
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
+
+// Ambil nama_pengguna dari sesi atau cookie
+$nama_pengguna = $_SESSION['nama_pengguna'] ?? $_COOKIE['nama_pengguna'] ?? '';
 
 // Tampilkan pesan sukses jika ada
 if (isset($_SESSION['success_message'])) {
@@ -52,7 +50,9 @@ if (isset($_SESSION['error_message'])) {
   <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2.min.css'); ?>">
   <!-- SweetAlert2 JS -->
   <script src="<?= base_url('assets/js/sweetalert2.all.min.js'); ?>"></script>
-
+  <!-- ChartJS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
   <style>
   .show-immediate {
@@ -389,6 +389,7 @@ if (isset($_SESSION['error_message'])) {
             </div>
           </li>
 
+          <?php if ($_SESSION['peran_pengguna'] === 'superadmin'): ?>
           <li>
             <a href="<?= base_url('pages/activity-log/index.php'); ?>"
               class="nav-link text-dark <?= setActivePage('pages/activity-log/index.php'); ?>">
@@ -401,6 +402,7 @@ if (isset($_SESSION['error_message'])) {
               </span>
             </a>
           </li>
+          <?php endif; ?>
         </ul>
       </div>
 
@@ -433,9 +435,13 @@ if (isset($_SESSION['error_message'])) {
             <span class="text-link"><?= ucwords($nama_pengguna); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-            <li><a class="dropdown-item" href="<?= base_url('pages/master-data/users/index.php'); ?>">User</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <?php if ($_SESSION['peran_pengguna'] === 'superadmin' || $_SESSION['peran_pengguna'] === 'kepala_perusahaan'): ?>
+            <li><a class="dropdown-item" href="<?= base_url('pages/master-data/users/index.php'); ?>">Data Pengguna</a>
+            </li>
+            <?php endif; ?>
+
+            <!-- <li><a class="dropdown-item" href="#">Settings</a></li> -->
+            <!-- <li><a class="dropdown-item" href="#">Profile</a></li> -->
             <li>
               <hr class="dropdown-divider">
             </li>

@@ -76,9 +76,9 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
         <?php
         // Tentukan kelas bootstrap berdasarkan nilai status
         $status_class = '';
-        if ($faktur['status'] == 'draft') {
+        if ($faktur['status'] == 'tunggu kirim') {
             $status_class = 'text-bg-warning';
-        } elseif ($faktur['status'] == 'terkirim' || $faktur['status'] == 'belum dibayar') {
+        } elseif ($faktur['status'] == 'belum dibayar') {
             $status_class = 'text-bg-info';
         } elseif ($faktur['status'] == 'dibayar') {
             $status_class = 'text-bg-success';

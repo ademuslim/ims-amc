@@ -158,9 +158,9 @@ if ($error_message): ?>
                   <?php
                   // Tentukan kelas bootstrap berdasarkan nilai status
                   $status_class = '';
-                  if ($data['status'] == 'draft') {
+                  if ($data['status'] == 'tunggu kirim') {
                       $status_class = 'text-bg-warning';
-                  } elseif ($data['status'] == 'terkirim' || $data['status'] == 'belum dibayar') {
+                  } elseif ($data['status'] == 'belum dibayar') {
                       $status_class = 'text-bg-info';
                   } elseif ($data['status'] == 'dibayar') {
                       $status_class = 'text-bg-success';

@@ -2,6 +2,9 @@
 require '../../../includes/function.php';
 require '../../../includes/vendor/autoload.php';
 
+// Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
+
 $table_name = 'kontak';
 
 if (isset($_POST['add'])) {
@@ -45,8 +48,36 @@ if (isset($_POST['add'])) {
   // Periksa apakah data berhasil ditambahkan
   if ($result > 0) {
       $_SESSION['success_message'] = "Kontak berhasil ditambahkan!";
+
+      // Pencatatan log aktivitas
+      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+      $aktivitas = 'Berhasil tambah kontak';
+      $tabel = 'kontak';
+      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil tambah kontak dengan ID ' . $id_kontak;
+      $log_data = [
+          'id_log' => $id_log,
+          'id_pengguna' => $id_pengguna,
+          'aktivitas' => $aktivitas,
+          'tabel' => $tabel,
+          'keterangan' => $keterangan
+      ];
+      insertData('log_aktivitas', $log_data);
   } else {
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan kontak.";
+
+      // Pencatatan log aktivitas
+      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+      $aktivitas = 'Gagal tambah kontak';
+      $tabel = 'kontak';
+      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal tambah kontak ' . $kategori;
+      $log_data = [
+          'id_log' => $id_log,
+          'id_pengguna' => $id_pengguna,
+          'aktivitas' => $aktivitas,
+          'tabel' => $tabel,
+          'keterangan' => $keterangan
+      ];
+      insertData('log_aktivitas', $log_data);
   }
 
   header("Location: index.php?category=$kategori");
@@ -73,6 +104,9 @@ if (isset($_POST['add'])) {
       exit();
   }
 
+  // Ambil data lama sebelum diubah
+  $oldData = selectData('kontak', 'id_kontak = ?', '', '', [['type' => 's', 'value' => $id_kontak]]);
+
   // Data yang akan diupdate di tabel
   $data = [
     'nama_kontak' => $nama_kontak,
@@ -90,6 +124,39 @@ if (isset($_POST['add'])) {
   // Periksa apakah data berhasil diupdate
   if ($result > 0) {
       $_SESSION['success_message'] = "Kontak berhasil diupdate!";
+
+      // Ambil data setelah diubah
+      $newData = selectData('kontak', 'id_kontak = ?', '', '', [['type' => 's', 'value' => $id_kontak]]);
+
+      // Data sebelum dan sesudah perubahan untuk log
+      $before = $oldData[0]; // Ambil baris pertama dari hasil query
+      $after = $newData[0]; // Ambil baris pertama dari hasil query
+
+      // Keterangan perubahan
+      $changeDescription = "Perubahan data kontak: | ";
+
+      // Nomor urut untuk tanda "-"
+      $counter = 1;
+
+      // Periksa setiap kolom untuk menemukan perubahan
+      foreach ($before as $column => $value) {
+          if ($value !== $after[$column]) {
+              $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
+              $counter++;
+          }
+      }
+      
+      // Catat aktivitas
+      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+      $logData = [
+        'id_log' => $id_log,
+        'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'aktivitas' => 'Ubah Data kontak',
+        'tabel' => 'kontak',
+        'keterangan' => $changeDescription,
+      ];
+
+      insertData('log_aktivitas', $logData);
   } else {
       $_SESSION['error_message'] = "Terjadi kesalahan saat mengupdate kontak.";
   }

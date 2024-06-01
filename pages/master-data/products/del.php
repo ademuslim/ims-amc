@@ -1,5 +1,9 @@
 <?php
 require '../../../includes/function.php';
+require '../../../includes/vendor/autoload.php';
+
+// Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
 
 if (isset($_GET['id'])) {
     // Ambil ID produk yang akan dihapus
@@ -23,9 +27,37 @@ if (isset($_GET['id'])) {
         if ($result > 0) {
             // Jika berhasil menghapus, tampilkan pesan sukses
             $_SESSION['success_message'] = "Data berhasil dihapus!";
+
+            // Pencatatan log aktivitas
+            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+            $aktivitas = 'Berhasil hapus produk';
+            $tabel = 'produk';
+            $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus produk dengan ID ' . $id;
+            $log_data = [
+                'id_log' => $id_log,
+                'id_pengguna' => $id_pengguna,
+                'aktivitas' => $aktivitas,
+                'tabel' => $tabel,
+                'keterangan' => $keterangan
+            ];
+            insertData('log_aktivitas', $log_data);
         } else {
             // Jika gagal menghapus, tampilkan pesan error
             $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data.";
+
+            // Pencatatan log aktivitas
+            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+            $aktivitas = 'Gagal hapus produk';
+            $tabel = 'produk';
+            $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal hapus produk dengan ID ' . $id;
+            $log_data = [
+                'id_log' => $id_log,
+                'id_pengguna' => $id_pengguna,
+                'aktivitas' => $aktivitas,
+                'tabel' => $tabel,
+                'keterangan' => $keterangan
+            ];
+            insertData('log_aktivitas', $log_data);
         }
     }
 } else {

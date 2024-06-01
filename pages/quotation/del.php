@@ -1,5 +1,9 @@
 <?php
 require '../../includes/function.php';
+require '../../includes/vendor/autoload.php';
+
+// Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
 
 if (isset($_GET['id'])) {
     // Ambil ID penawaran yang akan dihapus
@@ -24,7 +28,21 @@ if (isset($_GET['id'])) {
             $result2 = deleteData('penawaran_harga', "id_penawaran = '$id_penawaran'");
             if ($result2 > 0) {
                 // Jika berhasil menghapus, tampilkan pesan sukses
-                $_SESSION['success_message'] = "Data penawaran harga berhasil dihapus!";
+                $_SESSION['success_message'] = "Data penawaran harga beserta detail berhasil dihapus!";
+
+                // Pencatatan log aktivitas
+                $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+                $aktivitas = 'Berhasil hapus PH';
+                $tabel = 'penawaran harga';
+                $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus PH dengan ID ' . $id_penawaran;
+                $log_data = [
+                    'id_log' => $id_log,
+                    'id_pengguna' => $id_pengguna,
+                    'aktivitas' => $aktivitas,
+                    'tabel' => $tabel,
+                    'keterangan' => $keterangan
+                ];
+                insertData('log_aktivitas', $log_data);
             } else {
                 $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data penawaran harga.";
             }

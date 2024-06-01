@@ -21,8 +21,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($user) {
             // Simpan informasi pengguna ke sesi
+            $_SESSION['id_pengguna'] = $id_pengguna = $user['id_pengguna'];
             $_SESSION['peran_pengguna'] = $user['tipe_pengguna'];
             $_SESSION['nama_pengguna'] = $user['nama_pengguna'];
+
+            // Pencatatan log aktivitas
+            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+            $aktivitas = 'Login berhasil';
+            $tabel = 'pengguna';
+            $keterangan = 'Pengguna dengan email ' . $email . ' berhasil login.';
+            $log_data = [
+                'id_log' => $id_log,
+                'id_pengguna' => $id_pengguna,
+                'aktivitas' => $aktivitas,
+                'tabel' => $tabel,
+                'keterangan' => $keterangan
+            ];
+            insertData('log_aktivitas', $log_data);
 
             // Set pesan login berhasil
             $_SESSION['success_message'] = "Login berhasil! Selamat datang, " . ucwords($user['nama_pengguna']) . ".";
@@ -46,6 +61,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             // Jika autentikasi gagal, tampilkan pesan kesalahan dan simpan ke dalam session
             $_SESSION['login_error'] = "Email dan password salah. Silakan coba lagi.";
+
+            // Pencatatan log aktivitas
+            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+            $aktivitas = 'Login gagal';
+            $tabel = 'pengguna';
+            $keterangan = 'Gagal login dengan email ' . $email . '. Email atau password salah.';
+            $log_data = [
+                'id_log' => $id_log,
+                'aktivitas' => $aktivitas,
+                'tabel' => $tabel,
+                'keterangan' => $keterangan
+            ];
+            insertData('log_aktivitas', $log_data);
+
             header("Location: " . base_url('auth/login.php'));
             exit();
         }

@@ -1,6 +1,10 @@
 <?php
 require '../../includes/function.php';
 require '../../includes/vendor/autoload.php';
+
+// Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
+
 if (isset($_POST['add'])) {
     $pengirim = $_POST['pengirim'];
     $no_faktur = strtolower($_POST['no_faktur']);
@@ -152,7 +156,7 @@ if (isset($_POST['add'])) {
         'logo' => $file_destination_logo,
         'signature_info' => $signature_info,
         'kategori' => $kategori,
-        'status' => 'draft'
+        'status' => 'tunggu kirim'
     ];
 
     $result = insertData('faktur', $data);
@@ -203,7 +207,7 @@ if (isset($_POST['add'])) {
             $id_pesanan = $detail['id_pesanan'];
 
             // Debugging: Periksa data yang diambil
-            echo "ID Produk Faktur: $id_produk_faktur, Jumlah Dikirim Baru: $jumlah_dikirim_baru, ID Pesanan: $id_pesanan<br>";
+            // echo "ID Produk Faktur: $id_produk_faktur, Jumlah Dikirim Baru: $jumlah_dikirim_baru, ID Pesanan: $id_pesanan<br>";
 
             // Ambil data detail pesanan pembelian berdasarkan id pesanan dan id produk
             $detail_pesanan = selectData('detail_pesanan', "id_pesanan = '$id_pesanan' AND id_produk = '$id_produk_faktur'");
@@ -221,7 +225,7 @@ if (isset($_POST['add'])) {
                 $sisa_pesanan = $jumlah_pesanan - $jumlah_dikirim_total; // Hitung sisa pesanan
 
                 // Debugging: Periksa jumlah dikirim total dan sisa pesanan
-                echo "Jumlah Dikirim Total: $jumlah_dikirim_total, Sisa Pesanan: $sisa_pesanan<br>";
+                // echo "Jumlah Dikirim Total: $jumlah_dikirim_total, Sisa Pesanan: $sisa_pesanan<br>";
 
                 // Pastikan sisa pesanan tidak negatif
                 if ($sisa_pesanan < 0) {
@@ -241,6 +245,22 @@ if (isset($_POST['add'])) {
                 echo "Data detail pesanan tidak ditemukan untuk ID Pesanan: $id_pesanan dan ID Produk: $id_produk_faktur<br>";
             }
         }
+
+        // Pencatatan log aktivitas
+        $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+        $aktivitas = 'Berhasil membuat invoice baru';
+        $tabel = 'faktur';
+        $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil membuat invoice baru dengan ID ' . $id_faktur;
+        $log_data = [
+            'id_log' => $id_log,
+            'id_pengguna' => $id_pengguna,
+            'aktivitas' => $aktivitas,
+            'tabel' => $tabel,
+            'keterangan' => $keterangan
+        ];
+        insertData('log_aktivitas', $log_data);
+
+        $_SESSION['success_message'] = "Invoice berhasil dibuat.";
         header("Location: detail.php?category=$category_param&id=$id_faktur");
         exit();
     } else {
@@ -381,6 +401,9 @@ if (isset($_POST['add'])) {
     // Susun data signature info sebagai string
     $signature_info = "Location: $signing_location, Date: $signing_date, Name: $signer_name, Position: $signer_position, Path: $file_destination_signature";
 
+    // Ambil data lama sebelum diubah
+    $oldDataFaktur = selectData('faktur', 'id_faktur = ?', '', '', [['type' => 's', 'value' => $id_faktur]]);
+
     // Bangun data untuk pembaruan faktur
     $data = [
         'id_pengirim' => $pengirim,
@@ -408,6 +431,36 @@ if (isset($_POST['add'])) {
         header("Location: index.php?category=$category_param");
         exit();
     }
+
+    $newDataFaktur = selectData('faktur', 'id_faktur = ?', '', '', [['type' => 's', 'value' => $id_faktur]]);
+
+    // Data sebelum dan sesudah perubahan untuk log
+    $before = $oldDataFaktur[0]; // Ambil baris pertama dari hasil query
+    $after = $newDataFaktur[0]; // Ambil baris pertama dari hasil query
+
+    // Keterangan perubahan
+    $changeDescription = "Perubahan data invoice: | ";
+
+    // Periksa setiap kolom untuk menemukan perubahan
+    $counter = 1;
+    foreach ($before as $column => $value) {
+        if ($value !== $after[$column]) {
+            $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
+            $counter++;
+        }
+    }
+    
+    // Catat aktivitas
+    $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+    $logData = [
+      'id_log' => $id_log,
+      'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+      'aktivitas' => 'Ubah Data Invoice',
+      'tabel' => 'faktur',
+      'keterangan' => $changeDescription,
+    ];
+
+    insertData('log_aktivitas', $logData);
     
     // Lanjutkan edit detail
     // Peroleh nilai-nilai dari detail penawaran
@@ -510,7 +563,7 @@ if (isset($_POST['add'])) {
     }
 
     // echo "Operasi tambah dan ubah data selesai.";
-
+    $_SESSION['success_message'] = "Invoice berhasil diupdate.";
     // Redirect ke halaman detail setelah proses edit selesai
     header("Location: detail.php?category=$category_param&id=$id_faktur");
     exit();

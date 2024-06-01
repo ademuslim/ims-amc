@@ -54,7 +54,8 @@ function redirectUser($role) {
       exit();
   } elseif ($role === 'kepala_perusahaan') {
       // Arahkan kepala_perusahaan ke dashboard_kepala_perusahaan
-      header("Location: " . base_url('pages/dashboard-views'));
+    //   header("Location: " . base_url('pages/dashboard-views'));
+        header("Location: " . base_url('pages/dashboard'));
       exit();
   } else {
       // Jika role tidak valid, arahkan pengguna ke halaman login
@@ -299,6 +300,38 @@ function selectDataJoin($mainTable, $joinTables = [], $columns = '*', $condition
   mysqli_free_result($result);
   
   return $rows;
+}
+
+// Fungsi tampil data dengan LEFT JOIN tabel dan fitur order by
+function selectDataLeftJoin($mainTable, $joinTables = [], $columns = '*', $conditions = "", $orderBy = "") {
+    global $conn;
+    
+    // Bangun pernyataan SQL untuk select
+    $sql = "SELECT $columns FROM $mainTable";
+    
+    // Tambahkan LEFT JOIN clause jika ada
+    foreach ($joinTables as $joinTable) {
+        $sql .= " LEFT JOIN $joinTable[0] ON $joinTable[1]";
+    }
+    
+    // Tambahkan kondisi jika ada
+    if (!empty($conditions)) {
+        $sql .= " WHERE $conditions";
+    }
+    
+    // Tambahkan klausa ORDER BY jika ada
+    if (!empty($orderBy)) {
+        $sql .= " ORDER BY $orderBy";
+    }
+    
+    // Eksekusi query dan ambil hasil
+    $result = mysqli_query($conn, $sql);
+    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    
+    // Bebaskan hasil
+    mysqli_free_result($result);
+    
+    return $rows;
 }
 
 // Fungsi untuk menjumlahkan nilai dari kolom tertentu dengan kondisi yang dinamis

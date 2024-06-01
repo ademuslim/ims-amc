@@ -41,7 +41,8 @@
   <div class="row mb-3">
     <label for="keterangan" class="col-sm-3 col-form-label">Keterangan:</label>
     <div class="col-sm-9">
-      <textarea class="form-control" id="keterangan" name="keterangan" placeholder="Opsional."></textarea>
+      <textarea class="form-control" id="keterangan" name="keterangan"
+        placeholder="Opsional."><?= $produk['keterangan']; ?></textarea>
     </div>
   </div>
   <!-- Tambahkan input hidden untuk mengirim ID produk yang akan diubah -->

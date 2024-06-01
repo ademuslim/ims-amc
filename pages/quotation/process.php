@@ -1,6 +1,10 @@
 <?php
 require '../../includes/function.php';
 require '../../includes/vendor/autoload.php';
+
+// Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
+
 if (isset($_POST['add'])) {
     $pengirim = $_POST['pengirim'];
     $no_penawaran = strtolower($_POST['no_penawaran']);
@@ -194,7 +198,22 @@ if (isset($_POST['add'])) {
                 exit();
             }
         }
-         // Jika berhasil disimpan, arahkan pengguna ke halaman detail
+
+        // Pencatatan log aktivitas
+        $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+        $aktivitas = 'Berhasil membuat penawaran harga baru';
+        $tabel = 'penawaran_harga';
+        $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil membuat penawaran harga baru dengan ID ' . $id_penawaran;
+        $log_data = [
+            'id_log' => $id_log,
+            'id_pengguna' => $id_pengguna,
+            'aktivitas' => $aktivitas,
+            'tabel' => $tabel,
+            'keterangan' => $keterangan
+        ];
+        insertData('log_aktivitas', $log_data);
+        
+        // Jika berhasil disimpan, arahkan pengguna ke halaman detail
         $_SESSION['success_message'] = "Berhasil menyimpan data penawaran harga.";
         header("Location: detail.php?category=$category_param&id=$id_penawaran");
         exit();
@@ -337,6 +356,10 @@ if (isset($_POST['add'])) {
     // Susun data signature info sebagai string
     $signature_info = "Location: $signing_location, Date: $signing_date, Name: $signer_name, Position: $signer_position, Path: $file_destination_signature";
 
+    // Ambil data lama sebelum diubah
+    $oldDataPH = selectData('penawaran_harga', 'id_penawaran = ?', '', '', [['type' => 's', 'value' => $id_penawaran]]);
+
+
     // Bangun data untuk pembaruan penawaran_harga
     $data = [
         'id_pengirim' => $pengirim,
@@ -357,6 +380,36 @@ if (isset($_POST['add'])) {
     $conditions = "id_penawaran = '$id_penawaran'";
 
     $result = updateData('penawaran_harga', $data, $conditions);
+
+    $newDataPH = selectData('penawaran_harga', 'id_penawaran = ?', '', '', [['type' => 's', 'value' => $id_penawaran]]);
+
+    // Data sebelum dan sesudah perubahan untuk log
+    $before = $oldDataPH[0]; // Ambil baris pertama dari hasil query
+    $after = $newDataPH[0]; // Ambil baris pertama dari hasil query
+
+    // Keterangan perubahan
+    $changeDescription = "Perubahan data penawaran harga: | ";
+
+    // Periksa setiap kolom untuk menemukan perubahan
+    $counter = 1;
+    foreach ($before as $column => $value) {
+        if ($value !== $after[$column]) {
+            $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
+            $counter++;
+        }
+    }
+    
+    // Catat aktivitas
+    $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+    $logData = [
+      'id_log' => $id_log,
+      'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+      'aktivitas' => 'Ubah Data PH',
+      'tabel' => 'penawaran harga',
+      'keterangan' => $changeDescription,
+    ];
+
+    insertData('log_aktivitas', $logData);
 
     // Periksa apakah pembaruan penawaran_harga berhasil
     if (!$result) {

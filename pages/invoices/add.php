@@ -247,8 +247,9 @@ if ($category_param === 'outgoing') {
                         ['produk', 'detail_pesanan.id_produk = produk.id_produk']
                     ];
                     $columns = 'pesanan_pembelian.id_pesanan, pesanan_pembelian.no_pesanan, produk.nama_produk, produk.id_produk';
-                    $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0";
-                    $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+                    $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0 AND pesanan_pembelian.status = 'diproses'";
+                    $orderBy = 'pesanan_pembelian.tanggal DESC, produk.nama_produk ASC';
+                    $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);
 
                     foreach ($po as $row_po) {
                         echo '<option value="' . $row_po['id_pesanan'] . '" data-id-produk="' . $row_po['id_produk'] . '">' 

@@ -2,6 +2,9 @@
 require '../../../includes/function.php';
 require '../../../includes/vendor/autoload.php';
 
+// Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
+
 if (isset($_POST['add'])) {
   // Ambil nilai-nlai langsung dari $_POST
   $jenis_ppn = strtolower($_POST['jenis_ppn']);
@@ -33,9 +36,37 @@ if (isset($_POST['add'])) {
   if ($result > 0) {
       // Jika berhasil, simpan pesan sukses ke dalam session
       $_SESSION['success_message'] = "PPN berhasil ditambahkan!";
+
+      // Pencatatan log aktivitas
+      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+      $aktivitas = 'Berhasil tambah ppn';
+      $tabel = 'ppn';
+      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil tambah ppn dengan ID ' . $id_ppn;
+      $log_data = [
+          'id_log' => $id_log,
+          'id_pengguna' => $id_pengguna,
+          'aktivitas' => $aktivitas,
+          'tabel' => $tabel,
+          'keterangan' => $keterangan
+      ];
+      insertData('log_aktivitas', $log_data);
   } else {
       // Jika gagal, simpan pesan error ke dalam session
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan PPN.";
+
+      // Pencatatan log aktivitas
+      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+      $aktivitas = 'Gagal tambah ppn';
+      $tabel = 'ppn';
+      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal tambah ppn dengan jenis ppn ' . $jenis_ppn;
+      $log_data = [
+          'id_log' => $id_log,
+          'id_pengguna' => $id_pengguna,
+          'aktivitas' => $aktivitas,
+          'tabel' => $tabel,
+          'keterangan' => $keterangan
+      ];
+      insertData('log_aktivitas', $log_data);
   }
 }elseif (isset($_POST['edit'])) {
   // Ambil nilai-nilai dari form edit
@@ -50,6 +81,9 @@ if (isset($_POST['add'])) {
     header("Location: index.php");
     exit();
   }
+
+  // Ambil data lama sebelum diubah
+  $oldData = selectData('ppn', 'id_ppn = ?', '', '', [['type' => 's', 'value' => $id_ppn]]);
 
   // Data yang akan diupdate di tabel PPN
   $data = [
@@ -68,6 +102,39 @@ if (isset($_POST['add'])) {
   if ($result > 0) {
       // Jika berhasil, simpan pesan sukses ke dalam session
       $_SESSION['success_message'] = "PPN berhasil diupdate!";
+
+      // Ambil data setelah diubah
+      $newData = selectData('ppn', 'id_ppn = ?', '', '', [['type' => 's', 'value' => $id_ppn]]);
+
+      // Data sebelum dan sesudah perubahan untuk log
+      $before = $oldData[0]; // Ambil baris pertama dari hasil query
+      $after = $newData[0]; // Ambil baris pertama dari hasil query
+
+      // Keterangan perubahan
+      $changeDescription = "Perubahan data ppn: | ";
+
+      // Nomor urut untuk tanda "-"
+      $counter = 1;
+
+      // Periksa setiap kolom untuk menemukan perubahan
+      foreach ($before as $column => $value) {
+          if ($value !== $after[$column]) {
+              $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
+              $counter++;
+          }
+      }
+      
+      // Catat aktivitas
+      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
+      $logData = [
+        'id_log' => $id_log,
+        'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'aktivitas' => 'Ubah Data ppn',
+        'tabel' => 'ppn',
+        'keterangan' => $changeDescription,
+      ];
+
+      insertData('log_aktivitas', $logData);
   } else {
       // Jika gagal, simpan pesan error ke dalam session
       $_SESSION['error_message'] = "Terjadi kesalahan saat mengupdate PPN.";

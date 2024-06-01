@@ -31,14 +31,24 @@ $data_pengguna = selectData('pengguna');
     <?php foreach ($data_pengguna as $pengguna) : ?>
     <tr>
       <td class="text-start"><?= $no; ?></td>
-      <td colspan="4"><?= $pengguna['nama_pengguna']; ?></td>
+      <td colspan="4"><?= ucwords($pengguna['nama_pengguna']); ?></td>
       <td><?= $pengguna['email']; ?></td>
-      <td><?= $pengguna['tipe_pengguna']; ?></td>
+      <td>
+        <?php
+        if ($pengguna['tipe_pengguna'] == 'kepala_perusahaan'){
+          echo "Kepala Perusahaan";
+        } elseif ($pengguna['tipe_pengguna'] != 'kepala_perusahaan'){
+          echo ucwords($pengguna['tipe_pengguna']);
+        }
+        ?>
+      </td>
       <td>
         <div class="btn-group">
           <button type="button" class="btn-act btn-edit bg-transparent" data-bs-toggle="modal"
             data-bs-target="#editModal<?= $pengguna['id_pengguna']; ?>" title="Ubah Data"></button>
-          <a href="del.php?id=<?= $pengguna['id_pengguna']; ?>" class="btn-act btn-del" title="Hapus Data"></a>
+          <a href="javascript:void(0);"
+            onclick="confirmDelete('del.php?id=<?= $pengguna['id_pengguna']; ?>', 'Apakah Anda yakin ingin menghapus data user ini? Semua data terkait juga akan dihapus dan tidak dapat dikembalikan.')"
+            class="btn-act btn-del" title="Hapus Data"></a>
         </div>
       </td>
     </tr>
