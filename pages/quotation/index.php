@@ -31,7 +31,8 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Penawaran Harga</h1>
-  <a href="add.php?category=<?= $category_param ?>" class="btn btn-primary btn-lg btn-icon btn-add">Buat Penawaran
+  <a href="<?= base_url("pages/quotation/add/$category_param") ?>" class="btn btn-primary btn-lg btn-icon btn-add">Buat
+    Penawaran
     harga</a>
 </div>
 <table id="example" class="table nowrap table-hover" style="width:100%">
@@ -167,10 +168,14 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
 
       <td>
         <div class="btn-group">
-          <a href="detail.php?category=<?= $category_param ?>&id=<?= $ph['id_penawaran']; ?>" class="btn-act btn-view"
-            title="Lihat Detail"></a>
-          <a href="edit.php?category=<?= $category_param ?>&id=<?= $ph['id_penawaran']; ?>" class="btn-act btn-edit"
-            title="Ubah Data"></a>
+          <a href="<?= base_url("pages/quotation/detail/$category_param/{$ph['id_penawaran']}") ?>"
+            class="btn-act btn-view" title="Lihat Detail"></a>
+
+
+          <a href="<?= base_url("pages/quotation/edit/$category_param/{$ph['id_penawaran']}") ?>"
+            class="btn-act btn-edit" title="Ubah Data"></a>
+
+
           <a href="javascript:void(0);"
             onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $ph['id_penawaran']; ?>', 'Apakah Anda yakin ingin menghapus data penawaran ini? Semua detail penawaran terkait juga akan dihapus.')"
             class="btn-act btn-del" title="Hapus Data"></a>

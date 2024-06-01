@@ -78,7 +78,8 @@ if ($error_message): ?>
 
 <h1 class="fs-5 mb-4">Ubah Faktur</h1>
 <div class="paper-wrapper">
-  <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+  <form action="<?= base_url("pages/invoices/process.php") ?>" method="POST" class="needs-validation"
+    enctype="multipart/form-data" novalidate>
     <div class="container">
       <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
       <input type="hidden" name="id_faktur" value="<?= $id_faktur ?>">
@@ -735,11 +736,13 @@ document.getElementById("tanggal").addEventListener("change", function() {
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         // Ubah nomor penawaran menjadi huruf kapital
-        var nomorPO = this.responseText.toUpperCase();
-        document.getElementById("no_faktur").value = nomorPO;
+        var nomorFaktur = this.responseText.toUpperCase();
+        document.getElementById("no_faktur").value = nomorFaktur;
       }
     };
-    xhttp.open("GET", "getDocumentNumber.php?month=" + month + "&year=" + year, true);
+    xhttp.open("GET", "<?= base_url("pages/invoices/getDocumentNumber.php") ?>?month=" + month + "&year=" +
+      year,
+      true);
     xhttp.send();
   } else {
     document.getElementById("no_faktur").value =
@@ -767,7 +770,7 @@ function previewAddImage(event) {
     imagePreviewContainer.style.display = "block";
     cancelButton.style.display = "block";
   } else {
-    let default_logo_path = "<?= $default_logo_path; ?>";
+    let default_logo_path = "<?= base_url($default_logo_path) ?>";
 
     // Periksa apakah default_logo_path tidak kosong
     if (default_logo_path.trim() !== "") {
@@ -877,7 +880,7 @@ function previewAddSignature(event) {
     signaturePreviewContainer.style.display = "block";
     cancelButtonSignature.style.display = "block";
   } else {
-    let default_signature_path = "<?= $default_signature_path; ?>";
+    let default_signature_path = "<?= base_url($default_signature_path) ?>";
 
     // Periksa apakah default_signature_path tidak kosong
     if (default_signature_path.trim() !== "") {

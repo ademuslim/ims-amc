@@ -21,7 +21,8 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Purchase Order</h1>
-  <a href="add.php?category=<?= $category_param ?>" class="btn btn-primary btn-lg btn-icon btn-add">
+  <a href="<?= base_url("pages/purchase-orders/add/$category_param") ?>"
+    class="btn btn-primary btn-lg btn-icon btn-add">
     <?= $category_param === 'incoming' ? 'Tambah Purchase Order' : 'Buat Purchase Order' ?>
   </a>
 </div>
@@ -163,10 +164,12 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
 
       <td>
         <div class="btn-group">
-          <a href="detail.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>" class="btn-act btn-view"
-            title="Lihat Detail"></a>
-          <a href="edit.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>" class="btn-act btn-edit"
-            title="Ubah Data"></a>
+          <a href="<?= base_url("pages/purchase-orders/detail/$category_param/{$po['id_pesanan']}") ?>"
+            class="btn-act btn-view" title="Lihat Detail"></a>
+
+
+          <a href="<?= base_url("pages/purchase-orders/edit/$category_param/{$po['id_pesanan']}") ?>"
+            class="btn-act btn-edit" title="Ubah Data"></a>
           <a href="javascript:void(0);"
             onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $po['id_pesanan']; ?>', 'Apakah Anda yakin ingin menghapus data PO ini? Semua detail PO terkait juga akan dihapus.')"
             class="btn-act btn-del" title="Hapus Data"></a>

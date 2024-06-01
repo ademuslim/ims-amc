@@ -72,7 +72,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_logo = "../../assets/image/uploads/logo/" . $file_name;
+                    $file_destination_logo = "assets/image/uploads/logo/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_logo)) {
@@ -110,7 +110,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['signature']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_signature = "../../assets/image/uploads/signature/" . $file_name;
+                    $file_destination_signature = "assets/image/uploads/signature/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_signature)) {
@@ -191,7 +191,7 @@ if (isset($_POST['add'])) {
                 insertData('detail_faktur', $detail_produk);
             } catch (mysqli_sql_exception $e) {
                 $_SESSION['error_message'] = "Gagal menyimpan data detail produk: " . $e->getMessage();
-                header("Location: add.php?category=$category_param");
+                header("Location: " . base_url("pages/invoices/add/$category_param"));
                 exit();
             }
         }
@@ -261,11 +261,11 @@ if (isset($_POST['add'])) {
         insertData('log_aktivitas', $log_data);
 
         $_SESSION['success_message'] = "Invoice berhasil dibuat.";
-        header("Location: detail.php?category=$category_param&id=$id_faktur");
+        header("Location: " . base_url("pages/invoices/detail/$category_param/$id_faktur"));
         exit();
     } else {
         $_SESSION['error_message'] = "Gagal menyimpan data faktur.";
-        header("Location: add.php?category=$category_param");
+        header("Location: " . base_url("pages/invoices/add/$category_param"));
         exit();
     }
 // Edit Data
@@ -329,7 +329,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_logo = "../../assets/image/uploads/logo/" . $file_name;
+                    $file_destination_logo = "assets/image/uploads/logo/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_logo)) {
@@ -337,12 +337,12 @@ if (isset($_POST['add'])) {
                     } else {
                         $_SESSION['error_message'] = "Gagal menyimpan file gambar logo.";
                         // Handle error, misalnya redirect ke halaman add.php dengan pesan error
-                        header("Location: add.php?category=$category_param");
+                        header("Location: " . base_url("pages/invoices/add/$category_param"));
                     }
                 } else {
                     $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
                     // Handle error, misalnya redirect ke halaman add.php dengan pesan error
-                    header("Location: add.php?category=$category_param");
+                    header("Location: " . base_url("pages/invoices/add/$category_param"));
                 }
             } else {
                 // Jika input file logo kosong dan logo tidak dihapus
@@ -369,7 +369,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['signature']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_signature = "../../assets/image/uploads/signature/" . $file_name;
+                    $file_destination_signature = "assets/image/uploads/signature/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_signature)) {
@@ -377,12 +377,12 @@ if (isset($_POST['add'])) {
                     } else {
                         $_SESSION['error_message'] = "Gagal menyimpan file signature.";
                         // Handle error, misalnya redirect ke halaman add.php dengan pesan error
-                        header("Location: add.php?category=$category_param");
+                        header("Location: " . base_url("pages/invoices/add/$category_param"));
                     }
                 } else {
                     $_SESSION['error_message'] = "Ukuran file yang diunggah melebihi batas maksimal (2MB). Hanya gambar dengan format JPG, PNG, atau GIF yang diperbolehkan.";
                     // Handle error, misalnya redirect ke halaman add.php dengan pesan error
-                    header("Location: add.php?category=$category_param");
+                    header("Location: " . base_url("pages/invoices/add/$category_param"));
                 }
             } else {
                 // Jika input file signature kosong dan signature tidak dihapus
@@ -454,7 +454,7 @@ if (isset($_POST['add'])) {
     $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
     $logData = [
       'id_log' => $id_log,
-      'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+      'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
       'aktivitas' => 'Ubah Data Invoice',
       'tabel' => 'faktur',
       'keterangan' => $changeDescription,
@@ -565,12 +565,12 @@ if (isset($_POST['add'])) {
     // echo "Operasi tambah dan ubah data selesai.";
     $_SESSION['success_message'] = "Invoice berhasil diupdate.";
     // Redirect ke halaman detail setelah proses edit selesai
-    header("Location: detail.php?category=$category_param&id=$id_faktur");
+    header("Location: " . base_url("pages/invoices/detail/$category_param/$id_faktur"));
     exit();
 
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php
-    header("Location: index.php?category=" . $category_param);
+    header("Location: " . base_url("pages/invoices/$category_param"));
     exit();
 }
 

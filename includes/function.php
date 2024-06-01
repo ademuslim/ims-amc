@@ -59,7 +59,7 @@ function redirectUser($role) {
       exit();
   } else {
       // Jika role tidak valid, arahkan pengguna ke halaman login
-      header("Location: " . base_url('auth/login.php'));
+      header("Location: " . base_url('auth/login'));
       exit();
   }
 }

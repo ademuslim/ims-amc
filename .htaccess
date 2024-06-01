@@ -1,0 +1,69 @@
+# Aktifkan modul rewrite
+RewriteEngine On
+
+# Pastikan bahwa permintaan URL bukan untuk file atau direktori yang ada
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Ubah /auth/login menjadi /auth/login.php
+RewriteRule ^auth/login$ auth/login.php [L]
+
+# Ubah /pages/dashboard menjadi /pages/dashboard/index.php
+RewriteRule ^pages/dashboard/?$ pages/dashboard/index.php [L]
+
+# Ubah /pages/master-data/products menjadi /pages/master-data/products/index.php
+RewriteRule ^pages/master-data/products/?$ pages/master-data/products/index.php [L]
+
+# Ubah /pages/master-data/ppn menjadi /pages/master-data/ppn/index.php
+RewriteRule ^pages/master-data/ppn/?$ pages/master-data/ppn/index.php [L]
+
+# Ubah /pages/master-data/contacts/supplier menjadi /pages/master-data/contacts/index.php?category=supplier
+RewriteRule ^pages/master-data/contacts/supplier/?$ pages/master-data/contacts/index.php?category=supplier [L]
+
+# Ubah /pages/master-data/contacts/customer menjadi /pages/master-data/contacts/index.php?category=customer
+RewriteRule ^pages/master-data/contacts/customer/?$ pages/master-data/contacts/index.php?category=customer [L]
+
+# Ubah /pages/master-data/contacts/internal menjadi /pages/master-data/contacts/index.php?category=internal
+RewriteRule ^pages/master-data/contacts/internal/?$ pages/master-data/contacts/index.php?category=internal [L]
+
+# Ubah /pages/quotation/outgoing menjadi /pages/quotation/index.php?category=outgoing
+RewriteRule ^pages/quotation/outgoing/?$ pages/quotation/index.php?category=outgoing [L]
+
+# Ubah /pages/purchase-orders/outgoing menjadi /pages/purchase-orders/index.php?category=outgoing
+RewriteRule ^pages/purchase-orders/outgoing/?$ pages/purchase-orders/index.php?category=outgoing [L]
+
+# Ubah /pages/invoices/outgoing menjadi /pages/invoices/index.php?category=outgoing
+RewriteRule ^pages/invoices/outgoing/?$ pages/invoices/index.php?category=outgoing [L]
+
+# Ubah /pages/quotation/incoming menjadi /pages/quotation/index.php?category=incoming
+RewriteRule ^pages/quotation/incoming/?$ pages/quotation/index.php?category=incoming [L]
+
+# Ubah /pages/purchase-orders/incoming menjadi /pages/purchase-orders/index.php?category=incoming
+RewriteRule ^pages/purchase-orders/incoming/?$ pages/purchase-orders/index.php?category=incoming [L]
+
+# Ubah /pages/invoices/incoming menjadi /pages/invoices/index.php?category=incoming
+RewriteRule ^pages/invoices/incoming/?$ pages/invoices/index.php?category=incoming [L]
+
+# Ubah /pages/activity-log menjadi /pages/activity-log/index.php
+RewriteRule ^pages/activity-log/?$ pages/activity-log/index.php [L]
+
+# Ubah /pages/master-data/users menjadi /pages/master-data/users/index.php
+RewriteRule ^pages/master-data/users/?$ pages/master-data/users/index.php [L]
+
+# Ubah /auth/logout menjadi /auth/logout.php
+RewriteRule ^auth/logout/?$ auth/logout.php [L]
+
+# Quotation
+RewriteRule ^pages/quotation/add/([a-z]+)$ pages/quotation/add.php?category=$1 [NC,L]
+RewriteRule ^pages/quotation/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/quotation/edit.php?category=$1&id=$2 [NC,L]
+RewriteRule ^pages/quotation/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/quotation/detail.php?category=$1&id=$2 [NC,L]
+
+# Purchase Order
+RewriteRule ^pages/purchase-orders/add/([a-z]+)$ pages/purchase-orders/add.php?category=$1 [NC,L]
+RewriteRule ^pages/purchase-orders/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/purchase-orders/edit.php?category=$1&id=$2 [NC,L]
+RewriteRule ^pages/purchase-orders/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/purchase-orders/detail.php?category=$1&id=$2 [NC,L]
+
+# Invoices
+RewriteRule ^pages/invoices/add/([a-z]+)$ pages/invoices/add.php?category=$1 [NC,L]
+RewriteRule ^pages/invoices/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/invoices/edit.php?category=$1&id=$2 [NC,L]
+RewriteRule ^pages/invoices/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/invoices/detail.php?category=$1&id=$2 [NC,L]

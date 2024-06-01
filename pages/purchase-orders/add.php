@@ -47,7 +47,7 @@ if ($category_param === 'outgoing') {
             $default_signature_path = $pair[1];
           } else {
             // Jika nilai Path kosong, set default path
-            $default_signature_path = "../../assets/image/uploads/signature/no_signature.png";
+            $default_signature_path = "assets/image/uploads/signature/no_signature.png";
           }
           break; // Keluar dari loop setelah menemukan path
         }
@@ -59,7 +59,8 @@ if ($category_param === 'outgoing') {
 
 <h1 class="fs-5 mb-4">Buat Purchase Order Baru</h1>
 <div class="paper-wrapper">
-  <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+  <form action="<?= base_url("pages/purchase-orders/process.php") ?>" method="POST" class="needs-validation"
+    enctype="multipart/form-data" novalidate>
 
     <!-- Input kategori -->
     <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
@@ -669,7 +670,9 @@ document.getElementById("tanggal").addEventListener("change", function() {
         document.getElementById("no_po").value = nomorPO;
       }
     };
-    xhttp.open("GET", "getDocumentNumber.php?month=" + month + "&year=" + year, true);
+    xhttp.open("GET", "<?= base_url("pages/purchase-orders/getDocumentNumber.php") ?>?month=" + month + "&year=" +
+      year,
+      true);
     xhttp.send();
   } else {
     document.getElementById("no_po").value =
@@ -697,7 +700,7 @@ function previewAddImage(event) {
     imagePreviewContainer.style.display = "block";
     cancelButton.style.display = "block";
   } else {
-    let default_logo_path = "<?= $default_logo_path; ?>";
+    let default_logo_path = "<?= base_url($default_logo_path) ?>";
     imgElement.src = default_logo_path;
     imgElement.style.display = "block";
     placeholderContainer.style.display = "none";
@@ -796,7 +799,7 @@ function previewAddSignature(event) {
     signaturePreviewContainer.style.display = "block";
     cancelButtonSignature.style.display = "block";
   } else {
-    let default_signature_path = "<?= $default_signature_path; ?>";
+    let default_signature_path = "<?= base_url($default_signature_path) ?>";
     signElement.src = default_signature_path;
     signElement.style.display = "block";
     signaturePlaceholderContainer.style.display = "none";

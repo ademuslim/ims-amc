@@ -18,22 +18,6 @@ if ($category_param === 'outgoing') {
   die("Kategori tidak valid");
 }
 
-// Notifikasi
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
 // Variabel data detail
 $data_detail = [];
 $signatureInfo = []; // Array detail signature info
@@ -95,7 +79,8 @@ if ($error_message): ?>
 
 <h1 class="fs-5 mb-4">Ubah Purchase Order</h1>
 <div class="paper-wrapper">
-  <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+  <form action="<?= base_url("pages/purchase-orders/process.php") ?>" method="POST" class="needs-validation"
+    enctype="multipart/form-data" novalidate>
     <div class="container">
       <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
       <input type="hidden" name="id_pesanan" value="<?= $id_pesanan ?>">
@@ -784,7 +769,9 @@ document.getElementById("tanggal").addEventListener("change", function() {
         document.getElementById("no_po").value = nomorPO;
       }
     };
-    xhttp.open("GET", "getDocumentNumber.php?month=" + month + "&year=" + year, true);
+    xhttp.open("GET", "<?= base_url("pages/purchase-orders/getDocumentNumber.php") ?>?month=" + month + "&year=" +
+      year,
+      true);
     xhttp.send();
   } else {
     document.getElementById("no_po").value =
@@ -812,7 +799,7 @@ function previewAddImage(event) {
     imagePreviewContainer.style.display = "block";
     cancelButton.style.display = "block";
   } else {
-    let default_logo_path = "<?= $default_logo_path; ?>";
+    let default_logo_path = "<?= base_url($default_logo_path) ?>";
 
     // Periksa apakah default_logo_path tidak kosong
     if (default_logo_path.trim() !== "") {
@@ -922,7 +909,7 @@ function previewAddSignature(event) {
     signaturePreviewContainer.style.display = "block";
     cancelButtonSignature.style.display = "block";
   } else {
-    let default_signature_path = "<?= $default_signature_path; ?>";
+    let default_signature_path = "<?= base_url($default_signature_path) ?>";
 
     // Periksa apakah default_signature_path tidak kosong
     if (default_signature_path.trim() !== "") {

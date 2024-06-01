@@ -22,10 +22,11 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Invoice</h1>
-  <a href="add.php?category=<?= $category_param ?>" class="btn btn-primary btn-lg btn-icon btn-add">
+  <a href="<?= base_url("pages/invoices/add/$category_param") ?>" class="btn btn-primary btn-lg btn-icon btn-add">
     <?= $category_param === 'incoming' ? 'Tambah Invoice' : 'Buat Invoice' ?>
   </a>
 </div>
+
 <table id="example" class="table nowrap table-hover" style="width:100%">
   <thead>
     <tr>
@@ -160,10 +161,12 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
 
       <td>
         <div class="btn-group">
-          <a href="detail.php?category=<?= $category_param ?>&id=<?= $faktur['id_faktur'] ?>" class="btn-act btn-view"
-            title="Lihat Detail"></a>
-          <a href="edit.php?category=<?= $category_param ?>&id=<?= $faktur['id_faktur'] ?>" class="btn-act btn-edit"
-            title="Ubah Data"></a>
+          <a href="<?= base_url("pages/invoices/detail/$category_param/{$faktur['id_faktur']}") ?>"
+            class="btn-act btn-view" title="Lihat Detail"></a>
+
+
+          <a href="<?= base_url("pages/invoices/edit/$category_param/{$faktur['id_faktur']}") ?>"
+            class="btn-act btn-edit" title="Ubah Data"></a>
           <a href="javascript:void(0);"
             onclick="confirmDelete('del.php?category=<?= $category_param ?>&id=<?= $faktur['id_faktur']; ?>', 'Apakah Anda yakin ingin menghapus data invoice ini? Semua detail invoice terkait juga akan dihapus dan tidak dapat dikembalikan.')"
             class="btn-act btn-del" title="Hapus Data"></a>

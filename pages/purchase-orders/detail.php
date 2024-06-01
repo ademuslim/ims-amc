@@ -3,24 +3,6 @@ $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'Detail PO Outgoing' : 'Detail PO Incoming';
 require '../../includes/header.php';
 
-// Tampilkan pesan sukses jika ada
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-          ' . $_SESSION['success_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['success_message']);
-}
-
-// Tampilkan pesan error jika ada
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-          ' . $_SESSION['error_message'] . '
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-  unset($_SESSION['error_message']);
-}
-
 // Variabel untuk menyimpan data PO dan detail
 $data_pesanan_pembelian = [];
 $data_pesanan_pembelian_detail = [];
@@ -107,7 +89,7 @@ if ($error_message): ?>
       <div class="col-md-6 p-0">
         <?php if (!empty($data['logo'])): ?>
         <div>
-          <img class="image" src="<?= $data['logo'] ?>" alt="Detail Logo">
+          <img class="image" src="<?= base_url($data['logo']) ?>" alt="Detail Logo">
         </div>
         <?php endif; ?>
       </div>
@@ -302,13 +284,13 @@ if ($error_message): ?>
 
     <div class="row justify-content-end mt-5 mb-4">
       <div class="col-auto">
-        <a href="edit.php?category=<?= $category_param ?>&id=<?= $id_pesanan ?>">
+        <a href="<?= base_url("pages/purchase-orders/edit/$category_param/$id_pesanan") ?>">
           <button type="button" class="btn btn-warning btn-lg">Ubah Purchase Order</button>
         </a>
       </div>
 
       <div class="col-auto">
-        <a href="index.php?category=<?= $category_param ?>">
+        <a href="<?= base_url("pages/purchase-orders/$category_param") ?>">
           <button type="button" class="btn btn-secondary btn-lg">Kembali</button>
         </a>
       </div>

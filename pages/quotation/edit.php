@@ -79,7 +79,8 @@ if ($error_message): ?>
 
 <h1 class="fs-5 mb-4">Ubah Penawaran Harga</h1>
 <div class="paper-wrapper">
-  <form action="process.php" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+  <form action="<?= base_url("pages/quotation/process.php") ?>" method="POST" class="needs-validation"
+    enctype="multipart/form-data" novalidate>
     <div class="container">
       <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
       <input type="hidden" name="id_penawaran" value="<?= $id_penawaran ?>">
@@ -426,7 +427,7 @@ if ($error_message): ?>
           <button type="submit" class="btn btn-primary btn-lg" name="edit">Simpan</button>
         </div>
         <div class="col-auto">
-          <a href="index.php?category=<?= $category_param ?>">
+          <a href="<?= base_url("pages/quotation/$category_param") ?>">
             <button type="button" class="btn btn-secondary btn-lg">Batal</button>
           </a>
         </div>
@@ -700,7 +701,8 @@ document.getElementById("tanggal").addEventListener("change", function() {
         document.getElementById("no_penawaran").value = nomorPenawaran;
       }
     };
-    xhttp.open("GET", "getDocumentNumber.php?month=" + month + "&year=" + year, true);
+    xhttp.open("GET", "<?= base_url("pages/quotation/getDocumentNumber.php") ?>?month=" + month + "&year=" + year,
+      true);
     xhttp.send();
   } else {
     document.getElementById("no_penawaran").value =
@@ -728,7 +730,7 @@ function previewAddImage(event) {
     imagePreviewContainer.style.display = "block";
     cancelButton.style.display = "block";
   } else {
-    let default_logo_path = "<?= $default_logo_path; ?>";
+    let default_logo_path = "<?= base_url($default_logo_path) ?>";
 
     // Periksa apakah default_logo_path tidak kosong
     if (default_logo_path.trim() !== "") {
@@ -838,7 +840,7 @@ function previewAddSignature(event) {
     signaturePreviewContainer.style.display = "block";
     cancelButtonSignature.style.display = "block";
   } else {
-    let default_signature_path = "<?= $default_signature_path; ?>";
+    let default_signature_path = "<?= base_url($default_signature_path) ?>";
 
     // Periksa apakah default_signature_path tidak kosong
     if (default_signature_path.trim() !== "") {

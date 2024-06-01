@@ -36,6 +36,6 @@ $log_data = [
 insertData('log_aktivitas', $log_data);
 
 // Redirect ke halaman login
-header("Location: " . base_url('auth/login.php'));
+header("Location: " . base_url('auth/login'));
 exit();
 ?>

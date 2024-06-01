@@ -117,7 +117,7 @@ if ($error_message): ?>
       <div class="col-md-6 p-0">
         <?php if (!empty($data['logo'])): ?>
         <div>
-          <img class="image" src="<?= $data['logo'] ?>" alt="Detail Logo">
+          <img class="image" src="<?= base_url($data['logo']) ?>" alt="Detail Logo">
         </div>
         <?php endif; ?>
       </div>
@@ -300,13 +300,13 @@ if ($error_message): ?>
 
     <div class="row justify-content-end mt-5 mb-4">
       <div class="col-auto">
-        <a href="edit.php?category=<?= $category_param ?>&id=<?= $id_faktur ?>">
-          <button type="button" class="btn btn-warning btn-lg">Ubah Invoice</button>
+        <a href="<?= base_url("pages/invoices/edit/$category_param/$id_faktur") ?>">
+          <button type="button" class="btn btn-warning btn-lg">Ubah Invoices</button>
         </a>
       </div>
 
       <div class="col-auto">
-        <a href="index.php?category=<?= $category_param ?>">
+        <a href="<?= base_url("pages/invoices/$category_param") ?>">
           <button type="button" class="btn btn-secondary btn-lg">Kembali</button>
         </a>
       </div>
