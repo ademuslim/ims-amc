@@ -16,11 +16,11 @@ if (isset($_SESSION['peran_pengguna'])) {
         redirectUser($peran_pengguna);
     } else {
         // Jika otentikasi gagal, arahkan ke halaman login
-        header("Location: " . base_url('auth/login.php'));
+        header("Location: " . base_url('auth/login'));
         exit();
     }
 } else {
     // Jika tidak ada sesi dan tidak ada cookie "ingat akun", arahkan ke halaman login
-    header("Location: " . base_url('auth/login.php'));
+    header("Location: " . base_url('auth/login'));
     exit();
 }

@@ -125,36 +125,50 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
         $data_pesanan_pembelian_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
 
         $subtotal = 0;
-        if (!empty($data_pesanan_pembelian_detail)): ?>
-
-        <div class="row fw-bold border-bottom">
-          <div class="col">No.</div>
-          <div class="col">Deskripsi</div>
-          <div class="col">Kuantitas</div>
-          <div class="col">Harga</div>
-          <div class="col">Total Harga</div>
-          <!-- PO Open -->
-          <div class="col">Pesanan Terkirim</div>
-          <div class="col">Sisa Pesanan</div>
-        </div>
-        <?php
-            $no_detail = 1; 
-            foreach ($data_pesanan_pembelian_detail as $detail): 
-            
-            // Hitung total harga untuk setiap baris
-            $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
-            // Tambahkan total harga ke subtotal
-            $subtotal += $total_harga;
+        if (!empty($data_pesanan_pembelian_detail)): 
+          $no_detail = 1; 
+          foreach ($data_pesanan_pembelian_detail as $detail): 
+          
+          // Hitung total harga untuk setiap baris
+          $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
+          // Tambahkan total harga ke subtotal
+          $subtotal += $total_harga;
         ?>
         <div class="row border-bottom">
-          <div class="col"><?= $no_detail ?></div>
-          <div class="col"><?= strtoupper($detail['nama_produk']); ?></div>
-          <div class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></div>
-          <div class="col"><?= formatRupiah($detail['harga_satuan']); ?></div>
-          <div class="col"><?= formatRupiah($total_harga); ?></div>
+          <span class="col-md-4">No.</span>
+          <span class="col"><?= $no_detail ?></span>
+        </div>
 
-          <div class="col"><?= $detail['jumlah_dikirim'] . " " . strtoupper($detail['satuan']); ?></div>
-          <div class="col"><?= $detail['sisa_pesanan'] . " " . strtoupper($detail['satuan']); ?></div>
+        <div class="row border-bottom">
+          <span class="col-md-4">Deskripsi</span>
+          <span class="col"><?= strtoupper($detail['nama_produk']); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Kuantitas</span>
+          <span class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Harga</span>
+          <span class="col"><?= formatRupiah($detail['harga_satuan']); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Total Harga</span>
+          <span class="col"><?= formatRupiah($total_harga); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Dikirim</span>
+          <span class="col"><?= $detail['jumlah_dikirim'] . " " . strtoupper($detail['satuan']); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Sisa</span>
+          <span class="col"><?= $detail['sisa_pesanan'] . " " . strtoupper($detail['satuan']); ?></span>
+        </div>
+
         </div>
         <?php $no_detail++; endforeach; ?>
         <?php else: ?>

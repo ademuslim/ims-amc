@@ -77,7 +77,7 @@ if (isset($_SESSION['peran_pengguna'])) {
           </label>
         </div>
         <div class="d-flex flex-row justify-content-end align-items-center">
-          <p class="my-auto">Belum punya akun? <a href="register.php" class="text-dark">Daftar</a>.</p>
+          <!-- <p class="my-auto">Belum punya akun? <a href="register.php" class="text-dark">Daftar</a>.</p> -->
           <button class="btn btn-dark ms-3" type="submit" name="login_submit">LOG IN</button>
         </div>
       </form>

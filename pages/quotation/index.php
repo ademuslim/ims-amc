@@ -135,16 +135,8 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
         $data_penawaran_harga_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
 
         $subtotal = 0;
-        if (!empty($data_penawaran_harga_detail)): ?>
+        if (!empty($data_penawaran_harga_detail)):
 
-        <div class="row fw-bold border-bottom">
-          <div class="col">No.</div>
-          <div class="col">Deskripsi</div>
-          <div class="col">Kuantitas</div>
-          <div class="col">Harga</div>
-          <div class="col">Total Harga</div>
-        </div>
-        <?php
             $no_detail = 1; 
             foreach ($data_penawaran_harga_detail as $detail): 
             
@@ -154,11 +146,28 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
             $subtotal += $total_harga;
         ?>
         <div class="row border-bottom">
-          <div class="col"><?= $no_detail ?></div>
-          <div class="col"><?= strtoupper($detail['nama_produk']); ?></div>
-          <div class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></div>
-          <div class="col"><?= formatRupiah($detail['harga_satuan']); ?></div>
-          <div class="col"><?= formatRupiah($total_harga); ?></div>
+          <span class="col-md-4">No.</span>
+          <span class="col-md-8"><?= $no_detail ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Deskripsi</span>
+          <span class="col-md-8"><?= strtoupper($detail['nama_produk']); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Kuantitas</span>
+          <span class="col-md-8"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Harga</span>
+          <span class="col-md-8"><?= formatRupiah($detail['harga_satuan']); ?></span>
+        </div>
+
+        <div class="row border-bottom">
+          <span class="col-md-4">Total Harga</span>
+          <span class="col-md-8"><?= formatRupiah($total_harga); ?></span>
         </div>
         <?php $no_detail++; endforeach; ?>
         <?php else: ?>

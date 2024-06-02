@@ -9,10 +9,10 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^auth/login$ auth/login.php [L]
 
 # Ubah /pages/dashboard menjadi /pages/dashboard/index.php
-RewriteRule ^pages/dashboard/?$ pages/dashboard/index.php [L]
+RewriteRule ^pages/dashboard$ pages/dashboard/index.php [L]
 
 # Ubah /pages/master-data/products menjadi /pages/master-data/products/index.php
-RewriteRule ^pages/master-data/products/?$ pages/master-data/products/index.php [L]
+RewriteRule ^pages/master-data/products$ pages/master-data/products/index.php [L]
 
 # Ubah /pages/master-data/ppn menjadi /pages/master-data/ppn/index.php
 RewriteRule ^pages/master-data/ppn/?$ pages/master-data/ppn/index.php [L]
