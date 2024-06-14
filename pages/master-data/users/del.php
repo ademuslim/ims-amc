@@ -19,20 +19,24 @@ if (isset($_GET['id'])) {
         // Jika data digunakan dalam tabel lain, tampilkan pesan error
         $_SESSION['error_message'] = "Data sedang digunakan dalam data lain dan tidak dapat dihapus.";
     } else {
-        // Jika data tidak digunakan dalam tabel lain, hapus data dari tabel produk
-        $result = deleteData('pengguna', "id_pengguna = '$id_pengguna'");
+        // Jika data tidak digunakan dalam tabel lain, perbarui status_hapus dari tabel pengguna
+        $table = 'pengguna';
+        $data = [
+            'status_hapus' => 1
+        ];
+        $conditions = "id_pengguna = '$id_pengguna'";
+
+        $result = updateData($table, $data, $conditions);
 
         if ($result > 0) {
             // Jika berhasil menghapus, tampilkan pesan sukses
-            $_SESSION['success_message'] = "Data pengguna berhasil dihapus!";
+            $_SESSION['success_message'] = "Data pengguna berhasil dihapus dari sistem, data tetap ada dalam database!";
 
             // Pencatatan log aktivitas
-            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
-            $aktivitas = 'Berhasil hapus pengguna';
+            $aktivitas = 'Berhasil hapus pengguna, data tetap ada dalam database!';
             $tabel = 'pengguna';
             $keterangan = 'Pengguna dengan ID ' . $id_pengguna_log . ' berhasil hapus pengguna dengan ID ' . $id_pengguna;
             $log_data = [
-                'id_log' => $id_log,
                 'id_pengguna' => $id_pengguna_log,
                 'aktivitas' => $aktivitas,
                 'tabel' => $tabel,
@@ -41,7 +45,7 @@ if (isset($_GET['id'])) {
             insertData('log_aktivitas', $log_data);
         } else {
             // Jika gagal menghapus, tampilkan pesan error
-            $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data pengguna.";
+            $_SESSION['error_message'] = "Data pengguna gagal dihapus dari sistem!";
         }
     }
 } else {

@@ -29,12 +29,10 @@ if (isset($_GET['id'])) {
             $_SESSION['success_message'] = "Data ppn berhasil dihapus!";
 
             // Pencatatan log aktivitas
-            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
             $aktivitas = 'Berhasil hapus ppn';
             $tabel = 'ppn';
             $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus ppn dengan ID ' . $id;
             $log_data = [
-                'id_log' => $id_log,
                 'id_pengguna' => $id_pengguna,
                 'aktivitas' => $aktivitas,
                 'tabel' => $tabel,
@@ -45,13 +43,10 @@ if (isset($_GET['id'])) {
             // Jika gagal menghapus, tampilkan pesan error
             $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data ppn.";
 
-            // Pencatatan log aktivitas
-            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
             $aktivitas = 'Gagal hapus ppn';
             $tabel = 'ppn';
             $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal hapus ppn dengan ID ' . $id;
             $log_data = [
-                'id_log' => $id_log,
                 'id_pengguna' => $id_pengguna,
                 'aktivitas' => $aktivitas,
                 'tabel' => $tabel,

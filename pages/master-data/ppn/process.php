@@ -38,12 +38,10 @@ if (isset($_POST['add'])) {
       $_SESSION['success_message'] = "PPN berhasil ditambahkan!";
 
       // Pencatatan log aktivitas
-      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
       $aktivitas = 'Berhasil tambah ppn';
       $tabel = 'ppn';
       $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil tambah ppn dengan ID ' . $id_ppn;
       $log_data = [
-          'id_log' => $id_log,
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
           'tabel' => $tabel,
@@ -55,12 +53,10 @@ if (isset($_POST['add'])) {
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan PPN.";
 
       // Pencatatan log aktivitas
-      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
       $aktivitas = 'Gagal tambah ppn';
       $tabel = 'ppn';
       $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal tambah ppn dengan jenis ppn ' . $jenis_ppn;
       $log_data = [
-          'id_log' => $id_log,
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
           'tabel' => $tabel,
@@ -125,9 +121,7 @@ if (isset($_POST['add'])) {
       }
       
       // Catat aktivitas
-      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
       $logData = [
-        'id_log' => $id_log,
         'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
         'aktivitas' => 'Ubah Data ppn',
         'tabel' => 'ppn',

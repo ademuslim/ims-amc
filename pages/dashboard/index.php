@@ -214,7 +214,7 @@ $conditionsInv = "kategori = 'keluar' AND YEAR(tanggal) = ? AND status IN ('diba
 $bind_paramsInv = array(
     array('type' => 'i', 'value' => $current_year)
 );
-$data_inv = selectData('faktur', $conditionsInv, "", "", $bind_paramsInv);
+$data_inv = selectData('faktur', $conditionsInv, "tanggal DESC", "", $bind_paramsInv);
 $total_sending_inv_outgoing_curent_year = count($data_inv);
 
 // Grapik pendapatan perbulan

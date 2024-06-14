@@ -31,12 +31,10 @@ if (isset($_GET['id'])) {
                 $_SESSION['success_message'] = "Data PO berhasil dihapus!";
 
                 // Pencatatan log aktivitas
-                $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
                 $aktivitas = 'Berhasil hapus PO';
                 $tabel = 'pesanan_pembelian';
                 $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus PO dengan ID ' . $id_pesanan;
                 $log_data = [
-                    'id_log' => $id_log,
                     'id_pengguna' => $id_pengguna,
                     'aktivitas' => $aktivitas,
                     'tabel' => $tabel,

@@ -24,11 +24,9 @@ if (isset($_COOKIE['ingat_user_id'])) {
 session_destroy();
 
 // Pencatatan log aktivitas
-$id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
 $aktivitas = 'Log Out';
 $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' keluar dari sistem.';
 $log_data = [
-    'id_log' => $id_log,
     'id_pengguna' => $id_pengguna, // Menambahkan id_pengguna dalam pencatatan log
     'aktivitas' => $aktivitas,
     'keterangan' => $keterangan,

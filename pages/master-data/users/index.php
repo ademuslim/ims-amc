@@ -2,13 +2,13 @@
 $page_title = "Users";
 require '../../../includes/header.php';
 
-$data_pengguna = selectData('pengguna');
+$data_pengguna = selectData('pengguna', 'status_hapus = 0');
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data User</h1>
   <button type="button" class="btn btn-primary btn-lg btn-icon btn-add" data-bs-toggle="modal"
     data-bs-target="#addModal">
-    Tambah Data User
+    Tambah Data Pengguna
   </button>
 </div>
 <table id="example" class="table table-hover" style="width:100%">

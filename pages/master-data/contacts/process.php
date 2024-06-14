@@ -50,12 +50,10 @@ if (isset($_POST['add'])) {
       $_SESSION['success_message'] = "Kontak berhasil ditambahkan!";
 
       // Pencatatan log aktivitas
-      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
       $aktivitas = 'Berhasil tambah kontak';
       $tabel = 'kontak';
       $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil tambah kontak dengan ID ' . $id_kontak;
       $log_data = [
-          'id_log' => $id_log,
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
           'tabel' => $tabel,
@@ -66,12 +64,10 @@ if (isset($_POST['add'])) {
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan kontak.";
 
       // Pencatatan log aktivitas
-      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
       $aktivitas = 'Gagal tambah kontak';
       $tabel = 'kontak';
       $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal tambah kontak ' . $kategori;
       $log_data = [
-          'id_log' => $id_log,
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
           'tabel' => $tabel,
@@ -146,10 +142,7 @@ if (isset($_POST['add'])) {
           }
       }
       
-      // Catat aktivitas
-      $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
       $logData = [
-        'id_log' => $id_log,
         'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
         'aktivitas' => 'Ubah Data kontak',
         'tabel' => 'kontak',

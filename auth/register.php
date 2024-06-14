@@ -1,20 +1,20 @@
 <?php
-require_once '../includes/function.php';
+// require_once '../includes/function.php';
 
-// Jika pengguna sudah login, arahkan ke halaman utama
-if (isset($_SESSION['peran_pengguna'])) {
-    redirectUser($_SESSION['peran_pengguna']);
-}
+// // Jika pengguna sudah login, arahkan ke halaman utama
+// if (isset($_SESSION['peran_pengguna'])) {
+//     redirectUser($_SESSION['peran_pengguna']);
+// }
 
-// Inisialisasi variabel error
-$registration_error = "";
+// // Inisialisasi variabel error
+// $registration_error = "";
 
-// Jika terdapat pesan kesalahan dari URL
-if (isset($_GET['error'])) {
-    $registration_error = $_GET['error'];
-}
+// // Jika terdapat pesan kesalahan dari URL
+// if (isset($_GET['error'])) {
+//     $registration_error = $_GET['error'];
+// }
 ?>
-
+<!-- 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
 
@@ -83,4 +83,4 @@ if (isset($_GET['error'])) {
   </script>
 </body>
 
-</html>
+</html> -->

@@ -20,15 +20,12 @@ $mainTable = 'log_aktivitas';
 $joinTables = [
     ["pengguna", "log_aktivitas.id_pengguna = pengguna.id_pengguna"], 
 ];
-
-// Kolom-kolom yang ingin diambil dari tabel utama dan tabel-tabel yang di-join
 $columns = 'log_aktivitas.*, pengguna.nama_pengguna';
-
-// Klausa ORDER BY
+$conditions = 'log_aktivitas.status_hapus = 0';
 $orderBy = 'log_aktivitas.tanggal DESC';
 
 // Panggil fungsi selectDataLeftJoin dengan ORDER BY
-$data_log_aktivitas = selectDataLeftJoin($mainTable, $joinTables, $columns, "", $orderBy);
+$data_log_aktivitas = selectDataLeftJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -44,7 +41,7 @@ $data_log_aktivitas = selectDataLeftJoin($mainTable, $joinTables, $columns, "", 
       <th>Aktivitas</th>
       <th>Data Tabel</th>
       <th>Keterangan</th>
-      <th>Detail</th>
+      <th>Aksi</th>
     </tr>
   </thead>
   <tbody>
@@ -61,7 +58,13 @@ $data_log_aktivitas = selectDataLeftJoin($mainTable, $joinTables, $columns, "", 
       <td><?= $log['aktivitas']; ?></td>
       <td><?= $log['tabel'] ? ucwords($log['tabel']) : '-'; ?></td>
       <td><?= str_replace(" | ", "<br>", $log['keterangan']); ?></td>
-      <td></td>
+      <td>
+        <div class="btn-group">
+          <a href="javascript:void(0);"
+            onclick="confirmDelete('del.php?id=<?= $log['id_log']; ?>', 'Apakah Anda yakin ingin menghapus data ini? Data yang sudah dihapus tetap ada dalam database dan tidak dapat ditampilkan kembali.')"
+            class="btn-act btn-del" title="Hapus Data"></a>
+        </div>
+      </td>
     </tr>
     <?php $no++; endforeach; endif; ?>
   </tbody>

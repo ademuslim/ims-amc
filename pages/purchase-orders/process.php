@@ -206,12 +206,10 @@ if (isset($_POST['add'])) {
         }
 
         // Pencatatan log aktivitas
-        $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
         $aktivitas = 'Berhasil membuat PO baru';
         $tabel = 'pesanan_pembelian';
         $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil membuat PO baru dengan ID ' . $id_pesanan;
         $log_data = [
-            'id_log' => $id_log,
             'id_pengguna' => $id_pengguna,
             'aktivitas' => $aktivitas,
             'tabel' => $tabel,
@@ -412,9 +410,7 @@ if (isset($_POST['add'])) {
     }
     
     // Catat aktivitas
-    $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
     $logData = [
-      'id_log' => $id_log,
       'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
       'aktivitas' => 'Ubah Data PO',
       'tabel' => 'pesanan_pembelian',

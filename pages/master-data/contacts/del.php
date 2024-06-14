@@ -31,12 +31,10 @@ if (isset($_GET['id'])) {
             $_SESSION['success_message'] = "Data kontak berhasil dihapus!";
 
             // Pencatatan log aktivitas
-            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
             $aktivitas = 'Berhasil hapus kontak';
             $tabel = 'kontak';
             $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus kontak dengan ID ' . $id;
             $log_data = [
-                'id_log' => $id_log,
                 'id_pengguna' => $id_pengguna,
                 'aktivitas' => $aktivitas,
                 'tabel' => $tabel,
@@ -48,12 +46,10 @@ if (isset($_GET['id'])) {
             $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data kontak.";
 
             // Pencatatan log aktivitas
-            $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
             $aktivitas = 'Gagal hapus kontak';
             $tabel = 'kontak';
             $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal hapus kontak dengan ID ' . $id;
             $log_data = [
-                'id_log' => $id_log,
                 'id_pengguna' => $id_pengguna,
                 'aktivitas' => $aktivitas,
                 'tabel' => $tabel,

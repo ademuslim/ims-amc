@@ -38,12 +38,10 @@ if (isset($_GET['id'])) {
         $_SESSION['success_message'] = "Data faktur beserta detail berhasil dihapus!";
 
         // Pencatatan log aktivitas
-        $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
         $aktivitas = 'Berhasil hapus invoice';
         $tabel = 'faktur';
         $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus invoice dengan ID ' . $id_faktur;
         $log_data = [
-            'id_log' => $id_log,
             'id_pengguna' => $id_pengguna,
             'aktivitas' => $aktivitas,
             'tabel' => $tabel,
@@ -54,12 +52,10 @@ if (isset($_GET['id'])) {
         $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data faktur.";
 
         // Pencatatan log aktivitas
-        $id_log = Ramsey\Uuid\Uuid::uuid4()->toString();
         $aktivitas = 'Gagal hapus invoice';
         $tabel = 'faktur';
         $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal hapus invoice dengan ID ' . $id_faktur;
         $log_data = [
-            'id_log' => $id_log,
             'id_pengguna' => $id_pengguna,
             'aktivitas' => $aktivitas,
             'tabel' => $tabel,
