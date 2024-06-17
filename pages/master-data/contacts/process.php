@@ -50,9 +50,9 @@ if (isset($_POST['add'])) {
       $_SESSION['success_message'] = "Kontak berhasil ditambahkan!";
 
       // Pencatatan log aktivitas
-      $aktivitas = 'Berhasil tambah kontak';
-      $tabel = 'kontak';
-      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil tambah kontak dengan ID ' . $id_kontak;
+      $aktivitas = 'Berhasil tambah data';
+      $tabel = 'Kontak';
+      $keterangan = "Berhasil tambah kontak dengan ID $id_kontak";
       $log_data = [
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
@@ -64,9 +64,9 @@ if (isset($_POST['add'])) {
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan kontak.";
 
       // Pencatatan log aktivitas
-      $aktivitas = 'Gagal tambah kontak';
-      $tabel = 'kontak';
-      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal tambah kontak ' . $kategori;
+      $aktivitas = 'Gagal tambah data';
+      $tabel = 'Kontak';
+      $keterangan = "Gagal tambah kontak dengan kategori $kategori";
       $log_data = [
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
@@ -129,7 +129,7 @@ if (isset($_POST['add'])) {
       $after = $newData[0]; // Ambil baris pertama dari hasil query
 
       // Keterangan perubahan
-      $changeDescription = "Perubahan data kontak: | ";
+      $changeDescription = "Perubahan data kontak dengan ID $id_kontak: | ";
 
       // Nomor urut untuk tanda "-"
       $counter = 1;
@@ -144,7 +144,7 @@ if (isset($_POST['add'])) {
       
       $logData = [
         'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
-        'aktivitas' => 'Ubah Data kontak',
+        'aktivitas' => 'Berhasil ubah data',
         'tabel' => 'kontak',
         'keterangan' => $changeDescription,
       ];

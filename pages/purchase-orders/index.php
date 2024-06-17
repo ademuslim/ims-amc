@@ -1,6 +1,7 @@
 <?php
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'PO Outgoing' : 'PO Incoming';
+$content_title = $category_param === 'outgoing' ? 'Keluar' : 'Masuk';
 require '../../includes/header.php';
 
 $category = ($category_param === 'outgoing') ? 'keluar' : (($category_param === 'incoming') ? 'masuk' : die("Kategori tidak valid"));
@@ -13,14 +14,14 @@ $joinTables = [
 ];
 
 $columns = 'pesanan_pembelian.*, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, ppn.jenis_ppn';
-$conditions = "pesanan_pembelian.kategori = '$category'";
+$conditions = "pesanan_pembelian.kategori = '$category' AND pesanan_pembelian.status_hapus = 0";
 $orderBy = 'pesanan_pembelian.tanggal DESC';
 
 $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="fs-5 m-0">Data Purchase Order</h1>
+  <h1 class="fs-5 m-0">Data Purchase Order <?= $content_title ?></h1>
   <a href="<?= base_url("pages/purchase-orders/add/$category_param") ?>"
     class="btn btn-primary btn-lg btn-icon btn-add">
     <?= $category_param === 'incoming' ? 'Tambah Purchase Order' : 'Buat Purchase Order' ?>
@@ -42,9 +43,6 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
 
       <th>Status</th>
       <th>Total</th>
-      <th>PPN</th>
-      <th>Diskon</th>
-      <th>U.P.</th>
 
       <?php if ($category_param == 'outgoing') { ?>
       <th>Pengirim</th>
@@ -52,15 +50,13 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
       <th>Penerima</th>
       <?php } ?>
 
-      <th>Catatan</th>
-      <th>Detail</th>
       <th>Aksi</th>
     </tr>
   </thead>
   <tbody>
     <?php if (empty($data_pesanan_pembelian)) : ?>
     <tr>
-      <td colspan="12">Tidak ada data</td>
+      <td colspan="8">Tidak ada data</td>
     </tr>
     <?php else : $no = 1; foreach ($data_pesanan_pembelian as $po) : ?>
     <tr>
@@ -88,10 +84,8 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
         ?>
         <span class="badge <?= $status_class ?>"><?= strtoupper($po['status']) ?></span>
       </td>
+
       <td><?= formatRupiah($po['total']); ?></td>
-      <td><?= ucwords($po['jenis_ppn']); ?></td>
-      <td><?= $po['diskon'] != 0 ? $po['diskon'] : "-"; ?></td>
-      <td><?= !empty($po['up']) ? ucwords($po['up']) : "-"; ?></td>
       <td>
         <?php if (!empty($po['logo'])) : ?>
         <img class="me-3" src="<?= base_url($po['logo']); ?>" alt="Logo" width="50">
@@ -106,81 +100,13 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
         ?>
       </td>
 
-      <td><?= !empty($po['catatan']) ? ucfirst($po['catatan']) : "-"; ?></td>
-
-      <!-- Detail PO -->
-      <td>
-        <?php
-        $id_pesanan = $po['id_pesanan'];
-        $data_pesanan_pembelian_detail = [];
-        $mainDetailTable = 'detail_pesanan';
-        $joinDetailTables = [
-            ['pesanan_pembelian', 'detail_pesanan.id_pesanan = pesanan_pembelian.id_pesanan'], 
-            ['produk', 'detail_pesanan.id_produk = produk.id_produk']
-        ];
-        $columns = 'detail_pesanan.*, produk.*';
-        $conditions = "detail_pesanan.id_pesanan = '$id_pesanan'";
-
-        // Panggil fungsi selectDataJoin dengan ORDER BY
-        $data_pesanan_pembelian_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
-
-        $subtotal = 0;
-        if (!empty($data_pesanan_pembelian_detail)): 
-          $no_detail = 1; 
-          foreach ($data_pesanan_pembelian_detail as $detail): 
-          
-          // Hitung total harga untuk setiap baris
-          $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
-          // Tambahkan total harga ke subtotal
-          $subtotal += $total_harga;
-        ?>
-        <div class="row border-bottom">
-          <span class="col-md-4">No.</span>
-          <span class="col"><?= $no_detail ?></span>
-        </div>
-
-        <div class="row border-bottom">
-          <span class="col-md-4">Deskripsi</span>
-          <span class="col"><?= strtoupper($detail['nama_produk']); ?></span>
-        </div>
-
-        <div class="row border-bottom">
-          <span class="col-md-4">Kuantitas</span>
-          <span class="col"><?= $detail['jumlah'] . " " . strtoupper($detail['satuan']); ?></span>
-        </div>
-
-        <div class="row border-bottom">
-          <span class="col-md-4">Harga</span>
-          <span class="col"><?= formatRupiah($detail['harga_satuan']); ?></span>
-        </div>
-
-        <div class="row border-bottom">
-          <span class="col-md-4">Total Harga</span>
-          <span class="col"><?= formatRupiah($total_harga); ?></span>
-        </div>
-
-        <div class="row border-bottom">
-          <span class="col-md-4">Dikirim</span>
-          <span class="col"><?= $detail['jumlah_dikirim'] . " " . strtoupper($detail['satuan']); ?></span>
-        </div>
-
-        <div class="row border-bottom">
-          <span class="col-md-4">Sisa</span>
-          <span class="col"><?= $detail['sisa_pesanan'] . " " . strtoupper($detail['satuan']); ?></span>
-        </div>
-
-        </div>
-        <?php $no_detail++; endforeach; ?>
-        <?php else: ?>
-        <span class="text-center">-</span>
-        <?php endif; ?>
-      </td>
-
       <td>
         <div class="btn-group">
+          <button type="button" class="btn-act btn-approve bg-transparent" data-bs-toggle="modal"
+            data-bs-target="#approveModal<?= $po['id_pesanan']; ?>" title="Perbarui Status"></button>
+
           <a href="<?= base_url("pages/purchase-orders/detail/$category_param/{$po['id_pesanan']}") ?>"
             class="btn-act btn-view" title="Lihat Detail"></a>
-
 
           <a href="<?= base_url("pages/purchase-orders/edit/$category_param/{$po['id_pesanan']}") ?>"
             class="btn-act btn-edit" title="Ubah Data"></a>
@@ -190,6 +116,24 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
         </div>
       </td>
     </tr>
+
+    <!-- Modal Approve -->
+    <div class="modal fade" id="approveModal<?= $po['id_pesanan']; ?>" data-bs-backdrop="static" tabindex="-1"
+      aria-labelledby="approveModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Purchase Order</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <?php include 'approve.php'; ?>
+            <!-- Include file approve.php untuk konten modal persetujuan -->
+          </div>
+        </div>
+      </div>
+    </div>
+
     <?php $no++; endforeach; endif; ?>
   </tbody>
 </table>

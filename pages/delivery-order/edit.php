@@ -1,6 +1,6 @@
 <?php
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
-$page_title = $category_param === 'outgoing' ? 'Edit Quotation Outgoing' : 'Edit Quotation Incoming';
+$page_title = $category_param === 'outgoing' ? 'Edit Invoice Outgoing' : 'Edit Invoice Incoming';
 require '../../includes/header.php';
 
 // Set kategori halaman (Outgoing / Incoming)
@@ -8,10 +8,12 @@ if ($category_param === 'outgoing') {
   $category = 'keluar';
   $sender = 'internal';
   $receiver = 'customer';
+  $category_po = 'masuk';
 } elseif ($category_param === 'incoming') {
   $category = 'masuk';
   $sender = 'customer';
   $receiver = 'internal';
+  $category_po = 'keluar';
 } else {
   die("Kategori tidak valid");
 }
@@ -21,22 +23,19 @@ $data_detail = [];
 $signatureInfo = []; // Array detail signature info
 $error_message = '';
 
-// Ambil Data Penawaran Harga berdasarkan id
 if (isset($_GET['id']) && $_GET['id'] !== '') {
-  $id_penawaran = $_GET['id'];
-  $mainTable = 'penawaran_harga';
+  $id_faktur = $_GET['id'];
+  $mainTable = 'faktur';
   $joinTables = [
-    ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak"], 
-    ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak"],
-    ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
+    ["kontak pengirim", "faktur.id_pengirim = pengirim.id_kontak"],
+    ["kontak penerima", "faktur.id_penerima = penerima.id_kontak"],
+    ['ppn', 'faktur.id_ppn = ppn.id_ppn']
   ];
+  $columns = 'faktur.*, pengirim.id_kontak AS id_pengirim, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, penerima.id_kontak AS id_penerima, ppn.jenis_ppn';
+  $conditions = "faktur.id_faktur = '$id_faktur'";
 
-  // Kolom-kolom yang ingin diambil dari tabel utama dan tabel-tabel yang di-join
-  $columns = 'penawaran_harga.*, pengirim.id_kontak AS id_pengirim, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, penerima.id_kontak AS id_penerima, ppn.jenis_ppn';
-  $conditions = "penawaran_harga.id_penawaran = '$id_penawaran'";
-  
   $data = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
-  
+
   if (!empty($data)) {
     $data = $data[0];
     $default_logo_path = $data["logo"];
@@ -53,26 +52,23 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
         }
       }
       $default_signature_path = $signatureInfo["Path"];
-        if ($default_signature_path == "") {
-          $default_signature_path = "assets/image/uploads/signature/no_signature.png";
-        }
     }
 
-    // Jika data penawaran harga ditemukan lanjut mengambil detail penawaran berdasarkan id
-    $mainDetailTable = 'detail_penawaran';
+    // Detail pesanan berdasarkan id_faktur
+    $mainDetailTable = 'detail_faktur';
     $joinDetailTables = [
-        ['penawaran_harga', 'detail_penawaran.id_penawaran = penawaran_harga.id_penawaran'], 
-        ['produk', 'detail_penawaran.id_produk = produk.id_produk']
+        ['faktur', 'detail_faktur.id_faktur = faktur.id_faktur'], 
+        ['produk', 'detail_faktur.id_produk = produk.id_produk']
     ];
-    $columns = 'detail_penawaran.*, produk.*';
-    $conditions = "detail_penawaran.id_penawaran = '$id_penawaran'";
+    $columns = 'detail_faktur.*, produk.*';
+    $conditions = "detail_faktur.id_faktur = '$id_faktur'";
     // Panggil fungsi selectDataJoin dengan ORDER BY
     $data_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
   } else {
-      echo "Penawaran tidak ditemukan.";
+      echo "Faktur tidak ditemukan.";
   }
 } else {
-echo "ID penawaran tidak ditemukan.";
+echo "ID faktur tidak ditemukan.";
 }
 
 if ($error_message): ?>
@@ -80,13 +76,13 @@ if ($error_message): ?>
 <?php else: ?>
 <?php if (!empty($data)): ?>
 
-<h1 class="fs-5 mb-4">Ubah Penawaran Harga</h1>
+<h1 class="fs-5 mb-4">Ubah Faktur</h1>
 <div class="paper-wrapper">
-  <form action="<?= base_url("pages/quotation/process.php") ?>" method="POST" class="needs-validation"
+  <form action="<?= base_url("pages/invoices/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>
     <div class="container">
       <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
-      <input type="hidden" name="id_penawaran" value="<?= $id_penawaran ?>">
+      <input type="hidden" name="id_faktur" value="<?= $id_faktur ?>">
       <input type="hidden" name="default_logo_path" value="<?= $default_logo_path ?>">
       <input type="hidden" name="signature_info" value="<?= $data['signature_info'] ?>">
 
@@ -122,10 +118,10 @@ if ($error_message): ?>
 
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Penawaran Harga</p>
+          <p class="fs-2 text-end">Purchase Order</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Penawaran Harga Incoming</p>
+        <p class="fs-2 p-0">Purchase Order Incoming</p>
         <?php } ?>
       </div>
 
@@ -160,21 +156,42 @@ if ($error_message): ?>
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
-            <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
+            <!-- input edit no invoice outgoing -->
+            <?php if ($category_param == 'outgoing') { ?>
+            <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" name="no_penawaran"
-                value="<?= strtoupper($data['no_penawaran']) ?>" required>
+              <input type="text" class="form-control form-control-sm" id="no_faktur" name="no_faktur"
+                value="<?= strtoupper($data['no_faktur']) ?>" readonly required>
               <div class="invalid-feedback">
-                No penawaran harga tidak boleh kosong.
+                Sistem error, nomor faktur gagal dimuat.
               </div>
             </div>
+
+            <!-- input edit no invoice incoming -->
+            <?php } elseif ($category_param == 'incoming') { ?>
+            <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control form-control-sm" name="no_faktur"
+                value="<?= strtoupper($data['no_faktur']) ?>" required>
+              <div class="invalid-feedback">
+                No Faktur tidak boleh kosong.
+              </div>
+            </div>
+            <?php } ?>
           </div>
 
           <div class="row mb-3">
             <label for="tanggal" class="col-sm-3 col-form-label">Tanggal</label>
-            <div class="col-auto">
+            <div class="col-sm-9">
+              <!-- input tgl invoice outgoing -->
+              <?php if ($category_param == 'outgoing') { ?>
+              <input type="datetime-local" class="form-control form-control-sm" id="tanggal" name="tanggal"
+                value="<?= $data['tanggal'] ?>" readonly required>
+              <!-- input tgl invoice incoming -->
+              <?php } elseif ($category_param == 'incoming') { ?>
               <input type="datetime-local" class="form-control form-control-sm" id="tanggal" name="tanggal"
                 value="<?= $data['tanggal'] ?>" required>
+              <?php } ?>
               <div class="invalid-feedback">
                 Harap pilih tanggal.
               </div>
@@ -187,7 +204,7 @@ if ($error_message): ?>
               <select class="form-select form-select-sm" id="status" name="status" required>
                 <?php 
               // Ambil status
-              $status_options = getEnum('status', 'penawaran_harga');
+              $status_options = getEnum('status', 'faktur');
               foreach ($status_options as $option) { ?>
                 <option value="<?= $option; ?>" <?php if ($option === $data['status']) echo 'selected'; ?>>
                   <?= ucfirst($option); ?>
@@ -230,22 +247,6 @@ if ($error_message): ?>
         </div>
       </div>
 
-      <div class="row">
-        <!-- Input Kontak Person -->
-        <div class="col-md-5 p-0">
-          <div class="row mb-3">
-            <label for="up" class="col-sm-3 col-form-label">U.P.</label>
-            <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" id="up" name="up"
-                value="<?= ucwords($data['up']) ?>">
-              <div class="invalid-feedback">
-                Harap masukan U.P. dengan valid.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <hr class="row mb-5 border border-secondary border-1 opacity-25">
 
       <div class="row">
@@ -253,10 +254,16 @@ if ($error_message): ?>
         <table class="table table-light table-striped">
           <thead>
             <tr class="fw-bolder">
-              <td>No</td>
-              <td>Nama Produk</td>
-              <td>Kuantitas</td>
-              <td>Harga (Rp)</td>
+              <td>No.</td>
+              <td>No. PO.<a href="#" class="link-danger link-offset-2 link-underline-opacity-0" data-bs-toggle="tooltip"
+                  data-bs-custom-class="custom-tooltip" data-bs-title="PO yang tersedia">*</a></td>
+              <td>Nama Produk<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Pilih produk sesuai PO">*</a></td>
+              <td>Kuantitas<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Masukan kuantitas tidak melebihi kuantitas PO">*</a></td>
+              <td>Harga</td>
               <td colspan="2">Jumlah</td>
             </tr>
           </thead>
@@ -272,14 +279,25 @@ if ($error_message): ?>
             ?>
             <tr class="main-tr">
               <td><?= $no ?></td>
-              <input type="hidden" name="id_detail_penawaran[]" value="<?= $detail['id_detail_penawaran'] ?>">
+              <input type="hidden" name="id_detail_faktur[]" value="<?= $detail['id_detail_faktur'] ?>">
+              <td>
+                <select class="form-select form-select-sm" name="id_pesanan[]" required>
+                  <?php
+                    $po = selectData("pesanan_pembelian");
+                    foreach ($po as $row_po) {
+                        $selected = ($row_po['id_pesanan'] == $detail['id_pesanan']) ? "selected" : "";
+                        echo '<option value="' . $row_po['id_pesanan'] . '" ' . $selected . '>' . strtoupper($row_po['no_pesanan']) . '</option>';
+                    }
+                  ?>
+                </select>
+              </td>
               <td>
                 <select class="form-select form-select-sm" name="id_produk[]" required>
                   <?php
                     $produk = selectData("produk");
                     foreach ($produk as $row_produk) {
                         $selected = ($row_produk['id_produk'] == $detail['id_produk']) ? "selected" : "";
-                        echo '<option value="' . $row_produk['id_produk'] . '" ' . $selected . '>' . strtoupper($row_produk['nama_produk']) . '</option>';
+                        echo '<option value="' . $row_produk['id_produk'] . '" ' . $selected . '>' . ucwords($row_produk['nama_produk']) . '</option>';
                     }
                   ?>
                 </select>
@@ -296,16 +314,18 @@ if ($error_message): ?>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="2" rowspan="2" class="bg-transparent">
+              <td colspan="3" rowspan="2" class="bg-transparent">
                 <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
                   Baris</button>
               </td>
-              <td colspan="2">Subtotal</td>
+              <td class="fw-bolder" colspan="2">Subtotal</td>
               <td colspan="2" id="total-harga">0</td>
             </tr>
-
             <tr>
-              <td>Diskon</td>
+              <td class="fw-bolder">Diskon<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Diskon dalam persen, isi 0 jika tanpa diskon.">*</a></td>
+              <td>
               <td>
                 <div class="input-group input-group-sm">
                   <input type="number" class="form-control" id="diskon" name="diskon" min="0" max="99"
@@ -317,8 +337,11 @@ if ($error_message): ?>
             </tr>
 
             <tr>
-              <td colspan="2" class="bg-transparent"></td>
-              <td>PPN</td>
+              <td colspan="3" class="bg-transparent"></td>
+              <td class="fw-bolder">PPN<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="PPN dalam persen, pilih 'Tanpa PPN' jika tanpa PPN.">*</a></td>
+              <td>
               <td>
                 <div class="input-group input-group-sm">
                   <select class="form-select form-select-sm" id="jenis_ppn" name="jenis_ppn" required
@@ -339,8 +362,8 @@ if ($error_message): ?>
             </tr>
 
             <tr>
-              <td colspan="2" class="bg-transparent"></td>
-              <td colspan="2">Total</td>
+              <td colspan="3" class="bg-transparent"></td>
+              <td class="fw-bolder" colspan="2">Total</td>
               <td colspan="2">
                 <span id="grand-total">0</span>
                 <!-- Input tersembunyi untuk menyimpan grand total -->
@@ -430,7 +453,7 @@ if ($error_message): ?>
           <button type="submit" class="btn btn-primary btn-lg" name="edit">Simpan</button>
         </div>
         <div class="col-auto">
-          <a href="<?= base_url("pages/quotation/$category_param") ?>">
+          <a href="javascript:history.back()">
             <button type="button" class="btn btn-secondary btn-lg">Batal</button>
           </a>
         </div>
@@ -543,13 +566,13 @@ $(document).ready(function() {
 
   // Event untuk menghapus baris
   $(document).on('click', '.remove-btn', function() {
-    var idDetailPenawaran = $(this).closest('.main-tr').find('input[name="id_detail_penawaran[]"]').val();
+    var idDetailFaktur = $(this).closest('.main-tr').find('input[name="id_detail_faktur[]"]').val();
     $(this).closest('.main-tr').remove();
     updateRowNumbers(); // Panggil fungsi untuk memperbarui nomor urutan setelah menghapus baris
     updateTotal(); // Panggil fungsi untuk memperbarui total setelah menghapus baris
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total setelah menghapus baris
-    // Tambahkan idDetailPenawaran ke #deleted-rows dan cetak konten #deleted-rows ke konsol
-    $('#deleted-rows').append('<input type="hidden" name="deleted_rows[]" value="' + idDetailPenawaran + '">');
+    // Tambahkan idDetailFaktur ke #deleted-rows dan cetak konten #deleted-rows ke konsol
+    $('#deleted-rows').append('<input type="hidden" name="deleted_rows[]" value="' + idDetailFaktur + '">');
   });
 
   // Event untuk menambahkan baris baru
@@ -560,13 +583,26 @@ $(document).ready(function() {
           echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
       }
       ?>';
-    // Ambil jumlah baris saat ini dan tambahkan 1,
+
+    var poOptions = '<?php
+        $po = selectData("pesanan_pembelian","kategori = '$category_po'" );
+        foreach ($po as $row_po) {
+            echo '<option value="' . $row_po['id_pesanan'] . '">' . $row_po['no_pesanan'] . '</option>';
+        }
+    ?>';
+
     var rowCount = $('#detail-table tr.main-tr').length + 1;
     var newIdDetail = "newId" + (rowCount - 1);
     $('#detail-table').append(
       `<tr class="main-tr">
           <td>${rowCount}</td>
-          <input type="hidden" name="id_detail_penawaran[]" value="${newIdDetail}">
+          <input type="hidden" name="id_detail_faktur[]" value="${newIdDetail}">
+          <td>
+            <select class="form-select form-select-sm" id="id_pesanan" name="id_pesanan[]" required>
+                <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
+                ${poOptions}
+            </select>
+          </td>
           <td>
             <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
               <option value="" selected disabled>-- Pilih Produk --</option>
@@ -594,7 +630,7 @@ $(document).ready(function() {
   // Event listener untuk menghitung total saat nilai "Qty" atau "Harga Satuan" berubah
   $(document).on('input', '.qty, .price', function() {
     var row = $(this).closest('.main-tr'); // Temukan baris terdekat
-    var idDetailPenawaran = row.find('input[name="id_detail_penawaran[]"]').val(); // Dapatkan ID detail
+    var idDetailFaktur = row.find('input[name="id_detail_faktur[]"]').val(); // Dapatkan ID detail
     var idProduk = row.find('select[name="id_produk[]"]').val(); // Dapatkan ID produk
     var jumlah = row.find('.qty').val(); // Dapatkan jumlah
     var hargaSatuan = unformatRupiah(row.find('.price').val()); // Dapatkan harga satuan tanpa format Rupiah
@@ -700,15 +736,16 @@ document.getElementById("tanggal").addEventListener("change", function() {
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         // Ubah nomor penawaran menjadi huruf kapital
-        var nomorPenawaran = this.responseText.toUpperCase();
-        document.getElementById("no_penawaran").value = nomorPenawaran;
+        var nomorFaktur = this.responseText.toUpperCase();
+        document.getElementById("no_faktur").value = nomorFaktur;
       }
     };
-    xhttp.open("GET", "<?= base_url("pages/quotation/getDocumentNumber.php") ?>?month=" + month + "&year=" + year,
+    xhttp.open("GET", "<?= base_url("pages/invoices/getDocumentNumber.php") ?>?month=" + month + "&year=" +
+      year,
       true);
     xhttp.send();
   } else {
-    document.getElementById("no_penawaran").value =
+    document.getElementById("no_faktur").value =
       ""; // Kosongkan nilai nomor penawaran jika tanggal tidak diisi
   }
 });

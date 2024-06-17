@@ -6,10 +6,10 @@ if (!checkLoginStatus()) {
     exit();
 }
 
-
-// Ambil id_pengguna dari sesi atau cookie
+// Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
 $id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
 $nama_pengguna = $_SESSION['nama_pengguna'] ?? $_COOKIE['nama_pengguna'] ?? '';
+$nama_lengkap = $_SESSION['nama_lengkap'] ?? $_COOKIE['nama_lengkap'] ?? '';
 $peran_pengguna = $_SESSION['peran_pengguna'] ?? $_COOKIE['peran_pengguna'] ?? '';
 
 // Tampilkan pesan sukses jika ada
@@ -73,21 +73,16 @@ if (isset($_SESSION['error_message'])) {
     width: 100%;
     min-height: 100%;
     background-color: #f2fafd;
-    /* Transparan */
     z-index: 9999;
-    /* Pastikan loader di atas konten lain */
   }
 
   .loader {
     border: 8px solid #f3f3f3;
-    /* Warna loader */
     border-radius: 50%;
     border-top: 8px solid #3498db;
-    /* Warna loader */
     width: 60px;
     height: 60px;
     animation: spin 2s linear infinite;
-    /* Animasi putaran */
     position: absolute;
     left: 50%;
     top: 100px;
@@ -107,22 +102,17 @@ if (isset($_SESSION['error_message'])) {
   /* Custom sweetalert */
   .swal2-popup {
     font-size: 0.8rem;
-    /* Ubah ukuran font */
     width: 300px;
-    /* Ubah lebar */
     background: #0077b6 !important;
-    /* Ubah warna background */
     color: white;
   }
 
   .swal2-content {
     color: white !important;
-    /* Ubah warna teks isi pesan menjadi putih */
   }
 
   .swal2-close {
     font-size: 1rem;
-    /* Ubah ukuran tombol close */
   }
   </style>
 </head>
@@ -158,6 +148,7 @@ if (isset($_SESSION['error_message'])) {
             </a>
           </li>
 
+          <!-- Accordion Master Data -->
           <li>
             <div class="accordion accordion-flush" style="background-color: transparent;" id="accordionFlushMasterData">
               <div class="accordion-item">
@@ -190,6 +181,7 @@ if (isset($_SESSION['error_message'])) {
                           </span>
                         </a>
                       </li>
+
                       <li>
                         <a href="<?= base_url('pages/master-data/contacts/internal'); ?>"
                           class="nav-link <?= setActivePage('pages/master-data/contacts/internal'); ?>">
@@ -202,6 +194,7 @@ if (isset($_SESSION['error_message'])) {
                           </span>
                         </a>
                       </li>
+
                       <li>
                         <a href="<?= base_url('pages/master-data/contacts/customer'); ?>"
                           class="nav-link <?= setActivePage('pages/master-data/contacts/customer'); ?>">
@@ -214,6 +207,7 @@ if (isset($_SESSION['error_message'])) {
                           </span>
                         </a>
                       </li>
+
                       <li>
                         <a href="<?= base_url('pages/master-data/contacts/supplier'); ?>"
                           class="nav-link <?= setActivePage('pages/master-data/contacts/supplier'); ?>">
@@ -226,6 +220,7 @@ if (isset($_SESSION['error_message'])) {
                           </span>
                         </a>
                       </li>
+
                       <li>
                         <a href="<?= base_url('pages/master-data/ppn'); ?>"
                           class="nav-link <?= setActivePage('pages/master-data/ppn'); ?>">
@@ -238,6 +233,21 @@ if (isset($_SESSION['error_message'])) {
                           </span>
                         </a>
                       </li>
+
+                      <?php if ($peran_pengguna === 'superadmin'): ?>
+                      <li>
+                        <a href="<?= base_url('pages/master-data/users'); ?>"
+                          class="nav-link <?= setActivePage('pages/master-data/users'); ?>">
+                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                            <path
+                              d="M237-285q54-38 115.5-56.5T480-360q66 0 127.5 18.5T723-285q35-41 52-91t17-104q0-129.67-91.23-220.84-91.23-91.16-221-91.16Q350-792 259-700.84 168-609.67 168-480q0 54 17 104t52 91Zm243-123q-60 0-102-42t-42-102q0-60 42-102t102-42q60 0 102 42t42 102q0 60-42 102t-102 42Zm.28 312Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Zm-.28-72q52 0 100-16.5t90-48.5q-43-27-91-41t-99-14q-51 0-99.5 13.5T290-233q42 32 90 48.5T480-168Zm0-312q30 0 51-21t21-51q0-30-21-51t-51-21q-30 0-51 21t-21 51q0 30 21 51t51 21Zm0-72Zm0 319Z" />
+                          </svg>
+                          <span class="text-link">
+                            Pengguna
+                          </span>
+                        </a>
+                      </li>
+                      <?php endif; ?>
                     </ul>
                   </div>
                 </div>
@@ -300,6 +310,19 @@ if (isset($_SESSION['error_message'])) {
                           </svg>
                           <span class="text-link">
                             Invoice
+                          </span>
+                        </a>
+                      </li>
+
+                      <li>
+                        <a href="<?= base_url('pages/delivery-order/outgoing'); ?>"
+                          class="nav-link text-dark <?= setActivePage('pages/delivery-order/outgoing'); ?>">
+                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                            <path
+                              d="M240-160q-50 0-85-35t-35-85H40v-440q0-33 23.5-56.5T120-800h560v160h120l120 160v200h-80q0 50-35 85t-85 35q-50 0-85-35t-35-85H360q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T280-280q0-17-11.5-28.5T240-320q-17 0-28.5 11.5T200-280q0 17 11.5 28.5T240-240ZM120-360h32q17-18 39-29t49-11q27 0 49 11t39 29h272v-360H120v360Zm600 120q17 0 28.5-11.5T760-280q0-17-11.5-28.5T720-320q-17 0-28.5 11.5T680-280q0 17 11.5 28.5T720-240Zm-40-200h170l-90-120h-80v120ZM360-540Z" />
+                          </svg>
+                          <span class="text-link">
+                            Delivery Order
                           </span>
                         </a>
                       </li>
@@ -368,6 +391,19 @@ if (isset($_SESSION['error_message'])) {
                           </span>
                         </a>
                       </li>
+
+                      <li>
+                        <a href="<?= base_url('pages/delivery-order/incoming'); ?>"
+                          class="nav-link text-dark <?= setActivePage('pages/delivery-order/incoming'); ?>">
+                          <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
+                            <path
+                              d="M240-160q-50 0-85-35t-35-85H40v-440q0-33 23.5-56.5T120-800h560v160h120l120 160v200h-80q0 50-35 85t-85 35q-50 0-85-35t-35-85H360q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T280-280q0-17-11.5-28.5T240-320q-17 0-28.5 11.5T200-280q0 17 11.5 28.5T240-240ZM120-360h32q17-18 39-29t49-11q27 0 49 11t39 29h272v-360H120v360Zm600 120q17 0 28.5-11.5T760-280q0-17-11.5-28.5T720-320q-17 0-28.5 11.5T680-280q0 17 11.5 28.5T720-240Zm-40-200h170l-90-120h-80v120ZM360-540Z" />
+                          </svg>
+                          <span class="text-link">
+                            Delivery Order
+                          </span>
+                        </a>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -403,7 +439,7 @@ if (isset($_SESSION['error_message'])) {
                 // Ubah nama pengguna menjadi huruf besar untuk memastikan konsistensi
                 
                 // Memisahkan nama pengguna menjadi kata-kata terpisah
-                $kata = explode(" ", $nama_pengguna);
+                $kata = explode(" ", $nama_lengkap);
 
                 // Inisialisasi variabel untuk menyimpan inisial
                 $inisial = '';
@@ -418,24 +454,38 @@ if (isset($_SESSION['error_message'])) {
                 echo strtoupper($inisial);
                 ?>
             </span>
-            <span class="text-link"><?= ucwords($nama_pengguna); ?></span>
+            <span class="text-link"><?= ucwords($nama_lengkap); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-            <?php if ($peran_pengguna === 'superadmin' || $peran_pengguna === 'staff'): ?>
-            <li>
-              <a class="dropdown-item" href="<?= base_url('pages/master-data/users'); ?>">Data Pengguna</a>
-            </li>
-            <?php endif; ?>
-
-            <li>
-              <hr class="dropdown-divider">
+            <li class="mt-2">
+              <span class="p-3">Data Pengguna</span>
             </li>
 
-            <li>
+            <li class="mt-2">
               <span class="ps-3">
-                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#fff">
+                <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="#fff">
+                  <path
+                    d="M560-440h200v-80H560v80Zm0-120h200v-80H560v80ZM200-320h320v-22q0-45-44-71.5T360-440q-72 0-116 26.5T200-342v22Zm160-160q33 0 56.5-23.5T440-560q0-33-23.5-56.5T360-640q-33 0-56.5 23.5T280-560q0 33 23.5 56.5T360-480ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z" />
+                </svg>
+              </span>
+              <span><?= ucwords($nama_lengkap) ?></span>
+            </li>
+
+            <li class="mt-2">
+              <span class="ps-3">
+                <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="#fff">
                   <path
                     d="M237-285q54-38 115.5-56.5T480-360q66 0 127.5 18.5T723-285q35-41 52-91t17-104q0-129.67-91.23-220.84-91.23-91.16-221-91.16Q350-792 259-700.84 168-609.67 168-480q0 54 17 104t52 91Zm243-123q-60 0-102-42t-42-102q0-60 42-102t102-42q60 0 102 42t42 102q0 60-42 102t-102 42Zm.28 312Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Zm-.28-72q52 0 100-16.5t90-48.5q-43-27-91-41t-99-14q-51 0-99.5 13.5T290-233q42 32 90 48.5T480-168Zm0-312q30 0 51-21t21-51q0-30-21-51t-51-21q-30 0-51 21t-21 51q0 30 21 51t51 21Zm0-72Zm0 319Z" />
+                </svg>
+              </span>
+              <span><?= $nama_pengguna ?></span>
+            </li>
+
+            <li class="mt-2">
+              <span class="ps-3">
+                <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18" fill="#fff">
+                  <path
+                    d="m438-338 226-226-57-57-169 169-84-84-57 57 141 141Zm42 258q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Zm0-84q104-33 172-132t68-220v-189l-240-90-240 90v189q0 121 68 220t172 132Zm0-316Z" />
                 </svg>
               </span>
               <span><?= ucwords($peran_pengguna) ?></span>
@@ -445,8 +495,8 @@ if (isset($_SESSION['error_message'])) {
               <hr class="dropdown-divider">
             </li>
 
-            <li>
-              <a class="dropdown-item" href="<?= base_url('auth/logout'); ?>">Sign out</a>
+            <li class="mb-2">
+              <a class="dropdown-item text-warning" href="<?= base_url('auth/logout'); ?>">Sign out</a>
             </li>
           </ul>
         </div>

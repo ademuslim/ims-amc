@@ -15,24 +15,24 @@ $data_pengguna = selectData('pengguna', 'status_hapus = 0');
   <thead>
     <tr>
       <th>No.</th>
-      <th colspan="4">Nama</th>
-      <th>Email</th>
-      <th>Tipe</th>
+      <th colspan="4">Nama Lengkap</th>
+      <th>Username</th>
+      <th>Tipe Pengguna</th>
       <th>Aksi</th>
     </tr>
   </thead>
   <tbody>
     <?php if (empty($data_pengguna)) : ?>
     <tr>
-      <td colspan="5">Tidak ada data</td>
+      <td colspan="4">Tidak ada data</td>
     </tr>
     <?php else : ?>
     <?php $no = 1; ?>
     <?php foreach ($data_pengguna as $pengguna) : ?>
     <tr>
       <td class="text-start"><?= $no; ?></td>
-      <td colspan="4"><?= ucwords($pengguna['nama_pengguna']); ?></td>
-      <td><?= $pengguna['email']; ?></td>
+      <td colspan="4"><?= ucwords($pengguna['nama_lengkap']); ?></td>
+      <td><?= $pengguna['nama_pengguna']; ?></td>
       <td>
         <?php
         if ($pengguna['tipe_pengguna'] == 'kepala_perusahaan'){
@@ -69,9 +69,7 @@ $data_pengguna = selectData('pengguna', 'status_hapus = 0');
         </div>
       </div>
     </div>
-    <?php $no++; ?>
-    <?php endforeach; ?>
-    <?php endif; ?>
+    <?php $no++; endforeach; endif; ?>
   </tbody>
 </table>
 </div>

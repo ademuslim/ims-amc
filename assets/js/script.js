@@ -12,7 +12,7 @@ $(document).ready(function () {
       {
         className: "dtr-control arrow-right",
         orderable: false,
-        targets: -1,
+        targets: -1, // Pastikan ini benar-benar kolom terakhir
       },
       {
         targets: "_all",
@@ -22,34 +22,30 @@ $(document).ready(function () {
     responsive: {
       details: {
         type: "column",
-        target: -1,
+        target: -1, // Sesuaikan dengan kolom yang ada
       },
     },
     dom:
       "<'d-flex justify-content-between align-items-center mb-4'<B><f>>" +
       "<'row'<'col-md-12'tr>>" +
       "<'row'<'col-md-12 d-flex justify-content-end align-items-center gap-3'ipl>>",
-    // lengthChange: false,
     buttons: [
-      // {
-      //   extend: "pageLength",
-      // },
       {
-        extend: "colvis", // Menambahkan tombol Column Visibility
-        postfixButtons: ["colvisRestore"], // Menambahkan tombol untuk mengembalikan visibilitas kolom
+        extend: "colvis",
+        postfixButtons: ["colvisRestore"],
         text: "Tampil Kolom",
       },
       {
         extend: "copy",
         exportOptions: {
-          columns: ":not(:last-child)", // Mengabaikan kolom terakhir (Aksi)
+          columns: ":not(:last-child)",
         },
         text: "Salin",
       },
       {
         extend: "excel",
         exportOptions: {
-          columns: ":not(:last-child)", // Mengabaikan kolom terakhir (Aksi)
+          columns: ":not(:last-child)",
         },
         text: "Excel",
       },
@@ -58,15 +54,14 @@ $(document).ready(function () {
         orientation: "landscape",
         pageSize: "LEGAL",
         exportOptions: {
-          columns: ":not(:last-child)", // Mengabaikan kolom terakhir (Aksi)
+          columns: ":not(:last-child)",
         },
         text: "PDF",
       },
       {
         extend: "print",
-        // autoPrint: false,
         exportOptions: {
-          columns: ":not(:last-child)", // Mengabaikan kolom terakhir (Aksi)
+          columns: ":not(:last-child)",
         },
         text: "Cetak",
       },
@@ -76,8 +71,6 @@ $(document).ready(function () {
       sInfo: "Menampilkan _START_ hingga _END_ dari _TOTAL_ entri",
       sInfoEmpty: "Menampilkan 0 hingga 0 dari 0 entri",
       sInfoFiltered: "(disaring dari total entri _MAX_)",
-      sInfoPostFix: "",
-      sInfoThousands: ",",
       sLengthMenu: "_MENU_",
       sLoadingRecords: "Memuat...",
       sProcessing: "Sedang memproses...",
@@ -92,11 +85,11 @@ $(document).ready(function () {
     lengthMenu: [
       [10, 25, 50, -1],
       [10, 25, 50, 100],
-    ], // Menetapkan opsi panjang halaman
+    ],
   });
 
+  // Menyusun ulang tombol dan elemen lainnya
   table.buttons().container().appendTo("#example_wrapper .col-md-8:eq(0)");
-  // Menambahkan margin bawah ke elemen yang menampung tombol dan fitur pencarian
   $("#example_wrapper .row").css("margin-bottom", "20px");
 });
 

@@ -33,9 +33,9 @@ if (isset($_GET['id'])) {
             $_SESSION['success_message'] = "Data pengguna berhasil dihapus dari sistem, data tetap ada dalam database!";
 
             // Pencatatan log aktivitas
-            $aktivitas = 'Berhasil hapus pengguna, data tetap ada dalam database!';
-            $tabel = 'pengguna';
-            $keterangan = 'Pengguna dengan ID ' . $id_pengguna_log . ' berhasil hapus pengguna dengan ID ' . $id_pengguna;
+            $aktivitas = 'Berhasil hapus data';
+            $tabel = 'Pengguna';
+            $keterangan = "Berhasil hapus pengguna dengan ID $id_pengguna, data tetap ada dalam database!";
             $log_data = [
                 'id_pengguna' => $id_pengguna_log,
                 'aktivitas' => $aktivitas,

@@ -1,95 +1,70 @@
 <?php
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
-$page_title = $category_param === 'outgoing' ? 'Edit Quotation Outgoing' : 'Edit Quotation Incoming';
+$page_title = $category_param === 'outgoing' ? 'Add Invoice Outgoing' : 'Add Invoice Incoming';
 require '../../includes/header.php';
 
 // Set kategori halaman (Outgoing / Incoming)
 if ($category_param === 'outgoing') {
   $category = 'keluar';
   $sender = 'internal';
-  $receiver = 'customer';
+  $receiver1 = 'customer';
+  $receiver2 = 'supplier';
+  $category_po = 'masuk';
 } elseif ($category_param === 'incoming') {
   $category = 'masuk';
-  $sender = 'customer';
+  $sender1 = 'customer';
+  $sender2 = 'supplier';
   $receiver = 'internal';
+  $category_po = 'keluar';
 } else {
   die("Kategori tidak valid");
 }
 
-// Variabel data detail
-$data_detail = [];
-$signatureInfo = []; // Array detail signature info
-$error_message = '';
-
-// Ambil Data Penawaran Harga berdasarkan id
-if (isset($_GET['id']) && $_GET['id'] !== '') {
-  $id_penawaran = $_GET['id'];
-  $mainTable = 'penawaran_harga';
-  $joinTables = [
-    ["kontak pengirim", "penawaran_harga.id_pengirim = pengirim.id_kontak"], 
-    ["kontak penerima", "penawaran_harga.id_penerima = penerima.id_kontak"],
-    ['ppn', 'penawaran_harga.id_ppn = ppn.id_ppn']
-  ];
-
-  // Kolom-kolom yang ingin diambil dari tabel utama dan tabel-tabel yang di-join
-  $columns = 'penawaran_harga.*, pengirim.id_kontak AS id_pengirim, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, penerima.id_kontak AS id_penerima, ppn.jenis_ppn';
-  $conditions = "penawaran_harga.id_penawaran = '$id_penawaran'";
+// Khusus Outgoing
+if ($category_param === 'outgoing') {
+  $default_logo_path = "";
+  $default_signature_path = ""; // Default path signature
   
-  $data = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
-  
+  // Ambil path logo dan path signature terbaru dari tabel penawaran_harga (Kategori = keluar)
+  $data = selectData("penawaran_harga", "kategori = 'keluar' AND logo IS NOT NULL AND logo != ''", "tanggal DESC", "1");
+
   if (!empty($data)) {
-    $data = $data[0];
-    $default_logo_path = $data["logo"];
-    if (!empty($data["signature_info"])) {
-      // Pisahkan data signature_info berdasarkan koma (,) untuk mendapatkan setiap elemen
-      $signature_info_parts = explode(", ", $data["signature_info"]);
-      // Loop melalui setiap elemen untuk menyimpan pasangan kunci dan nilai
+    $default_logo_path = $data[0]["logo"];
+    
+    // Ambil signature_info
+    if (!empty($data[0]["signature_info"])) {
+      // Pisahkan setiap elemen signature_info berdasarkan koma (,)
+      $signature_info_parts = explode(", ", $data[0]["signature_info"]);
+
+      // Ambil 'path' untuk path signature
       foreach ($signature_info_parts as $part) {
-        // Pecah setiap elemen menjadi pasangan kunci dan nilai
-        $pair = explode(": ", $part);
-        // Simpan pasangan kunci dan nilai dalam array asosiatif
-        if (count($pair) == 2) {
-          $signatureInfo[$pair[0]] = $pair[1];
+        $pair = explode(": ", $part); // Pecah menjadi pasangan kunci dan nilai
+        
+        // Jika pasangan kunci dan nilai sesuai dengan 'path', simpan nilainya
+        if ($pair[0] == 'Path') {
+          // Jika nilai Path tidak kosong, gunakan nilai tersebut
+          if (!empty($pair[1])) {
+            $default_signature_path = $pair[1];
+          } else {
+            // Jika nilai Path kosong, set default path
+            $default_signature_path = "../../assets/image/uploads/signature/no_signature.png";
+          }
+          break; // Keluar dari loop setelah menemukan path
         }
       }
-      $default_signature_path = $signatureInfo["Path"];
-        if ($default_signature_path == "") {
-          $default_signature_path = "assets/image/uploads/signature/no_signature.png";
-        }
     }
-
-    // Jika data penawaran harga ditemukan lanjut mengambil detail penawaran berdasarkan id
-    $mainDetailTable = 'detail_penawaran';
-    $joinDetailTables = [
-        ['penawaran_harga', 'detail_penawaran.id_penawaran = penawaran_harga.id_penawaran'], 
-        ['produk', 'detail_penawaran.id_produk = produk.id_produk']
-    ];
-    $columns = 'detail_penawaran.*, produk.*';
-    $conditions = "detail_penawaran.id_penawaran = '$id_penawaran'";
-    // Panggil fungsi selectDataJoin dengan ORDER BY
-    $data_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
-  } else {
-      echo "Penawaran tidak ditemukan.";
   }
-} else {
-echo "ID penawaran tidak ditemukan.";
 }
+?>
 
-if ($error_message): ?>
-<p><?php echo $error_message; ?></p>
-<?php else: ?>
-<?php if (!empty($data)): ?>
-
-<h1 class="fs-5 mb-4">Ubah Penawaran Harga</h1>
+<h1 class="fs-5 mb-4">Buat Invoice Baru</h1>
 <div class="paper-wrapper">
-  <form action="<?= base_url("pages/quotation/process.php") ?>" method="POST" class="needs-validation"
+  <form action="<?= base_url("pages/invoices/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>
-    <div class="container">
-      <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
-      <input type="hidden" name="id_penawaran" value="<?= $id_penawaran ?>">
-      <input type="hidden" name="default_logo_path" value="<?= $default_logo_path ?>">
-      <input type="hidden" name="signature_info" value="<?= $data['signature_info'] ?>">
+    <!-- Input kategori -->
+    <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
 
+    <div class="container">
       <!-- Input Logo Outgoing-->
       <div class="row">
         <?php if ($category_param === 'outgoing') {?>
@@ -97,7 +72,7 @@ if ($error_message): ?>
           <input type="hidden" id="removeLogoInput" name="remove_logo" value="false">
           <div id="image-preview-container" class="position-relative">
             <div class="d-flex flex-column justify-content-center align-items-center h-100">
-              <img id="logo-preview" src="" alt="Preview Logo">
+              <img id="logo-preview" src="" alt="Tanpa Logo">
             </div>
             <button type="button" title="Hapus Logo" class="position-absolute top-0 end-0 z-3" id="cancelButton"
               onclick="removeLogo()"></button>
@@ -122,10 +97,10 @@ if ($error_message): ?>
 
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Penawaran Harga</p>
+          <p class="fs-2 text-end">Invoice</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Penawaran Harga Incoming</p>
+        <p class="fs-2 p-0">Invoice Incoming</p>
         <?php } ?>
       </div>
 
@@ -136,19 +111,25 @@ if ($error_message): ?>
             <label for="pengirim" class="col-sm-3 col-form-label">Pengirim</label>
             <div class="col-sm-9">
               <select class="form-select form-select-sm" id="pengirim" name="pengirim" required>
+                <option value="" selected disabled>-- Pilih Pengirim --</option>
                 <?php
-                    // Ambil data kontak sesuai dengan kategori sender
+                  // Ambil data kontak sesuai dengan kategori sender
+                  $kontak_pengirim = [];
+                  if ($category_param === 'outgoing') {
                     $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
-                    foreach ($kontak_pengirim as $row_pengirim) {
-                        $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
-
-                        // Tentukan pengirim mana yang akan menjadi default berdasarkan kategori dan ID pengirim saat ini
-                        if ($row_pengirim['id_kontak'] == $data['id_pengirim']) {
-                            $selected = "selected";
-                        }
-                        echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
-                    }
-                  ?>
+                  } elseif ($category_param === 'incoming') {
+                    $kontak_pengirim = array_merge(
+                      selectData("kontak", "kategori = '$sender1'"),
+                      selectData("kontak", "kategori = '$sender2'")
+                    );
+                  }
+                  
+                  foreach ($kontak_pengirim as $row_pengirim) {
+                    // Jika kategori adalah 'outgoing' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
+                    $selected = ($category_param == 'outgoing' && strtolower($row_pengirim['nama_kontak']) == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                    echo '<option value="' . $row_pengirim['id_kontak'] . '" ' . $selected . '>' . ucwords($row_pengirim['nama_kontak']) . '</option>';
+                  }
+                ?>
               </select>
               <div class="invalid-feedback">
                 Harap pilih pengirim.
@@ -160,40 +141,36 @@ if ($error_message): ?>
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
-            <label for="no_penawaran" class="col-sm-3 col-form-label">No:</label>
+            <!-- input no invoice outgoing -->
+            <?php if ($category_param == 'outgoing') { ?>
+            <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" name="no_penawaran"
-                value="<?= strtoupper($data['no_penawaran']) ?>" required>
+              <input type="text" class="form-control form-control-sm" id="no_faktur" name="no_faktur" readonly required>
               <div class="invalid-feedback">
-                No penawaran harga tidak boleh kosong.
+                Sistem error, nomor invoice gagal dimuat.
               </div>
             </div>
+
+            <!-- input no invoice incoming -->
+            <?php } elseif ($category_param == 'incoming') { ?>
+            <label for="no_faktur" class="col-sm-3 col-form-label">No:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control form-control-sm" name="no_faktur" required>
+              <div class="invalid-feedback">
+                No faktur tidak boleh kosong.
+              </div>
+            </div>
+            <?php } ?>
           </div>
 
+          <!-- Tanggal -->
           <div class="row mb-3">
             <label for="tanggal" class="col-sm-3 col-form-label">Tanggal</label>
             <div class="col-auto">
-              <input type="datetime-local" class="form-control form-control-sm" id="tanggal" name="tanggal"
-                value="<?= $data['tanggal'] ?>" required>
+              <input type="datetime-local" class="form-control form-control-sm" id="tanggal" name="tanggal" required>
               <div class="invalid-feedback">
                 Harap pilih tanggal.
               </div>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <label for="status" class="col-sm-3 col-form-label">status</label>
-            <div class="col-sm-9">
-              <select class="form-select form-select-sm" id="status" name="status" required>
-                <?php 
-              // Ambil status
-              $status_options = getEnum('status', 'penawaran_harga');
-              foreach ($status_options as $option) { ?>
-                <option value="<?= $option; ?>" <?php if ($option === $data['status']) echo 'selected'; ?>>
-                  <?= ucfirst($option); ?>
-                </option>
-                <?php } ?>
-              </select>
             </div>
           </div>
         </div>
@@ -202,25 +179,31 @@ if ($error_message): ?>
       <hr class="row mb-5 border border-secondary border-1 opacity-25">
 
       <div class="row">
-        <!-- Input Penerima -->
+        <!-- Input penerima -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
             <label for="penerima" class="col-sm-3 col-form-label">Penerima</label>
             <div class="col-sm-9">
               <select class="form-select form-select-sm" id="penerima" name="penerima" required>
+                <option value="" selected disabled>-- Pilih Penerima --</option>
                 <?php
-                    // Ambil data kontak sesuai dengan kategori receiver
+                  // Ambil data kontak sesuai dengan kategori receiver
+                  $kontak_penerima = [];
+                  if ($category_param === 'outgoing') {
+                    $kontak_penerima = array_merge(
+                      selectData("kontak", "kategori = '$receiver1'"),
+                      selectData("kontak", "kategori = '$receiver2'")
+                    );
+                  } elseif ($category_param === 'incoming') {
                     $kontak_penerima = selectData("kontak", "kategori = '$receiver'");
-                    foreach ($kontak_penerima as $row_penerima) {
-                        $selected = ""; // Variabel untuk menentukan apakah opsi saat ini harus dipilih
+                  }
 
-                        // Tentukan penerima mana yang akan menjadi default berdasarkan kategori dan ID penerima saat ini
-                        if ($row_penerima['id_kontak'] == $data['id_penerima']) {
-                            $selected = "selected";
-                        }
-                        echo '<option value="' . $row_penerima['id_kontak'] . '" ' . $selected . '>' . ucwords($row_penerima['nama_kontak']) . '</option>';
-                    }
-                  ?>
+                  foreach ($kontak_penerima as $row_penerima) {
+                    // Jika kategori adalah 'incoming' dan nama kontak adalah 'PT. Mitra Tehno Gemilang', tandai sebagai selected
+                    $selected = ($category_param == 'incoming' && strtolower($row_penerima['nama_kontak']) == 'pt. mitra tehno gemilang') ? 'selected' : '';
+                    echo '<option value="' . $row_penerima['id_kontak'] . '" ' . $selected . '>' . ucwords($row_penerima['nama_kontak']) . '</option>';
+                  }
+                ?>
               </select>
               <div class="invalid-feedback">
                 Harap pilih penerima.
@@ -230,86 +213,105 @@ if ($error_message): ?>
         </div>
       </div>
 
-      <div class="row">
-        <!-- Input Kontak Person -->
-        <div class="col-md-5 p-0">
-          <div class="row mb-3">
-            <label for="up" class="col-sm-3 col-form-label">U.P.</label>
-            <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" id="up" name="up"
-                value="<?= ucwords($data['up']) ?>">
-              <div class="invalid-feedback">
-                Harap masukan U.P. dengan valid.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <hr class="row mb-5 border border-secondary border-1 opacity-25">
 
       <div class="row">
-        <!-- Tambah, Hapus, Edit detail produk -->
+        <!-- Tambah detail produk -->
         <table class="table table-light table-striped">
           <thead>
             <tr class="fw-bolder">
-              <td>No</td>
-              <td>Nama Produk</td>
-              <td>Kuantitas</td>
-              <td>Harga (Rp)</td>
+              <td>No.</td>
+              <td>No. PO.<a href="#" class="link-danger link-offset-2 link-underline-opacity-0" data-bs-toggle="tooltip"
+                  data-bs-custom-class="custom-tooltip" data-bs-title="PO yang tersedia">*</a></td>
+              <td>Nama Produk<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Pilih produk sesuai PO">*</a></td>
+              <td>Kuantitas<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Masukan kuantitas tidak melebihi kuantitas PO">*</a></td>
+              <td>Harga</td>
               <td colspan="2">Jumlah</td>
             </tr>
           </thead>
           <tbody id="detail-table">
-            <?php
-              $subtotal = 0;
-              if (!empty($data_detail)):
-                  $no = 1;
-                  foreach ($data_detail as $detail):
-                      // Hitung total harga untuk setiap baris
-                      $total_harga = $detail['jumlah'] * $detail['harga_satuan'];
-                      $subtotal += $total_harga;
-            ?>
             <tr class="main-tr">
-              <td><?= $no ?></td>
-              <input type="hidden" name="id_detail_penawaran[]" value="<?= $detail['id_detail_penawaran'] ?>">
+              <td>1</td>
+
               <td>
-                <select class="form-select form-select-sm" name="id_produk[]" required>
+                <select class="form-select form-select-sm id_pesanan_info" id="id_pesanan" name="id_pesanan[]" required>
+                  <option value="" selected disabled>-- Pilih No. PO. --</option>
                   <?php
-                    $produk = selectData("produk");
+                    $mainTable = 'pesanan_pembelian';
+                    $joinTables = [
+                        ['detail_pesanan', 'pesanan_pembelian.id_pesanan = detail_pesanan.id_pesanan'],
+                        ['produk', 'detail_pesanan.id_produk = produk.id_produk']
+                    ];
+                    $columns = 'pesanan_pembelian.id_pesanan, pesanan_pembelian.no_pesanan, produk.nama_produk, produk.id_produk';
+                    $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0 AND pesanan_pembelian.status = 'diproses'";
+                    $orderBy = 'pesanan_pembelian.tanggal DESC, produk.nama_produk ASC';
+                    $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);
+
+                    foreach ($po as $row_po) {
+                        echo '<option value="' . $row_po['id_pesanan'] . '" data-id-produk="' . $row_po['id_produk'] . '">' 
+                            . strtoupper($row_po['no_pesanan']) . " (" . ucwords($row_po['nama_produk']) . ")" 
+                            . '</option>';
+                    }
+                  ?>
+                </select>
+                <div class="pesanan-info">
+                  <!-- Info di_pesanan yang terpilih akan ditampilkan di sini -->
+                </div>
+              </td>
+              <td>
+                <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
+                  <option value="" selected disabled>-- Pilih Produk --</option>
+                  <?php
+                    $mainTable = 'produk';
+                    $joinTables = [
+                        ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
+                    ];
+                    $columns = 'DISTINCT produk.id_produk, produk.nama_produk';
+                    $conditions = "detail_pesanan.sisa_pesanan > 0";
+                    $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
                     foreach ($produk as $row_produk) {
-                        $selected = ($row_produk['id_produk'] == $detail['id_produk']) ? "selected" : "";
-                        echo '<option value="' . $row_produk['id_produk'] . '" ' . $selected . '>' . strtoupper($row_produk['nama_produk']) . '</option>';
+                      echo '<option value="' . $row_produk['id_produk'] . '">' . ucwords($row_produk['nama_produk']) . '</option>';
                     }
                   ?>
                 </select>
               </td>
-              <td><input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1"
-                  value="<?= $detail['jumlah'] ?>" required></td>
-              <td><input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0"
-                  value="<?= $detail['harga_satuan'] ?>" required></td>
-              <td class="total"><?= $total_harga ?></td>
-              <td class="align-middle text-center"><button type="button" class="remove-btn btn-cancel m-0"></button>
+              <td>
+                <input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required>
+              </td>
+              <td>
+                <input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
+              </td>
+              <td class="total">0</td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center align-items-center">
+                  <button type="button" class="remove-btn btn-cancel m-0"></button>
+                </div>
               </td>
             </tr>
-            <?php $no++; endforeach; endif; ?>
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="2" rowspan="2" class="bg-transparent">
+              <td colspan="4" rowspan="4" class="bg-transparent">
                 <button type="button" class="add-more-tr btn btn-primary btn-lg btn-icon btn-add mt-3">Tambah
                   Baris</button>
               </td>
-              <td colspan="2">Subtotal</td>
+              <td class="fw-bolder" colspan="2">Subtotal</td>
               <td colspan="2" id="total-harga">0</td>
             </tr>
 
             <tr>
-              <td>Diskon</td>
+              <td class="fw-bolder">Diskon<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Diskon dalam persen, isi 0 jika tanpa diskon.">*</a></td>
               <td>
                 <div class="input-group input-group-sm">
-                  <input type="number" class="form-control" id="diskon" name="diskon" min="0" max="99"
-                    value="<?= $data['diskon'] ?>" aria-describedby="basic-addon1">
+                  <input type="number" class="form-control" id="diskon" name="diskon" min="0" step="0.01" value="0"
+                    aria-describedby="basic-addon1">
                   <span class="input-group-text" id="basic-addon1">%</span>
                 </div>
               </td>
@@ -317,20 +319,20 @@ if ($error_message): ?>
             </tr>
 
             <tr>
-              <td colspan="2" class="bg-transparent"></td>
-              <td>PPN</td>
+              <td class="fw-bolder">PPN<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="PPN dalam persen, pilih 'Tanpa PPN' jika tanpa PPN.">*</a></td>
               <td>
                 <div class="input-group input-group-sm">
                   <select class="form-select form-select-sm" id="jenis_ppn" name="jenis_ppn" required
                     aria-describedby="tarif-ppn">
                     <option value="" selected disabled>-- Pilih PPN --</option>
                     <?php
-                      $ppn = selectData("ppn");
-                      foreach ($ppn as $row_ppn) {
-                        $selected = ($row_ppn['id_ppn'] == $data['id_ppn']) ? "selected" : "";
-                          echo '<option value="' . $row_ppn['id_ppn'] . '" ' . $selected . '>' . ucwords($row_ppn['jenis_ppn']) . '</option>';
-                      }
-                    ?>
+                        $ppn = selectData("ppn");
+                        foreach ($ppn as $row_ppn) {
+                            echo '<option value="' . $row_ppn['id_ppn'] . '">' . ucwords($row_ppn['jenis_ppn']) . '</option>';
+                        }
+                      ?>
                   </select>
                   <label class="input-group-text" for="jenis_ppn">%<span class="d-none" id="tarif-ppn"></span></label>
                 </div>
@@ -339,8 +341,7 @@ if ($error_message): ?>
             </tr>
 
             <tr>
-              <td colspan="2" class="bg-transparent"></td>
-              <td colspan="2">Total</td>
+              <td class="fw-bolder" colspan="2">Total</td>
               <td colspan="2">
                 <span id="grand-total">0</span>
                 <!-- Input tersembunyi untuk menyimpan grand total -->
@@ -349,9 +350,6 @@ if ($error_message): ?>
             </tr>
           </tfoot>
         </table>
-
-        <!-- Input tersembunyi untuk menyimpan ID detail yang dihapus -->
-        <div id="deleted-rows"></div>
       </div>
 
       <hr class="row mb-5 border border-secondary border-1 opacity-25">
@@ -359,8 +357,7 @@ if ($error_message): ?>
       <div class="row justify-content-between">
         <div class="col-md-5 p-0 mb-3">
           <div class="form-floating">
-            <textarea class="form-control" id="catatan" name="catatan"
-              style="height: 100px"><?= ucfirst($data['catatan']) ?></textarea>
+            <textarea class="form-control" id="catatan" name="catatan" style="height: 100px"></textarea>
             <label for="catatan" name="catatan">Catatan</label>
           </div>
         </div>
@@ -370,11 +367,9 @@ if ($error_message): ?>
           <div class="row mb-3">
             <label class="mb-3">Tempat dan tanggal.</label>
             <div class="input-group input-group-sm p-0">
-              <input type="text" class="form-control" name="signing_location"
-                value="<?= isset($signatureInfo['Location']) ? ucwords($signatureInfo['Location']) : '' ?>" required>
+              <input type="text" class="form-control" name="signing_location" required>
               <span class="input-group-text">,</span>
-              <input type="date" class="form-control" name="signing_date"
-                value="<?= isset($signatureInfo['Date']) ? $signatureInfo['Date'] : '' ?>" required>
+              <input type="date" class="form-control" name="signing_date" required>
             </div>
           </div>
 
@@ -386,7 +381,7 @@ if ($error_message): ?>
 
               <div id="signature-preview-container" class="position-relative">
                 <div class="d-flex flex-column justify-content-center align-items-center h-100">
-                  <img id="signature-preview" src="" alt="Tanpa Signature">
+                  <img id="signature-preview" src="" alt="Preview Signature">
                 </div>
                 <button type="button" title="Hapus Tanda Tangan" class="position-absolute top-0 end-0 z-3"
                   id="cancelButtonSignature" onclick="removeSignature()"></button>
@@ -414,23 +409,23 @@ if ($error_message): ?>
           <?php } ?>
 
           <div class="row mb-3">
-            <input type="text" class="form-control form-control-sm" id="signer-name" name="signer_name"
-              value="<?= isset($signatureInfo['Name']) ? ucwords($signatureInfo['Name']) : '' ?>" required>
+            <input type="text" class="form-control form-control-sm" id="signer-name" name="signer_name" required
+              placeholder="Nama Lengkap">
           </div>
-
           <div class="row mb-3">
             <input type="text" class="form-control form-control-sm" id="signer-position" name="signer_position"
-              value="<?= isset($signatureInfo['Position']) ? ucwords($signatureInfo['Position']) : '' ?>" required>
+              placeholder="Jabatan" required>
           </div>
         </div>
       </div>
 
       <div class="row justify-content-end mt-4 mb-4">
         <div class="col-auto">
-          <button type="submit" class="btn btn-primary btn-lg" name="edit">Simpan</button>
+          <button type="submit" class="btn btn-primary btn-lg" name="add">Simpan</button>
         </div>
+
         <div class="col-auto">
-          <a href="<?= base_url("pages/quotation/$category_param") ?>">
+          <a href="index.php?category=<?= $category_param ?>">
             <button type="button" class="btn btn-secondary btn-lg">Batal</button>
           </a>
         </div>
@@ -438,8 +433,6 @@ if ($error_message): ?>
     </div>
   </form>
 </div>
-<?php endif; endif; ?>
-
 <script>
 // Validasi Bootstrap pada formulir
 $('form.needs-validation').on('submit', function(e) {
@@ -457,6 +450,7 @@ $('form.needs-validation').on('submit', function(e) {
 
 // Data Detail
 $(document).ready(function() {
+  // Event listener untuk input harga satuan
   $(document).on('input', '.price', function() {
     // Ambil nilai input
     var input = $(this).val();
@@ -500,88 +494,83 @@ $(document).ready(function() {
     return parseFloat(price.replace(/\D/g, ''));
   }
 
-  // Panggil updateTotal() dan updateGrandTotal() saat halaman dimuat
-  updateTotal();
-  setPPNTarif(); // Memastikan tarif PPN diatur saat halaman dimuat
-  updateGrandTotal();
-
-  // Format harga satuan saat halaman dimuat
-  $('.price').each(function() {
-    var value = $(this).val();
-    $(this).val(formatRupiah(value));
-  });
-
-  // Format total saat halaman dimuat
-  $('.total').each(function() {
-    var value = $(this).text();
-    $(this).text(formatRupiah(value));
-  });
-
-  // Format subtotal saat halaman dimuat
-  $('#total-harga').each(function() {
-    var value = $(this).text();
-    $(this).text(formatRupiah(value));
-  });
-
-  // Format nilai diskon saat halaman dimuat
-  $('#nilai-diskon').each(function() {
-    var value = $(this).text();
-    $(this).text(formatRupiah(value));
-  });
-
-  // Format nilai ppn saat halaman dimuat
-  $('#total-ppn').each(function() {
-    var value = $(this).text();
-    $(this).text(formatRupiah(value));
-  });
-
-  // Format nilai ppn saat halaman dimuat
-  $('#grand-total').each(function() {
-    var value = $(this).text();
-    $(this).text(formatRupiah(value));
-  });
-
   // Event untuk menghapus baris
   $(document).on('click', '.remove-btn', function() {
-    var idDetailPenawaran = $(this).closest('.main-tr').find('input[name="id_detail_penawaran[]"]').val();
     $(this).closest('.main-tr').remove();
     updateRowNumbers(); // Panggil fungsi untuk memperbarui nomor urutan setelah menghapus baris
     updateTotal(); // Panggil fungsi untuk memperbarui total setelah menghapus baris
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total setelah menghapus baris
-    // Tambahkan idDetailPenawaran ke #deleted-rows dan cetak konten #deleted-rows ke konsol
-    $('#deleted-rows').append('<input type="hidden" name="deleted_rows[]" value="' + idDetailPenawaran + '">');
   });
 
   // Event untuk menambahkan baris baru
   $(document).on('click', '.add-more-tr', function() {
     var produkOptions = '<?php
-      $produk = selectData("produk");
+      $mainTable = 'produk';
+      $joinTables = [
+          ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
+      ];
+      $columns = 'produk.id_produk, produk.nama_produk';
+      $conditions = "detail_pesanan.sisa_pesanan > 0";
+      $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
       foreach ($produk as $row_produk) {
-          echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
+        echo '<option value="' . $row_produk['id_produk'] . '">' . ucwords($row_produk['nama_produk']) . '</option>';
       }
-      ?>';
-    // Ambil jumlah baris saat ini dan tambahkan 1,
-    var rowCount = $('#detail-table tr.main-tr').length + 1;
-    var newIdDetail = "newId" + (rowCount - 1);
+    ?>';
+
+    var poOptions = '<?php
+        $mainTable = 'pesanan_pembelian';
+        $joinTables = [
+          ['detail_pesanan', 'pesanan_pembelian.id_pesanan = detail_pesanan.id_pesanan'],
+          ['produk', 'detail_pesanan.id_produk = produk.id_produk']
+        ];
+        $columns = 'pesanan_pembelian.id_pesanan, pesanan_pembelian.no_pesanan, produk.nama_produk, produk.id_produk';
+        $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0";
+
+        // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
+        $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+
+        // Loop melalui hasil query dan tampilkan dalam opsi dropdown
+        foreach ($po as $row_po) {
+          echo '<option value="' . $row_po['id_pesanan'] . '" data-id-produk="' . $row_po['id_produk'] . '">' 
+              . strtoupper($row_po['no_pesanan']) . " (" . ucwords($row_po['nama_produk']) . ")" 
+              . '</option>';
+          }
+    ?>';
+
+    var rowCount = $('#detail-table tr.main-tr').length + 1; // Ambil jumlah baris saat ini dan tambahkan 1
     $('#detail-table').append(
       `<tr class="main-tr">
           <td>${rowCount}</td>
-          <input type="hidden" name="id_detail_penawaran[]" value="${newIdDetail}">
+          <td>
+              <select class="form-select form-select-sm id_pesanan_info" id="id_pesanan" name="id_pesanan[]" required>
+                <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
+                ${poOptions}
+              </select>
+              <div class="pesanan-info">
+              </div>
+          </td>
           <td>
             <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
               <option value="" selected disabled>-- Pilih Produk --</option>
               ${produkOptions}
             </select>
           </td>
-            <td><input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required></td>
-            <td><input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required></td>
-            <td class="total">0</td>
-            <td class="align-middle text-center"><button type="button" class="remove-btn btn-cancel"></button></td>
+          <td>
+            <input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required>
+          </td>
+          <td>
+            <input type="text" name="harga_satuan[]" class="form-control form-control-sm price" min="0" required>
+          </td>
+          <td class="total">0</td>
+          <td class="text-center">
+            <div class="d-flex justify-content-center align-items-center">
+              <button type="button" class="remove-btn btn-cancel m-0"></button>
+            </div>
+          </td>
         </tr>`
     );
-    updateRowNumbers();
-    updateTotal();
-    updateGrandTotal();
+    updateRowNumbers(); // Panggil fungsi untuk memperbarui nomor urutan setelah menambahkan baris baru
   });
 
   // Fungsi untuk memperbarui nomor urutan pada setiap baris
@@ -590,15 +579,8 @@ $(document).ready(function() {
       $(this).find('td:first').text(index + 1); // Atur nomor urutan sesuai dengan indeks baris
     });
   }
-
   // Event listener untuk menghitung total saat nilai "Qty" atau "Harga Satuan" berubah
   $(document).on('input', '.qty, .price', function() {
-    var row = $(this).closest('.main-tr'); // Temukan baris terdekat
-    var idDetailPenawaran = row.find('input[name="id_detail_penawaran[]"]').val(); // Dapatkan ID detail
-    var idProduk = row.find('select[name="id_produk[]"]').val(); // Dapatkan ID produk
-    var jumlah = row.find('.qty').val(); // Dapatkan jumlah
-    var hargaSatuan = unformatRupiah(row.find('.price').val()); // Dapatkan harga satuan tanpa format Rupiah
-
     updateTotal(); // Panggil fungsi untuk memperbarui total
     updateGrandTotal(); // Panggil fungsi untuk memperbarui grand total
   });
@@ -631,35 +613,27 @@ $(document).ready(function() {
     return tarif; // Mengembalikan tarif PPN
   }
 
-  // Fungsi untuk memastikan tarif PPN diatur saat halaman dimuat
-  function setPPNTarif() {
-    var selectedOption = $('#jenis_ppn').val();
-    if (selectedOption) {
-      var tarifPPN = getTarifPPN(selectedOption);
-      $('#tarif-ppn').text(tarifPPN);
-    }
-  }
-
   // Fungsi untuk memperbarui total harga
   function updateTotal() {
     var totalHarga = 0;
     $('#detail-table tr.main-tr').each(function() {
       var qty = parseFloat($(this).find('.qty').val()) || 0;
-      var price = parseFloat(unformatRupiah($(this).find('.price').val())) || 0;
+      var price = unformatRupiah($(this).find('.price').val()) || 0; // Unformat harga sebelum perhitungan
       var total = qty * price;
-      $(this).find('.total').text(formatRupiah(total)); // Atur teks pada elemen <td class="total">
+      $(this).find('.total').text(formatRupiah(total)); // Format dan atur teks pada elemen <td class="total">
       totalHarga += total; // Tambahkan total baris ke total harga
     });
-    $('#total-harga').text(formatRupiah(totalHarga)); // Atur teks total harga pada elemen dengan id "total-harga"
+    $('#total-harga').text(formatRupiah(
+      totalHarga)); // Format dan atur teks total harga pada elemen dengan id "total-harga"
   }
 
   // Fungsi untuk memperbarui grand total
   function updateGrandTotal() {
     var totalHarga = unformatRupiah($('#total-harga').text()) || 0;
-    var diskonPersen = unformatRupiah($('#diskon').val()) || 0;
+    var diskonPersen = parseFloat($('#diskon').val()) || 0;
     var diskon = (totalHarga * diskonPersen) / 100; // Hitung nilai diskon dari persentase
     var tarifPPN = parseFloat($('#tarif-ppn').text()) || 0;
-    var totalPPN = Math.round((totalHarga - diskon) * (tarifPPN / 100)); // Hitung dan bulatkan total PPN
+    var totalPPN = (totalHarga - diskon) * (tarifPPN / 100);
     var grandTotal = totalHarga - diskon + totalPPN; // Perhatikan pengurangan diskon dan penambahan total PPN
 
     // Memperbarui teks grand total pada elemen dengan id "grand-total"
@@ -674,9 +648,30 @@ $(document).ready(function() {
     // Memperbarui teks nilai total PPN pada elemen dengan id "total-ppn"
     $('#total-ppn').text(formatRupiah(totalPPN));
   }
-  // Panggil fungsi untuk menghitung total dan grand total saat halaman dimuat pertama kali
-  updateTotal();
-  updateGrandTotal();
+
+  $(document).on('change', '.id_pesanan_info', function() {
+    var id_pesanan = $(this).val();
+    var id_produk = $(this).find(':selected').data(
+      'id-produk'); // Mengambil data-id-produk dari opsi yang dipilih
+    var infoCell = $(this).closest('tr').find('.pesanan-info');
+
+    $.ajax({
+      url: 'getPesananInfo.php',
+      method: 'POST',
+      data: {
+        id_pesanan: id_pesanan,
+        id_produk: id_produk // Jika diperlukan untuk request AJAX
+      },
+      success: function(response) {
+        infoCell.html(response);
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX error:', status, error);
+        infoCell.html('<p>Gagal memuat data.</p>');
+      }
+    });
+  });
+
 });
 </script>
 
@@ -700,15 +695,16 @@ document.getElementById("tanggal").addEventListener("change", function() {
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         // Ubah nomor penawaran menjadi huruf kapital
-        var nomorPenawaran = this.responseText.toUpperCase();
-        document.getElementById("no_penawaran").value = nomorPenawaran;
+        var nomorFaktur = this.responseText.toUpperCase();
+        document.getElementById("no_faktur").value = nomorFaktur;
       }
     };
-    xhttp.open("GET", "<?= base_url("pages/quotation/getDocumentNumber.php") ?>?month=" + month + "&year=" + year,
+    xhttp.open("GET", "<?= base_url("pages/invoices/getDocumentNumber.php") ?>?month=" + month + "&year=" +
+      year,
       true);
     xhttp.send();
   } else {
-    document.getElementById("no_penawaran").value =
+    document.getElementById("no_faktur").value =
       ""; // Kosongkan nilai nomor penawaran jika tanggal tidak diisi
   }
 });
@@ -734,23 +730,12 @@ function previewAddImage(event) {
     cancelButton.style.display = "block";
   } else {
     let default_logo_path = "<?= base_url($default_logo_path) ?>";
-
-    // Periksa apakah default_logo_path tidak kosong
-    if (default_logo_path.trim() !== "") {
-      imgElement.src = default_logo_path;
-      imgElement.style.display = "block";
-      placeholderContainer.style.display = "none";
-      imagePreviewContainer.style.display = "block";
-      cancelButton.style.display = "block";
-      console.log("Using default image.");
-    } else {
-      // Jika default_logo_path kosong, sembunyikan preview
-      imgElement.style.display = "none";
-      placeholderContainer.style.display = "block";
-      imagePreviewContainer.style.display = "none";
-      cancelButton.style.display = "none";
-      console.log("No file selected and default image not available.");
-    }
+    imgElement.src = default_logo_path;
+    imgElement.style.display = "block";
+    placeholderContainer.style.display = "none";
+    imagePreviewContainer.style.display = "block";
+    cancelButton.style.display = "block";
+    console.log("No file selected. Using default image.");
   }
   console.log("Image preview updated.");
 }
@@ -845,21 +830,20 @@ function previewAddSignature(event) {
   } else {
     let default_signature_path = "<?= base_url($default_signature_path) ?>";
 
-    // Periksa apakah default_signature_path tidak kosong
-    if (default_signature_path.trim() !== "") {
+    if (default_signature_path.trim() !== "") { // Pengecekan jika default_signature_path tidak kosong
       signElement.src = default_signature_path;
       signElement.style.display = "block";
       signaturePlaceholderContainer.style.display = "none";
       signaturePreviewContainer.style.display = "block";
       cancelButtonSignature.style.display = "block";
-      console.log("Using default signature.");
+      console.log("No file selected. Using default signature.");
     } else {
-      // Jika default_signature_path kosong, sembunyikan preview
+      // Hide preview if default_signature_path is empty
       signElement.style.display = "none";
       signaturePlaceholderContainer.style.display = "block";
       signaturePreviewContainer.style.display = "none";
       cancelButtonSignature.style.display = "none";
-      console.log("No file selected and default signature not available.");
+      console.log("No default signature path provided. Signature preview not displayed.");
     }
   }
   console.log("Signature preview updated.");
@@ -931,5 +915,4 @@ function toggleChangeSignatureButton(visible) {
   }
 }
 </script>
-
 <?php endif; require '../../includes/footer.php'; ?>

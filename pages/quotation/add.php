@@ -20,8 +20,8 @@ if ($category_param === 'outgoing') {
 
 // Khusus Outgoing
 if ($category_param === 'outgoing') {
-  $default_logo_path = "";
-  $default_signature_path = "";
+  $default_logo_path = "assets/image/uploads/logo/no_logo.png";
+  $default_signature_path = "assets/image/uploads/signature/no_signature.png";
   
   // Ambil path logo dan path signature terbaru dari tabel penawaran_harga (Kategori = keluar)
   $data = selectData("penawaran_harga", "kategori = 'keluar' AND logo IS NOT NULL AND logo != ''", "tanggal DESC", "1");
@@ -43,9 +43,6 @@ if ($category_param === 'outgoing') {
           // Jika nilai Path tidak kosong, gunakan nilai tersebut
           if (!empty($pair[1])) {
             $default_signature_path = $pair[1];
-          } else {
-            // Jika nilai Path kosong, set default path
-            $default_signature_path = "assets/image/uploads/signature/no_signature.png";
           }
           break; // Keluar dari loop setelah menemukan path
         }
@@ -97,9 +94,11 @@ if ($category_param === 'outgoing') {
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
           <p class="fs-2 text-end">Penawaran Harga</p>
+          <p class="fs-5 text-end text-info">[ OUTGOING ]</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Penawaran Harga Incoming</p>
+        <p class="fs-2 p-0">Penawaran Harga</p>
+        <p class="fs-5 text-info p-0">[ INCOMING ]</p>
         <?php } ?>
       </div>
 
@@ -218,7 +217,8 @@ if ($category_param === 'outgoing') {
           <div class="row mb-3">
             <label for="up" class="col-sm-3 col-form-label">U.P.</label>
             <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" id="up" name="up">
+              <input type="text" class="form-control form-control-sm" id="up" name="up"
+                placeholder='Opsional (Msl: "Bpk. John / Ibu. Grace")'>
             </div>
           </div>
         </div>

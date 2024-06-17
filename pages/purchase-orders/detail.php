@@ -86,6 +86,7 @@ if ($error_message): ?>
 
     <div class="row">
       <!-- Logo -->
+      <?php if ($category_param === 'outgoing') {?>
       <div class="col-md-6 p-0">
         <?php if (!empty($data['logo'])): ?>
         <div>
@@ -96,19 +97,24 @@ if ($error_message): ?>
       <!-- Judul Dokumen -->
       <div class="col-md-6 p-0">
         <p class="fs-2 text-end">Purchase Order</p>
+        <p class="fs-5 text-end text-info">[ OUTGOING ]</p>
       </div>
+      <?php } else { ?>
+      <p class="fs-2 p-0">Purchase Order</p>
+      <p class="fs-5 text-info p-0">[ INCOMING ]</p>
+      <?php } ?>
     </div>
 
     <div class="row justify-content-between align-items-end">
       <!-- Pengirim -->
-      <div class="col-md-7 p-0 mt-3">
+      <div class="col-md-5 p-0 mt-3">
         <p><?= strtoupper($data['nama_pengirim']) ?></p>
         <p><?= ucwords($data['alamat_pengirim']) ?></p>
         <p><?= "Telp: " . $data['telepon_pengirim'] . " Email: " . $data['email_pengirim']?></p>
       </div>
 
       <!-- Info Dokumen -->
-      <div class="col-md-5 p-0">
+      <div class="col-md-7 p-0">
         <div class="row justify-content-end">
           <div class="col-auto">
             <p>No.</p>
@@ -153,8 +159,11 @@ if ($error_message): ?>
     </div>
 
     <div class="row">
+      <?php if ($category_param == 'outgoing') : ?>
       <p class="p-0">Dengan hormat,</p>
       <p class="p-0">Dengan ini, kami mengajukan pesanan pembelian untuk produk/jasa yang tercantum di bawah ini. </p>
+      <?php endif; ?>
+
       <!-- Tampil detail produk -->
       <table class="table table-light table-striped">
         <thead>
@@ -244,15 +253,18 @@ if ($error_message): ?>
     </div>
     <?php endif; ?>
 
+    <?php if ($category_param == 'outgoing') : ?>
     <div class="row mb-3">
       <p>Demikian pesanan pembelian dari Kami, mohon diproses dengan baik. Apabila terdapat pertanyaan atau klarifikasi
         lebih lanjut mengenai pesanan ini, silakan hubungi kami. Kami sangat menghargai kerjasama dan dukungan yang
         berkelanjutan.</p>
       <p>Terima kasih atas perhatian dan kerjasamanya.</p>
     </div>
+    <?php endif; ?>
 
     <div class="row justify-content-end">
       <div class="col-md-5">
+        <?php if ($category_param == 'outgoing') : ?>
         <div class="row justify-content-center mb-3">
           <div class="col-auto">
             <?= isset($signatureDetails['Location']) ? ucfirst($signatureDetails['Location']) : '' ?>,
@@ -270,6 +282,7 @@ if ($error_message): ?>
           <div style="width: 100px; height: 100px"></div>
           <?php } ?>
         </div>
+        <?php endif; ?>
 
         <div class="row justify-content-center mb-3">
           <div class="col-auto"><?= isset($signatureDetails['Name']) ? ucwords($signatureDetails['Name']) : '' ?></div>

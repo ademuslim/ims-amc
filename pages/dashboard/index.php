@@ -288,7 +288,7 @@ $total_rejected_ph_outgoing_curent_year = count($data_ph);
   <div class="col">
     <div class="card custom-card d-flex flex-column h-100">
       <div class="card-body">
-        <h5 class="card-title">Selamat Datang, <?= ucwords($nama_pengguna); ?></h5>
+        <h5 class="card-title">Selamat Datang, <?= ucwords($nama_lengkap); ?></h5>
         <h6 class="card-subtitle">Invoice Management System, PT. MTG</h6>
       </div>
     </div>

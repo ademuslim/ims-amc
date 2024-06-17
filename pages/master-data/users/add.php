@@ -12,16 +12,17 @@
       <div class="modal-body">
         <form action="process.php" method="POST">
           <div class="row mb-3">
-            <label for="nama_pengguna" class="col-sm-3 col-form-label">Nama Pengguna:</label>
+            <label for="nama_lengkap" class="col-sm-3 col-form-label">Nama Lengkap:</label>
             <div class="col-sm-9">
-              <input type="text" class="auto-focus form-control form-control-sm" id="nama_pengguna" name="nama_pengguna"
+              <input type="text" class="auto-focus form-control form-control-sm" id="nama_lengkap" name="nama_lengkap"
                 required>
             </div>
           </div>
           <div class="row mb-3">
-            <label for="email" class="col-sm-3 col-form-label">Email:</label>
+            <label for="nama_pengguna" class="col-sm-3 col-form-label">Username:</label>
             <div class="col-sm-9">
-              <input type="email" class="form-control form-control-sm" id="email" name="email" required>
+              <input type="nama_pengguna" class="form-control form-control-sm" id="nama_pengguna" name="nama_pengguna"
+                required>
             </div>
           </div>
           <div class="row mb-3">
@@ -49,7 +50,7 @@
           </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         <button type="submit" class="btn btn-primary" name="add">Simpan</button>
         </form>
       </div>

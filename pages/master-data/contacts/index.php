@@ -21,11 +21,10 @@ if ($category_param === 'internal') {
     // Redirect atau tampilkan pesan error karena kategori tidak valid
 }
 
-// Sertakan header
 require '../../../includes/header.php';
 
-// Ambil data kontak sesuai dengan kategori yang dipilih
-$conditions = "kontak.kategori = '$category'";
+// Ambil data kontak sesuai dengan kategori yang dipilih dan status_hapus 0
+$conditions = "kontak.kategori = '$category' AND status_hapus = 0";
 $data_kontak = selectData('kontak', $conditions);
 ?>
 

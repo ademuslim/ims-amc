@@ -140,10 +140,6 @@ if (isset($_POST['add'])) {
     // Susun data signature info sebagai string
     $signature_info = "Location: $signing_location, Date: $signing_date, Name: $signer_name, Position: $signer_position, Path: $file_destination_signature";
 
-    // Ambil nilai bulan dan tahun dari tanggal faktur
-    $month = date('m', strtotime($tanggal));
-    $year = date('Y', strtotime($tanggal));
-
     // Buat ID faktur baru
     $id_faktur = Ramsey\Uuid\Uuid::uuid4()->toString();
 
@@ -176,9 +172,6 @@ if (isset($_POST['add'])) {
             // Generate UUID untuk id_detail_faktur
             $id_detail_faktur = Ramsey\Uuid\Uuid::uuid4()->toString();
 
-            // Generate no_pengiriman_barang untuk item ini
-            $no_pengiriman_barang = getLastShipmentNumber($id_faktur, 'spb', 'mtg', $month, $year);
-
             // Unformat harga satuan sebelum menyimpan ke database
             $harga_satuan_unformatted = unformatRupiah($harga_satuan[$i]);
 
@@ -186,7 +179,6 @@ if (isset($_POST['add'])) {
             $detail_produk = [
                 'id_detail_faktur' => $id_detail_faktur,
                 'id_faktur' => $id_faktur,
-                'no_pengiriman_barang' => $no_pengiriman_barang,
                 'id_produk' => $id_produk[$i], // Menggunakan indeks yang sama untuk setiap array
                 'jumlah' => $jumlah[$i], // Menggunakan indeks yang sama untuk setiap array
                 'harga_satuan' => $harga_satuan_unformatted, // Menggunakan nilai unformat untuk harga satuan

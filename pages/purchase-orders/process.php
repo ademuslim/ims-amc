@@ -206,9 +206,9 @@ if (isset($_POST['add'])) {
         }
 
         // Pencatatan log aktivitas
-        $aktivitas = 'Berhasil membuat PO baru';
-        $tabel = 'pesanan_pembelian';
-        $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil membuat PO baru dengan ID ' . $id_pesanan;
+        $aktivitas = 'Berhasil membuat PO';
+        $tabel = 'Pesanan Pembelian';
+        $keterangan = "Berhasil membuat pesanan pembelian baru dengan ID $id_pesanan";
         $log_data = [
             'id_pengguna' => $id_pengguna,
             'aktivitas' => $aktivitas,
@@ -217,11 +217,11 @@ if (isset($_POST['add'])) {
         ];
         insertData('log_aktivitas', $log_data);
 
-        $_SESSION['success_message'] = "PO berhasil dibuat.";
+        $_SESSION['success_message'] = "Pesanan pembelian berhasil dibuat.";
         header("Location: " . base_url("pages/purchase-orders/detail/$category_param/$id_pesanan"));
         exit();
     } else {
-        $_SESSION['error_message'] = "Gagal menyimpan data pesanan pembelian.";
+        $_SESSION['error_message'] = "Gagal membuat pesanan pembelian.";
         header("Location: " . base_url("pages/purchase-orders/add/$category_param"));
         exit();
     }
@@ -380,13 +380,11 @@ if (isset($_POST['add'])) {
     ];
     
     $conditions = "id_pesanan = '$id_pesanan'";
-
     $result = updateData('pesanan_pembelian', $data, $conditions);
 
-    // Periksa apakah pembaruan pesanan_harga berhasil
     if (!$result) {
-        // Jika gagal, tampilkan pesan kesalahan atau arahkan pengguna kembali ke halaman edit
-        $_SESSION['error_message'] = "Gagal memperbarui PO.";
+        // Jika gagal, tampilkan pesan kesalahan dan arahkan pengguna kembali ke halaman edit
+        $_SESSION['error_message'] = "Gagal memperbarui pesanan pembelian.";
         header("Location: index.php?category=$category_param");
         exit();
     }
@@ -398,7 +396,7 @@ if (isset($_POST['add'])) {
     $after = $newDataPO[0]; // Ambil baris pertama dari hasil query
 
     // Keterangan perubahan
-    $changeDescription = "Perubahan data PO: | ";
+    $changeDescription = "Perubahan data pesanan pembelian dengan ID $id_pesanan: | ";
 
     // Periksa setiap kolom untuk menemukan perubahan
     $counter = 1;
@@ -412,22 +410,20 @@ if (isset($_POST['add'])) {
     // Catat aktivitas
     $logData = [
       'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
-      'aktivitas' => 'Ubah Data PO',
-      'tabel' => 'pesanan_pembelian',
+      'aktivitas' => 'Berhasil ubah PO',
+      'tabel' => 'Pesanan Pembelian',
       'keterangan' => $changeDescription,
     ];
 
     insertData('log_aktivitas', $logData);
     
     // Lanjutkan edit detail
-    // Peroleh nilai-nilai dari detail pesanan
     $id_detail = $_POST['id_detail_pesanan'];
     $id_produk = $_POST['id_produk'];
     $jumlah = $_POST['jumlah'];
     $harga_satuan = $_POST['harga_satuan'];
 
     $id_penawaran = $_POST['id_penawaran'];
-
     $deleted_rows = isset($_POST['deleted_rows']) ? $_POST['deleted_rows'] : [];
 
     // Simpan semua data detail ke dalam array utama
@@ -499,9 +495,8 @@ if (isset($_POST['add'])) {
             'jumlah' => $detail['jumlah'],
             'harga_satuan' => $detail['harga_satuan'],
             'id_penawaran' => $detail['id_penawaran'],
-            // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
             'id_detail_pesanan' => $new_id_detail,
-            'id_pesanan' => $id_pesanan,
+            'id_pesanan' => $id_pesanan
         ];
         insertData('detail_pesanan', $data);
     }
@@ -512,8 +507,7 @@ if (isset($_POST['add'])) {
             'id_produk' => $detail['id_produk'],
             'jumlah' => $detail['jumlah'],
             'harga_satuan' => $detail['harga_satuan'],
-            'id_penawaran' => $detail['id_penawaran'],
-            // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
+            'id_penawaran' => $detail['id_penawaran']
         ];
         updateData('detail_pesanan', $data, "id_detail_pesanan = '{$detail['id_detail_pesanan']}'");
     }
@@ -523,7 +517,54 @@ if (isset($_POST['add'])) {
     // Redirect ke halaman detail setelah proses edit selesai
     header("Location: " . base_url("pages/purchase-orders/detail/$category_param/$id_pesanan"));
     exit();
-} else {
+} elseif (isset($_POST['approve'])) {
+    // Ambil data dari form
+    $id_pesanan = $_POST['id_pesanan'];
+    $status = $_POST['status'];
+    $kategori = $_POST['kategori'];
+    // Tentukan $category_param berdasarkan nilai $kategori
+    $category_param = $kategori === "keluar" ? "outgoing" : ($kategori === "masuk" ? "incoming" : die("Invalid category"));
+
+    // Ambil data lama sebelum status diubah
+    $oldDataPO = selectData('pesanan_pembelian', 'id_pesanan = ?', '', '', [['type' => 's', 'value' => $id_pesanan]]);
+
+    $data = [
+        'status' => $status
+    ];
+
+    $conditions = "id_pesanan = '$id_pesanan'";
+
+    $result = updateData('pesanan_pembelian', $data, $conditions);
+
+    $newDataPO = selectData('pesanan_pembelian', 'id_pesanan = ?', '', '', [['type' => 's', 'value' => $id_pesanan]]);
+
+    // Data sebelum dan sesudah perubahan untuk log
+    $before = $oldDataPO[0]; // Ambil baris pertama dari hasil query
+    $after = $newDataPO[0]; // Ambil baris pertama dari hasil query
+
+    // Keterangan perubahan
+    $changeDescription = "Perubahan status pesanan pembelian dengan ID $id_pesanan: | ";
+
+    foreach ($before as $column => $value) {
+        if ($value !== $after[$column]) {
+            $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
+        }
+    }
+    
+    // Catat aktivitas
+    $logData = [
+        'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'aktivitas' => 'Berhasil ubah status PO',
+        'tabel' => 'Pesanan Pembelian',
+        'keterangan' => $changeDescription,
+    ];
+
+    insertData('log_aktivitas', $logData);
+
+    $_SESSION['success_message'] = "Berhasil memperbarui status purchase order.";
+    header("Location: " . base_url("pages/purchase-orders/$category_param"));
+    exit();
+}else {
     // Jika tidak ada data yang diterima, arahkan ke index.php
     header("Location: " . base_url("pages/purchase-orders/$category_param"));
     exit();

@@ -22,8 +22,8 @@ if ($category_param === 'outgoing') {
 
 // Khusus Outgoing
 if ($category_param === 'outgoing') {
-  $default_logo_path = "";
-  $default_signature_path = "";
+  $default_logo_path = "assets/image/uploads/logo/no_logo.png";
+  $default_signature_path = "assets/image/uploads/signature/no_signature.png";
   
   // Ambil path logo dan path signature terbaru dari tabel penawaran_harga (Kategori = keluar)
   $data = selectData("penawaran_harga", "kategori = 'keluar' AND logo IS NOT NULL AND logo != ''", "tanggal DESC", "1");
@@ -45,9 +45,6 @@ if ($category_param === 'outgoing') {
           // Jika nilai Path tidak kosong, gunakan nilai tersebut
           if (!empty($pair[1])) {
             $default_signature_path = $pair[1];
-          } else {
-            // Jika nilai Path kosong, set default path
-            $default_signature_path = "assets/image/uploads/signature/no_signature.png";
           }
           break; // Keluar dari loop setelah menemukan path
         }
@@ -99,9 +96,11 @@ if ($category_param === 'outgoing') {
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
           <p class="fs-2 text-end">Purchase Order</p>
+          <p class="fs-5 text-end text-info">[ OUTGOING ]</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Purchase Order Incoming</p>
+        <p class="fs-2 p-0">Purchase Order</p>
+        <p class="fs-5 text-info p-0">[ INCOMING ]</p>
         <?php } ?>
       </div>
 
@@ -234,7 +233,9 @@ if ($category_param === 'outgoing') {
           <thead>
             <tr class="fw-bolder">
               <td>No.</td>
-              <td>No. Penawaran Harga</td>
+              <td>No. Penawaran Harga<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Penawaran Harga dengan status disetujui.">*</a></td>
               <td>Nama Produk<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
                   data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
                   data-bs-title="Pilih produk sesuai Penawaran Harga yang dipilih">*</a></td>
@@ -260,14 +261,14 @@ if ($category_param === 'outgoing') {
                     ['produk', 'detail_penawaran.id_produk = produk.id_produk']
                   ];
                   $columns = 'penawaran_harga.id_penawaran, penawaran_harga.no_penawaran, produk.nama_produk'; // Gunakan DISTINCT untuk menghindari duplikat
-                  $conditions = "penawaran_harga.kategori = '$category_ph'";
+                  $conditions = "penawaran_harga.kategori = '$category_ph' AND penawaran_harga.status = 'disetujui' AND penawaran_harga.status_hapus = 0";
 
                   // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
                   $ph = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 
                   // Loop melalui hasil query dan tampilkan dalam opsi dropdown
                   foreach ($ph as $row_ph) {
-                    echo '<option value="' . $row_ph['id_penawaran'] . '">' . strtoupper($row_ph['no_penawaran']) . " (" . ucwords($row_ph['nama_produk']) . ")" . '</option>';
+                    echo '<option value="' . $row_ph['id_penawaran'] . '">' . strtoupper($row_ph['no_penawaran']) . " (" . strtoupper($row_ph['nama_produk']) . ")" . '</option>';
                   }
                 ?>
                 </select>
@@ -279,7 +280,7 @@ if ($category_param === 'outgoing') {
                   <?php
                     $produk = selectData("produk");
                     foreach ($produk as $row_produk) {
-                        echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
+                        echo '<option value="' . $row_produk['id_produk'] . '">' . strtoupper($row_produk['nama_produk']) . '</option>';
                     }
                   ?>
                 </select>
@@ -513,7 +514,7 @@ $(document).ready(function() {
     var produkOptions = '<?php
       $produk = selectData("produk");
       foreach ($produk as $row_produk) {
-          echo '<option value="' . $row_produk['id_produk'] . '">' . $row_produk['nama_produk'] . '</option>';
+        echo '<option value="' . $row_produk['id_produk'] . '">' . strtoupper($row_produk['nama_produk']) . '</option>';
       }
     ?>';
 
@@ -523,15 +524,15 @@ $(document).ready(function() {
           ['detail_penawaran', 'penawaran_harga.id_penawaran = detail_penawaran.id_penawaran'],
           ['produk', 'detail_penawaran.id_produk = produk.id_produk'] // Perbaiki join ke tabel produk
         ];
-        $columns = 'penawaran_harga.id_penawaran, penawaran_harga.no_penawaran, produk.nama_produk'; // Gunakan DISTINCT untuk menghindari duplikat
-        $conditions = "penawaran_harga.kategori = '$category_ph'";
+        $columns = 'penawaran_harga.id_penawaran, penawaran_harga.no_penawaran, produk.nama_produk';
+        $conditions = "penawaran_harga.kategori = '$category_ph' AND penawaran_harga.status = 'disetujui' AND penawaran_harga.status_hapus = 0";
 
         // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
         $ph = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 
         // Loop melalui hasil query dan tampilkan dalam opsi dropdown
         foreach ($ph as $row_ph) {
-          echo '<option value="' . $row_ph['id_penawaran'] . '">' . $row_ph['no_penawaran'] . " (" . $row_ph['nama_produk'] . ")" . '</option>';
+          echo '<option value="' . $row_ph['id_penawaran'] . '">' . strtoupper($row_ph['no_penawaran']) . " (" . strtoupper($row_ph['nama_produk']) . ")" . '</option>';
         }
     ?>';
 
@@ -541,7 +542,7 @@ $(document).ready(function() {
           <td>${rowCount}</td>
           <td>
             <select class="form-select form-select-sm" id="id_penawaran" name="id_penawaran[]" required>
-                <option value="" selected disabled>-- Pilih No PH. --</option>
+                <option value="" selected disabled>-- Pilih No Penawaran Harga. --</option>
                 ${phOptions}
             </select>
           </td>

@@ -7,6 +7,7 @@ require '../includes/vendor/autoload.php';
 if(isset($_SESSION['id_pengguna'])){
     // Simpan id_pengguna sebelum dihapus dari sesi
     $id_pengguna = $_SESSION['id_pengguna'];
+    $nama_pengguna = $_SESSION['nama_pengguna'];
 } else {
     // Jika tidak ada id_pengguna dalam sesi, set nilai default
     $id_pengguna = 'unknown';
@@ -25,9 +26,9 @@ session_destroy();
 
 // Pencatatan log aktivitas
 $aktivitas = 'Log Out';
-$keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' keluar dari sistem.';
+$keterangan = 'Pengguna dengan username ' . $nama_pengguna . ' keluar dari sistem.';
 $log_data = [
-    'id_pengguna' => $id_pengguna, // Menambahkan id_pengguna dalam pencatatan log
+    'id_pengguna' => $id_pengguna,
     'aktivitas' => $aktivitas,
     'keterangan' => $keterangan,
 ];

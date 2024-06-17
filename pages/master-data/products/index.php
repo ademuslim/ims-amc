@@ -2,7 +2,7 @@
 $page_title = "Products";
 require '../../../includes/header.php';
 
-$data_produk = selectData('produk');
+$data_produk = selectData('produk', 'status_hapus = 0');
 ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Produk</h1>

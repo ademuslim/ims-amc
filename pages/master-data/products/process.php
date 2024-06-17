@@ -42,9 +42,9 @@ if (isset($_POST['add'])) {
       $_SESSION['success_message'] = "Produk berhasil ditambahkan!";
 
       // Pencatatan log aktivitas
-      $aktivitas = 'Berhasil tambah produk';
-      $tabel = 'produk';
-      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil tambah produk dengan ID ' . $id_produk;
+      $aktivitas = 'Berhasil tambah data';
+      $tabel = 'Produk';
+      $keterangan = "Berhasil tambah produk dengan ID $id_produk";
       $log_data = [
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
@@ -57,9 +57,9 @@ if (isset($_POST['add'])) {
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan produk.";
 
       // Pencatatan log aktivitas
-      $aktivitas = 'Gagal tambah produk';
-      $tabel = 'produk';
-      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal tambah produk dengan nama produk ' . $nama_produk;
+      $aktivitas = 'Gagal tambah data';
+      $tabel = 'Produk';
+      $keterangan = "Gagal tambah produk dengan nama $nama_produk";
       $log_data = [
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
@@ -117,7 +117,7 @@ if (isset($_POST['add'])) {
       $after = $newData[0]; // Ambil baris pertama dari hasil query
 
       // Keterangan perubahan
-      $changeDescription = "Perubahan data produk: | ";
+      $changeDescription = "Perubahan data produk dengan ID $id_produk: | ";
 
       // Periksa setiap kolom untuk menemukan perubahan
       $counter = 1;
@@ -131,8 +131,8 @@ if (isset($_POST['add'])) {
       // Catat aktivitas
       $logData = [
         'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
-        'aktivitas' => 'Ubah Data Produk',
-        'tabel' => 'produk',
+        'aktivitas' => "Berhasil ubah data",
+        'tabel' => 'Produk',
         'keterangan' => $changeDescription,
       ];
 

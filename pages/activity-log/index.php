@@ -35,9 +35,8 @@ $data_log_aktivitas = selectDataLeftJoin($mainTable, $joinTables, $columns, $con
   <thead>
     <tr>
       <th class="text-start">No.</th>
-      <th>ID Pengguna</th>
       <th>Nama Pengguna</th>
-      <th>Tanggal</th>
+      <th>Waktu</th>
       <th>Aktivitas</th>
       <th>Data Tabel</th>
       <th>Keterangan</th>
@@ -52,8 +51,7 @@ $data_log_aktivitas = selectDataLeftJoin($mainTable, $joinTables, $columns, $con
     <?php else: $no = 1; foreach ($data_log_aktivitas as $log): ?>
     <tr>
       <td class="text-start"><?= $no; ?></td>
-      <td><?= $log['id_pengguna']; ?></td>
-      <td><?= isset($log['nama_pengguna']) ? ucwords($log['nama_pengguna']) : 'N/A'; ?></td>
+      <td><?= isset($log['nama_pengguna']) ? $log['nama_pengguna'] : 'N/A'; ?></td>
       <td><?= $log['tanggal']; ?></td>
       <td><?= $log['aktivitas']; ?></td>
       <td><?= $log['tabel'] ? ucwords($log['tabel']) : '-'; ?></td>

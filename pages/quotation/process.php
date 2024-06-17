@@ -3,7 +3,7 @@ require '../../includes/function.php';
 require '../../includes/vendor/autoload.php';
 
 // Ambil id_pengguna dari sesi atau cookie untuk pencatatan log aktivitas
-$id_pengguna = $id_pengguna ?? $_COOKIE['ingat_user_id'] ?? '';
+$id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
 
 if (isset($_POST['add'])) {
     $pengirim = $_POST['pengirim'];
@@ -24,7 +24,6 @@ if (isset($_POST['add'])) {
     $file_destination_logo = $file_destination_signature = null;
     
     if ($category_param === 'outgoing') {
-
         // Inisialisasi nilai defaultLogoPath dan defaultSignaturePath untuk dokumen outgoing
         $defaultLogoPath = $defaultSignaturePath = null;
 
@@ -70,7 +69,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_logo = "assets/image/uploads/logo/" . $file_name;
+                    $file_destination_logo = "../../assets/image/uploads/logo/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_logo)) {
@@ -110,7 +109,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['signature']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_signature = "assets/image/uploads/signature/" . $file_name;
+                    $file_destination_signature = "../../assets/image/uploads/signature/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_signature)) {
@@ -200,9 +199,9 @@ if (isset($_POST['add'])) {
         }
 
         // Pencatatan log aktivitas
-        $aktivitas = 'Berhasil membuat penawaran harga baru';
-        $tabel = 'penawaran_harga';
-        $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil membuat penawaran harga baru dengan ID ' . $id_penawaran;
+        $aktivitas = 'Berhasil membuat PH';
+        $tabel = 'Penawaran Harga';
+        $keterangan = "Berhasil membuat penawaran harga baru dengan ID $id_penawaran";
         $log_data = [
             'id_pengguna' => $id_pengguna,
             'aktivitas' => $aktivitas,
@@ -212,11 +211,11 @@ if (isset($_POST['add'])) {
         insertData('log_aktivitas', $log_data);
         
         // Jika berhasil disimpan, arahkan pengguna ke halaman detail
-        $_SESSION['success_message'] = "Berhasil menyimpan data penawaran harga.";
+        $_SESSION['success_message'] = "Penawaran harga berhasil dibuat.";
         header("Location: " . base_url("pages/quotation/detail/$category_param/$id_penawaran"));
         exit();
     } else {
-        $_SESSION['error_message'] = "Gagal menyimpan data penawaran harga.";
+        $_SESSION['error_message'] = "Gagal membuat penawaran harga.";
         header("Location: " . base_url("pages/quotation/add/$category_param"));
     }
 // Edit Data
@@ -282,7 +281,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_logo = "assets/image/uploads/logo/" . $file_name;
+                    $file_destination_logo = "../../assets/image/uploads/logo/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_logo)) {
@@ -322,7 +321,7 @@ if (isset($_POST['add'])) {
                     // Generate nama file acak dan unik
                     $file_extension = pathinfo($_FILES['signature']['name'], PATHINFO_EXTENSION);
                     $file_name = uniqid() . '_' . date('Ymd') . '.' . $file_extension;
-                    $file_destination_signature = "assets/image/uploads/signature/" . $file_name;
+                    $file_destination_signature = "../../assets/image/uploads/signature/" . $file_name;
 
                     // Pindahkan file dari temp ke lokasi tujuan
                     if (move_uploaded_file($file_tmp, $file_destination_signature)) {
@@ -376,8 +375,14 @@ if (isset($_POST['add'])) {
     ];
     
     $conditions = "id_penawaran = '$id_penawaran'";
-
     $result = updateData('penawaran_harga', $data, $conditions);
+
+    if (!$result) {
+        // Jika gagal, tampilkan pesan kesalahan dan arahkan pengguna kembali ke halaman edit
+        $_SESSION['error_message'] = "Gagal memperbarui penawaran harga.";
+        header("Location: " . base_url("pages/quotation/edit/$category_param/$id_penawaran"));
+        exit();
+    }
 
     $newDataPH = selectData('penawaran_harga', 'id_penawaran = ?', '', '', [['type' => 's', 'value' => $id_penawaran]]);
 
@@ -386,7 +391,7 @@ if (isset($_POST['add'])) {
     $after = $newDataPH[0]; // Ambil baris pertama dari hasil query
 
     // Keterangan perubahan
-    $changeDescription = "Perubahan data penawaran harga: | ";
+    $changeDescription = "Perubahan data penawaran harga dengan ID $id_penawaran: | ";
 
     // Periksa setiap kolom untuk menemukan perubahan
     $counter = 1;
@@ -399,25 +404,15 @@ if (isset($_POST['add'])) {
     
     // Catat aktivitas
     $logData = [
-      'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
-      'aktivitas' => 'Ubah Data PH',
-      'tabel' => 'penawaran harga',
-      'keterangan' => $changeDescription,
+        'id_pengguna' => $id_pengguna,
+        'aktivitas' => 'Berhasil ubah PH',
+        'tabel' => 'Penawaran Harga',
+        'keterangan' => $changeDescription,
     ];
 
     insertData('log_aktivitas', $logData);
-
-    // Periksa apakah pembaruan penawaran_harga berhasil
-    if (!$result) {
-        // Jika gagal, tampilkan pesan kesalahan atau arahkan pengguna kembali ke halaman edit
-        $_SESSION['error_message'] = "Gagal memperbarui penawaran harga.";
-        header("Location: " . base_url("pages/quotation/edit/$category_param/$id_penawaran"));
-        exit();
-    }
     
     // Lanjutkan edit detail
-
-    // Peroleh nilai-nilai dari detail penawaran
     $id_detail = $_POST['id_detail_penawaran'];
     $id_produk = $_POST['id_produk'];
     $jumlah = $_POST['jumlah'];
@@ -434,20 +429,6 @@ if (isset($_POST['add'])) {
             'harga_satuan' => unformatRupiah($harga_satuan[$index])
         ];
     }
-
-    // // Tampilkan isi dari array $all_details untuk debugging
-    // echo "Isi dari all_details sebelum penghapusan:";
-    // echo "<pre>";
-    // var_dump($all_details);
-    // echo "</pre>";
-    // // exit();
-
-    // // Tampilkan isi dari array $deleted_rows untuk debugging
-    // echo "Isi dari deleted_rows:";
-    // echo "<pre>";
-    // var_dump($deleted_rows);
-    // echo "</pre>";
-    // // exit();
 
     // Hapus baris yang ada dalam deleted_rows
     foreach ($deleted_rows as $deleted_row) {
@@ -472,17 +453,6 @@ if (isset($_POST['add'])) {
         }
     }
 
-    // // Tampilkan isi dari array $add_detail dan $update_detail untuk debugging
-    // echo "Isi dari add_detail (baris baru):";
-    // echo "<pre>";
-    // var_dump($add_detail);
-    // echo "</pre>";
-
-    // echo "Isi dari update_detail (baris yang harus diperbarui):";
-    // echo "<pre>";
-    // var_dump($update_detail);
-    // echo "</pre>";
-
     // Lakukan operasi tambah data
     foreach ($add_detail as $detail) {
         try {
@@ -492,9 +462,8 @@ if (isset($_POST['add'])) {
                 'id_produk' => $detail['id_produk'],
                 'jumlah' => $detail['jumlah'],
                 'harga_satuan' => $detail['harga_satuan'],
-                // tambahkan kolom lain yang diperlukan sesuai dengan struktur tabel
                 'id_detail_penawaran' => $new_id_detail,
-                'id_penawaran' => $id_penawaran,
+                'id_penawaran' => $id_penawaran
             ];
             insertData('detail_penawaran', $data);
         } catch (Exception $e) {
@@ -524,6 +493,53 @@ if (isset($_POST['add'])) {
     // Jika berhasil disimpan, arahkan pengguna ke halaman detail
     $_SESSION['success_message'] = "Berhasil mengubah data penawaran harga.";
     header("Location: " . base_url("pages/quotation/detail/$category_param/$id_penawaran"));
+    exit();
+} elseif (isset($_POST['approve'])) {
+    // Ambil data dari form
+    $id_penawaran = $_POST['id_penawaran'];
+    $status = $_POST['status'];
+    $kategori = $_POST['kategori'];
+    // Tentukan $category_param berdasarkan nilai $kategori
+    $category_param = $kategori === "keluar" ? "outgoing" : ($kategori === "masuk" ? "incoming" : die("Invalid category"));
+
+    // Ambil data lama sebelum status diubah
+    $oldDataPH = selectData('penawaran_harga', 'id_penawaran = ?', '', '', [['type' => 's', 'value' => $id_penawaran]]);
+
+    $data = [
+        'status' => $status
+    ];
+
+    $conditions = "id_penawaran = '$id_penawaran'";
+
+    $result = updateData('penawaran_harga', $data, $conditions);
+
+    $newDataPH = selectData('penawaran_harga', 'id_penawaran = ?', '', '', [['type' => 's', 'value' => $id_penawaran]]);
+
+    // Data sebelum dan sesudah perubahan untuk log
+    $before = $oldDataPH[0]; // Ambil baris pertama dari hasil query
+    $after = $newDataPH[0]; // Ambil baris pertama dari hasil query
+
+    // Keterangan perubahan
+    $changeDescription = "Perubahan status penawaran harga dengan ID $id_penawaran: | ";
+
+    foreach ($before as $column => $value) {
+        if ($value !== $after[$column]) {
+            $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
+        }
+    }
+    
+    // Catat aktivitas
+    $logData = [
+        'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'aktivitas' => 'Berhasil ubah status PH',
+        'tabel' => 'Penawaran Harga',
+        'keterangan' => $changeDescription,
+    ];
+
+    insertData('log_aktivitas', $logData);
+
+    $_SESSION['success_message'] = "Berhasil memperbarui status penawaran harga.";
+    header("Location: " . base_url("pages/quotation/$category_param"));
     exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php

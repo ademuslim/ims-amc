@@ -47,6 +47,7 @@ if ($category_param === 'outgoing') {
             $default_signature_path = $pair[1];
           } else {
             // Jika nilai Path kosong, set default path
+            
             $default_signature_path = "../../assets/image/uploads/signature/no_signature.png";
           }
           break; // Keluar dari loop setelah menemukan path
@@ -239,7 +240,7 @@ if ($category_param === 'outgoing') {
 
               <td>
                 <select class="form-select form-select-sm id_pesanan_info" id="id_pesanan" name="id_pesanan[]" required>
-                  <option value="" selected disabled>-- Pilih No. PO. --</option>
+                  <option value="" selected disabled>-- Pilih PO. --</option>
                   <?php
                     $mainTable = 'pesanan_pembelian';
                     $joinTables = [
@@ -247,21 +248,22 @@ if ($category_param === 'outgoing') {
                         ['produk', 'detail_pesanan.id_produk = produk.id_produk']
                     ];
                     $columns = 'pesanan_pembelian.id_pesanan, pesanan_pembelian.no_pesanan, produk.nama_produk, produk.id_produk';
-                    $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0 AND pesanan_pembelian.status = 'diproses'";
+                    $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0 AND pesanan_pembelian.status = 'diproses' AND pesanan_pembelian.status_hapus = 0";
                     $orderBy = 'pesanan_pembelian.tanggal DESC, produk.nama_produk ASC';
                     $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);
 
                     foreach ($po as $row_po) {
                         echo '<option value="' . $row_po['id_pesanan'] . '" data-id-produk="' . $row_po['id_produk'] . '">' 
-                            . strtoupper($row_po['no_pesanan']) . " (" . ucwords($row_po['nama_produk']) . ")" 
+                            . strtoupper($row_po['no_pesanan']) . " (" . strtoupper($row_po['nama_produk']) . ")" 
                             . '</option>';
                     }
                   ?>
                 </select>
                 <div class="pesanan-info">
-                  <!-- Info di_pesanan yang terpilih akan ditampilkan di sini -->
+                  <!-- Info pesanan yang terpilih akan ditampilkan di sini -->
                 </div>
               </td>
+
               <td>
                 <select class="form-select form-select-sm" id="id_produk" name="id_produk[]" required>
                   <option value="" selected disabled>-- Pilih Produk --</option>
@@ -275,11 +277,12 @@ if ($category_param === 'outgoing') {
                     $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 
                     foreach ($produk as $row_produk) {
-                      echo '<option value="' . $row_produk['id_produk'] . '">' . ucwords($row_produk['nama_produk']) . '</option>';
+                      echo '<option value="' . $row_produk['id_produk'] . '">' . strtoupper($row_produk['nama_produk']) . '</option>';
                     }
                   ?>
                 </select>
               </td>
+
               <td>
                 <input type="number" name="jumlah[]" class="form-control form-control-sm qty" min="1" required>
               </td>
@@ -509,12 +512,12 @@ $(document).ready(function() {
       $joinTables = [
           ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
       ];
-      $columns = 'produk.id_produk, produk.nama_produk';
+      $columns = 'DISTINCT produk.id_produk, produk.nama_produk';
       $conditions = "detail_pesanan.sisa_pesanan > 0";
       $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 
       foreach ($produk as $row_produk) {
-        echo '<option value="' . $row_produk['id_produk'] . '">' . ucwords($row_produk['nama_produk']) . '</option>';
+        echo '<option value="' . $row_produk['id_produk'] . '">' . strtoupper($row_produk['nama_produk']) . '</option>';
       }
     ?>';
 
@@ -525,15 +528,16 @@ $(document).ready(function() {
           ['produk', 'detail_pesanan.id_produk = produk.id_produk']
         ];
         $columns = 'pesanan_pembelian.id_pesanan, pesanan_pembelian.no_pesanan, produk.nama_produk, produk.id_produk';
-        $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0";
+        $conditions = "pesanan_pembelian.kategori = '$category_po' AND detail_pesanan.sisa_pesanan > 0 AND pesanan_pembelian.status = 'diproses' AND pesanan_pembelian.status_hapus = 0";
+        $orderBy = 'pesanan_pembelian.tanggal DESC, produk.nama_produk ASC';
 
         // Fungsi selectDataJoin Anda mungkin perlu penyesuaian untuk menerima parameter DISTINCT
-        $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
+        $po = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);
 
         // Loop melalui hasil query dan tampilkan dalam opsi dropdown
         foreach ($po as $row_po) {
           echo '<option value="' . $row_po['id_pesanan'] . '" data-id-produk="' . $row_po['id_produk'] . '">' 
-              . strtoupper($row_po['no_pesanan']) . " (" . ucwords($row_po['nama_produk']) . ")" 
+              . strtoupper($row_po['no_pesanan']) . " (" . strtoupper($row_po['nama_produk']) . ")" 
               . '</option>';
           }
     ?>';
@@ -544,7 +548,7 @@ $(document).ready(function() {
           <td>${rowCount}</td>
           <td>
               <select class="form-select form-select-sm id_pesanan_info" id="id_pesanan" name="id_pesanan[]" required>
-                <option value="" selected disabled>-- Pilih Pesanan Pembelian. --</option>
+                <option value="" selected disabled>-- Pilih PO. --</option>
                 ${poOptions}
               </select>
               <div class="pesanan-info">
@@ -656,11 +660,12 @@ $(document).ready(function() {
     var infoCell = $(this).closest('tr').find('.pesanan-info');
 
     $.ajax({
-      url: 'getPesananInfo.php',
+      url: '<?= base_url("pages/invoices/getPesananInfo.php") ?>',
+
       method: 'POST',
       data: {
         id_pesanan: id_pesanan,
-        id_produk: id_produk // Jika diperlukan untuk request AJAX
+        id_produk: id_produk
       },
       success: function(response) {
         infoCell.html(response);

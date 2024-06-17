@@ -23,37 +23,39 @@ if (isset($_GET['id'])) {
         // Jika data digunakan dalam tabel lain, tampilkan pesan error
         $_SESSION['error_message'] = "Data sedang digunakan dalam data lain dan tidak dapat dihapus.";
     } else {
-        $result1 = deleteData('detail_pesanan', "id_pesanan = '$id_pesanan'");
-        if ($result1 > 0) {
-            $result2 = deleteData('pesanan_pembelian', "id_pesanan = '$id_pesanan'");
-            if ($result2 > 0) {
-                // Jika berhasil menghapus, tampilkan pesan sukses
-                $_SESSION['success_message'] = "Data PO berhasil dihapus!";
+        $table = 'pesanan_pembelian';
+        $data = [
+            'status_hapus' => 1
+        ];
+        $conditions = "id_pesanan = '$id_pesanan'";
 
-                // Pencatatan log aktivitas
-                $aktivitas = 'Berhasil hapus PO';
-                $tabel = 'pesanan_pembelian';
-                $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus PO dengan ID ' . $id_pesanan;
-                $log_data = [
-                    'id_pengguna' => $id_pengguna,
-                    'aktivitas' => $aktivitas,
-                    'tabel' => $tabel,
-                    'keterangan' => $keterangan
-                ];
-                insertData('log_aktivitas', $log_data);
-            } else {
-                $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data PO.";
-            }
-        }else {
-            $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data detail PO.";
+        $result = updateData($table, $data, $conditions);
+
+        if ($result > 0) {
+            // Jika berhasil menghapus, tampilkan pesan sukses
+            $_SESSION['success_message'] = "Data pesanan pembelian berhasil dihapus dari sistem, data tetap ada dalam database!";
+
+            // Pencatatan log aktivitas
+            $aktivitas = 'Berhasil hapus data';
+            $tabel = 'Pesanan Pembelian';
+            $keterangan = "Berhasil hapus pesanan pembelian dengan ID $id_pesanan, data tetap ada dalam database!";
+            $log_data = [
+                'id_pengguna' => $id_pengguna,
+                'aktivitas' => $aktivitas,
+                'tabel' => $tabel,
+                'keterangan' => $keterangan
+            ];
+            insertData('log_aktivitas', $log_data);
+        } else {
+            // Jika gagal menghapus, tampilkan pesan error
+            $_SESSION['error_message'] = "Data pesanan pembelian gagal dihapus dari sistem!";
         }
     }
 } else {
     // Jika tidak ada ID yang diberikan, tampilkan pesan error
-    $_SESSION['error_message'] = "ID pesanan tidak valid.";
+    $_SESSION['error_message'] = "ID pesanan pembelian tidak valid.";
 }
 
-// Redirect kembali ke index.php setelah proses selesai
 header("Location: index.php?category=$category_param");
 exit();
 ?>

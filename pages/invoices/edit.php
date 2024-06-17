@@ -52,6 +52,9 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
         }
       }
       $default_signature_path = $signatureInfo["Path"];
+      if ($default_signature_path == "") {
+        $default_signature_path = "assets/image/uploads/signature/no_signature.png";
+      }
     }
 
     // Detail pesanan berdasarkan id_faktur

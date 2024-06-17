@@ -15,13 +15,14 @@
             <label for="jenis_ppn" class="col-sm-3 col-form-label">Jenis PPN:</label>
             <div class="col-sm-9">
               <input type="text" class="auto-focus form-control form-control-sm" id="jenis_ppn" name="jenis_ppn"
-                required>
+                required placeholder="Misal: PPN 10%">
             </div>
           </div>
           <div class="row mb-3">
             <label for="tarif" class="col-sm-3 col-form-label">Tarif:</label>
             <div class="col-sm-9">
-              <input type="number" class="form-control form-control-sm" id="tarif" min="0" name="tarif" required>
+              <input type="number" class="form-control form-control-sm" id="tarif" min="0" name="tarif" required
+                placeholder="Misal: 10 (Untuk PPN 10%)">
             </div>
           </div>
           <div class="row mb-3">

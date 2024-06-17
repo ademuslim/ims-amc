@@ -15,14 +15,14 @@ if (isset($_POST['add'])) {
 
   // Pastikan kedua password tidak kosong
   if (empty($password) || empty($confirm_password)) {
-    $_SESSION['error_message'] = "Password dan Ulangi Password harus diisi.";
+    $error_message = "Password dan Ulangi Password harus diisi.";
     header("Location: " . base_url('pages/master-data/users'));
     exit();
   }
 
   // Periksa password dan ulangi password cocok
   if ($password !== $confirm_password) {
-      $_SESSION['error_message'] = "Password dan Ulangi Password tidak cocok.";
+      $error_message = "Password dan Ulangi Password tidak cocok.";
       header("Location: " . base_url('pages/master-data/users'));
       exit();
   }
@@ -50,7 +50,7 @@ if (isset($_POST['add'])) {
       $_SESSION['success_message'] = "Pengguna berhasil ditambahkan!";
 
       // Pencatatan log aktivitas
-      $aktivitas = 'Berhasil tambah data';
+      $aktivitas = 'Berhasil tambah pengguna';
       $tabel = 'Pengguna';
       $keterangan = 'Pengguna dengan username ' . $nama_pengguna_log . ' berhasil tambah pengguna dengan username ' . $nama_pengguna;
       $log_data = [
@@ -64,17 +64,17 @@ if (isset($_POST['add'])) {
       // Jika gagal, simpan pesan error ke dalam session
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan pengguna.";
   }
-}elseif (isset($_POST['edit'])) {
+} elseif (isset($_POST['edit'])) {
   // Ambil nilai-nilai dari form edit
   $id_pengguna = $_POST['id_pengguna'];
-  $nama_lengkap = strtolower($_POST['nama_lengkap']);
   $nama_pengguna = strtolower($_POST['nama_pengguna']);
+  $email = $_POST['email'];
   $password = $_POST['password'];
   $tipe_pengguna = $_POST['tipe_pengguna'];
 
   // Periksa apakah email sudah ada (kecuali untuk pengguna yang sedang diedit)
-  if (isValueExists('pengguna', 'nama_pengguna', $nama_pengguna, $id_pengguna, 'id_pengguna')) {
-    $_SESSION['error_message'] = "Username sudah terdaftar.";
+  if (isValueExists('pengguna', 'email', $email, $id_pengguna, 'id_pengguna')) {
+    $_SESSION['error_message'] = "Email sudah terdaftar.";
     header("Location: index.php");
     exit();
   }
@@ -84,8 +84,8 @@ if (isset($_POST['add'])) {
 
   // Data yang akan diupdate di tabel pengguna
   $data = [
-    'nama_lengkap' => $nama_lengkap,
     'nama_pengguna' => $nama_pengguna,
+    'email' => $email,
     'password' => $password,
     'tipe_pengguna' => $tipe_pengguna
   ];
@@ -124,8 +124,8 @@ if (isset($_POST['add'])) {
       
       // Catat aktivitas
       $logData = [
-        'id_pengguna' => $_SESSION['id_pengguna'],
-        'aktivitas' => 'Berhasil ubah data',
+        'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'aktivitas' => 'Ubah Data Pengguna',
         'tabel' => 'pengguna',
         'keterangan' => $changeDescription,
       ];

@@ -38,9 +38,9 @@ if (isset($_POST['add'])) {
       $_SESSION['success_message'] = "PPN berhasil ditambahkan!";
 
       // Pencatatan log aktivitas
-      $aktivitas = 'Berhasil tambah ppn';
-      $tabel = 'ppn';
-      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil tambah ppn dengan ID ' . $id_ppn;
+      $aktivitas = 'Berhasil tambah data';
+      $tabel = 'PPN';
+      $keterangan = "Berhasil tambah PPN dengan ID $id_ppn";
       $log_data = [
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
@@ -53,9 +53,9 @@ if (isset($_POST['add'])) {
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan PPN.";
 
       // Pencatatan log aktivitas
-      $aktivitas = 'Gagal tambah ppn';
-      $tabel = 'ppn';
-      $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal tambah ppn dengan jenis ppn ' . $jenis_ppn;
+      $aktivitas = 'Gagal tambah data';
+      $tabel = 'PPN';
+      $keterangan = "Gagal tambah PPN dengan jenis PPN $jenis_ppn";
       $log_data = [
           'id_pengguna' => $id_pengguna,
           'aktivitas' => $aktivitas,
@@ -107,7 +107,7 @@ if (isset($_POST['add'])) {
       $after = $newData[0]; // Ambil baris pertama dari hasil query
 
       // Keterangan perubahan
-      $changeDescription = "Perubahan data ppn: | ";
+      $changeDescription = "Perubahan data PPN dengan ID $id_ppn: | ";
 
       // Nomor urut untuk tanda "-"
       $counter = 1;
@@ -123,8 +123,8 @@ if (isset($_POST['add'])) {
       // Catat aktivitas
       $logData = [
         'id_pengguna' => $_SESSION['id_pengguna'], // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
-        'aktivitas' => 'Ubah Data ppn',
-        'tabel' => 'ppn',
+        'aktivitas' => 'Berhasil ubah data',
+        'tabel' => 'PPN',
         'keterangan' => $changeDescription,
       ];
 

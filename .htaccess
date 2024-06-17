@@ -35,6 +35,10 @@ RewriteRule ^pages/purchase-orders/outgoing/?$ pages/purchase-orders/index.php?c
 # Ubah /pages/invoices/outgoing menjadi /pages/invoices/index.php?category=outgoing
 RewriteRule ^pages/invoices/outgoing/?$ pages/invoices/index.php?category=outgoing [L]
 
+
+# Ubah /pages/delivery-order/outgoing menjadi /pages/delivery-order/index.php?category=outgoing
+RewriteRule ^pages/delivery-order/outgoing/?$ pages/delivery-order/index.php?category=outgoing [L]
+
 # Ubah /pages/quotation/incoming menjadi /pages/quotation/index.php?category=incoming
 RewriteRule ^pages/quotation/incoming/?$ pages/quotation/index.php?category=incoming [L]
 
@@ -43,6 +47,9 @@ RewriteRule ^pages/purchase-orders/incoming/?$ pages/purchase-orders/index.php?c
 
 # Ubah /pages/invoices/incoming menjadi /pages/invoices/index.php?category=incoming
 RewriteRule ^pages/invoices/incoming/?$ pages/invoices/index.php?category=incoming [L]
+
+# Ubah /pages/delivery-order/incoming menjadi /pages/delivery-order/index.php?category=incoming
+RewriteRule ^pages/delivery-order/incoming/?$ pages/delivery-order/index.php?category=incoming [L]
 
 # Ubah /pages/activity-log menjadi /pages/activity-log/index.php
 RewriteRule ^pages/activity-log/?$ pages/activity-log/index.php [L]
@@ -67,3 +74,8 @@ RewriteRule ^pages/purchase-orders/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/purcha
 RewriteRule ^pages/invoices/add/([a-z]+)$ pages/invoices/add.php?category=$1 [NC,L]
 RewriteRule ^pages/invoices/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/invoices/edit.php?category=$1&id=$2 [NC,L]
 RewriteRule ^pages/invoices/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/invoices/detail.php?category=$1&id=$2 [NC,L]
+
+# Delivery Order
+RewriteRule ^pages/delivery-order/add/([a-z]+)$ pages/delivery-order/add.php?category=$1 [NC,L]
+RewriteRule ^pages/delivery-order/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/delivery-order/edit.php?category=$1&id=$2 [NC,L]
+RewriteRule ^pages/delivery-order/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/delivery-order/detail.php?category=$1&id=$2 [NC,L]

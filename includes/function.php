@@ -110,24 +110,26 @@ function getUserRoleById($user_id) {
   return $tipe_pengguna;
 }
 
-// Fungsi otentikasi pengguna berdasarkan email dan password
-function authenticateUser($email, $password) {
+// Fungsi otentikasi pengguna berdasarkan nama_pengguna dan password
+function authenticateUser($username, $password) {
   global $conn; // Gunakan koneksi database dari objek global
 
-  // Ambil haquotationsh password dari database berdasarkan email
-  $query = "SELECT id_pengguna, tipe_pengguna, nama_pengguna, password FROM pengguna WHERE email = ?";
+  // Ambil password dari database berdasarkan nama_pengguna
+  $query = "SELECT id_pengguna, tipe_pengguna, nama_lengkap, nama_pengguna, password 
+            FROM pengguna 
+            WHERE nama_pengguna = ? AND status_hapus = 0";
   $stmt = mysqli_prepare($conn, $query);
-  mysqli_stmt_bind_param($stmt, "s", $email);
+  mysqli_stmt_bind_param($stmt, "s", $username);
   mysqli_stmt_execute($stmt);
   mysqli_stmt_store_result($stmt);
 
   // Bind result variables
-  mysqli_stmt_bind_result($stmt, $user_id, $user_role, $user_name, $hashed_password);
+  mysqli_stmt_bind_result($stmt, $user_id, $user_role, $full_name, $user_name, $hashed_password);
 
   // Fetch value
   mysqli_stmt_fetch($stmt);
 
-  // Periksa apakah ada baris yang cocok dengan email yang diberikan
+  // Periksa apakah ada baris yang cocok dengan nama_pengguna yang diberikan
   if (mysqli_stmt_num_rows($stmt) > 0) {
       // Verifikasi password
       if (password_verify($password, $hashed_password)) {
@@ -135,6 +137,7 @@ function authenticateUser($email, $password) {
           return array(
               'id_pengguna' => $user_id,
               'tipe_pengguna' => $user_role,
+              'nama_lengkap' => $full_name,
               'nama_pengguna' => $user_name
           );
       } else {
@@ -168,23 +171,23 @@ function authenticateByUserId($user_id) {
 
 
 // Fungsi tambah pengguna
-function register($id_pengguna, $nama_pengguna, $email, $password, $tipe_pengguna) {
+function register($id_pengguna, $nama_lengkap, $nama_pengguna, $password, $tipe_pengguna) {
   global $conn;
 
   $id_pengguna = $id_pengguna;
+  $nama_lengkap = $nama_lengkap;
   $nama_pengguna = $nama_pengguna;
-  $email = $email;
   $tipe_pengguna = $tipe_pengguna;
 
   // Hash password
   $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
   // Insert user data into database
-  $query = "INSERT INTO pengguna (id_pengguna, nama_pengguna, email, password, tipe_pengguna) VALUES (?, ?, ?, ?, ?)";
+  $query = "INSERT INTO pengguna (id_pengguna, nama_lengkap, nama_pengguna, password, tipe_pengguna) VALUES (?, ?, ?, ?, ?)";
   $stmt = mysqli_prepare($conn, $query);
   
   // Bind parameters
-  mysqli_stmt_bind_param($stmt, "sssss", $id_pengguna, $nama_pengguna, $email, $hashed_password, $tipe_pengguna);
+  mysqli_stmt_bind_param($stmt, "sssss", $id_pengguna, $nama_lengkap, $nama_pengguna, $hashed_password, $tipe_pengguna);
   
   // Execute statement
   $result = mysqli_stmt_execute($stmt);
@@ -599,6 +602,51 @@ function getLastDocumentNumber($tabel, $column, $order_by, $prefix, $suffix, $mo
     }
 
     return $new_doc_number;
+}
+
+function getLastShipmentNumber($id_faktur, $prefix, $suffix, $month, $year) {
+    global $conn;
+
+    // Query untuk mengambil nomor pengiriman barang terakhir dari detail_faktur
+    $query =    "SELECT no_pengiriman_barang 
+                FROM detail_faktur
+                JOIN faktur ON detail_faktur.id_faktur = faktur.id_faktur
+                WHERE YEAR(faktur.tanggal) = $year 
+                AND MONTH(faktur.tanggal) = $month 
+                AND faktur.id_faktur = '$id_faktur'
+                ORDER BY no_pengiriman_barang DESC LIMIT 1";
+
+    // Eksekusi query
+    $result = mysqli_query($conn, $query);
+
+    // Periksa apakah query berhasil dieksekusi
+    if (!$result) {
+        die("Error: " . mysqli_error($conn));
+    }
+
+    // Inisialisasi nomor pengiriman barang terbaru
+    $new_shipment_number = '';
+
+    // Periksa apakah ada hasil dari query
+    if (mysqli_num_rows($result) > 0) {
+        // Ambil nomor pengiriman barang terbaru
+        $row = mysqli_fetch_assoc($result);
+        $last_number = $row['no_pengiriman_barang'];
+
+        // Split nomor pengiriman barang terbaru untuk mendapatkan nomor
+        $doc_parts = explode('/', $last_number);
+        $last_doc_digits = intval($doc_parts[0]);
+
+        // Tambahkan 1 pada nomor pengiriman barang terbaru
+        $new_doc_digits = sprintf('%03d', $last_doc_digits + 1);
+        $new_shipment_number = $new_doc_digits . '/' . $prefix . '/' . $suffix . '/' . sprintf('%02d', $month) . '/' . $year;
+    } else {
+        // Jika tidak ada nomor pengiriman barang terbaru untuk bulan dan tahun yang sama,
+        // buat nomor pengiriman barang baru dimulai dari 001
+        $new_shipment_number = '001/' . $prefix . '/' . $suffix . '/' . sprintf('%02d', $month) . '/' . $year;
+    }
+
+    return $new_shipment_number;
 }
 
 // Fungsi menangani upload gambar

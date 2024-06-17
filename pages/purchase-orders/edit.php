@@ -53,6 +53,9 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
         }
       }
       $default_signature_path = $signatureInfo["Path"];
+      if ($default_signature_path == "") {
+        $default_signature_path = "assets/image/uploads/signature/no_signature.png";
+      }
     }
 
     // Detail pesanan berdasarkan id_pesanan
@@ -157,28 +160,14 @@ if ($error_message): ?>
         <!-- Info Dokumen -->
         <div class="col-md-5 p-0">
           <div class="row mb-3">
-            <!-- input no PO outgoing -->
-            <?php if ($category_param == 'outgoing') { ?>
             <label for="no_po" class="col-sm-3 col-form-label">No:</label>
             <div class="col-sm-9">
               <input type="text" class="form-control form-control-sm" id="no_po" name="no_po"
-                value="<?= strtoupper($data['no_pesanan']) ?>" readonly required>
-              <div class="invalid-feedback">
-                Sistem error, nomor PO gagal dimuat.
-              </div>
-            </div>
-
-            <!-- input no PO incoming -->
-            <?php } elseif ($category_param == 'incoming') { ?>
-            <label for="no_po" class="col-sm-3 col-form-label">No:</label>
-            <div class="col-sm-9">
-              <input type="text" class="form-control form-control-sm" name="no_po"
                 value="<?= strtoupper($data['no_pesanan']) ?>" required>
               <div class="invalid-feedback">
-                No PO tidak boleh kosong.
+                No purchase order tidak boleh kosong.
               </div>
             </div>
-            <?php } ?>
           </div>
 
           <div class="row mb-3">

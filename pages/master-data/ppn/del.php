@@ -19,19 +19,24 @@ if (isset($_GET['id'])) {
 
     if ($isInUse) {
         // Jika data digunakan dalam tabel lain, tampilkan pesan error
-        $_SESSION['error_message'] = "Data ppn sedang digunakan dalam tabel lain dan tidak dapat dihapus.";
+        $_SESSION['error_message'] = "Data sedang digunakan dalam tabel lain dan tidak dapat dihapus.";
     } else {
-        // Jika data tidak digunakan dalam tabel lain, hapus data dari tabel ppn
-        $result = deleteData('ppn', "id_ppn = '$id'");
+        $table = 'ppn';
+        $data = [
+            'status_hapus' => 1
+        ];
+        $conditions = "id_ppn = '$id'";
+
+        $result = updateData($table, $data, $conditions);
 
         if ($result > 0) {
             // Jika berhasil menghapus, tampilkan pesan sukses
-            $_SESSION['success_message'] = "Data ppn berhasil dihapus!";
+            $_SESSION['success_message'] = "Data PPN berhasil dihapus dari sistem, data tetap ada dalam database!";
 
             // Pencatatan log aktivitas
-            $aktivitas = 'Berhasil hapus ppn';
-            $tabel = 'ppn';
-            $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' berhasil hapus ppn dengan ID ' . $id;
+            $aktivitas = 'Berhasil hapus data';
+            $tabel = 'PPN';
+            $keterangan = "Berhasil hapus PPN dengan ID $id, data tetap ada dalam database!";
             $log_data = [
                 'id_pengguna' => $id_pengguna,
                 'aktivitas' => $aktivitas,
@@ -41,25 +46,15 @@ if (isset($_GET['id'])) {
             insertData('log_aktivitas', $log_data);
         } else {
             // Jika gagal menghapus, tampilkan pesan error
-            $_SESSION['error_message'] = "Terjadi kesalahan saat menghapus data ppn.";
-
-            $aktivitas = 'Gagal hapus ppn';
-            $tabel = 'ppn';
-            $keterangan = 'Pengguna dengan ID ' . $id_pengguna . ' gagal hapus ppn dengan ID ' . $id;
-            $log_data = [
-                'id_pengguna' => $id_pengguna,
-                'aktivitas' => $aktivitas,
-                'tabel' => $tabel,
-                'keterangan' => $keterangan
-            ];
-            insertData('log_aktivitas', $log_data);
+            $_SESSION['error_message'] = "Data PPN gagal dihapus dari sistem!";
         }
     }
 } else {
     // Jika tidak ada ID yang diberikan, tampilkan pesan error
-    $_SESSION['error_message'] = "ID ppn tidak valid.";
+    $_SESSION['error_message'] = "ID PPN tidak valid.";
 }
 
 // Redirect kembali ke index.php setelah proses selesai
 header("Location: index.php");
 exit();
+?>
