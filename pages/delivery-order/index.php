@@ -15,7 +15,7 @@ $joinTables = [
 ];
 
 $columns = 'faktur.*, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, ppn.jenis_ppn';
-$conditions = "faktur.kategori = '$category'";
+$conditions = "faktur.kategori = '$category' AND faktur.status_hapus = 0";
 $orderBy = 'faktur.tanggal DESC';
 
 $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);

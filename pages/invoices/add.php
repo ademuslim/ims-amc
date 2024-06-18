@@ -117,11 +117,11 @@ if ($category_param === 'outgoing') {
                   // Ambil data kontak sesuai dengan kategori sender
                   $kontak_pengirim = [];
                   if ($category_param === 'outgoing') {
-                    $kontak_pengirim = selectData("kontak", "kategori = '$sender'");
+                    $kontak_pengirim = selectData("kontak", "kategori = '$sender' AND status_hapus = 0");
                   } elseif ($category_param === 'incoming') {
                     $kontak_pengirim = array_merge(
-                      selectData("kontak", "kategori = '$sender1'"),
-                      selectData("kontak", "kategori = '$sender2'")
+                      selectData("kontak", "kategori = '$sender1' AND status_hapus = 0"),
+                      selectData("kontak", "kategori = '$sender2' AND status_hapus = 0")
                     );
                   }
                   
@@ -192,11 +192,11 @@ if ($category_param === 'outgoing') {
                   $kontak_penerima = [];
                   if ($category_param === 'outgoing') {
                     $kontak_penerima = array_merge(
-                      selectData("kontak", "kategori = '$receiver1'"),
-                      selectData("kontak", "kategori = '$receiver2'")
+                      selectData("kontak", "kategori = '$receiver1' AND status_hapus = 0"),
+                      selectData("kontak", "kategori = '$receiver2' AND status_hapus = 0")
                     );
                   } elseif ($category_param === 'incoming') {
-                    $kontak_penerima = selectData("kontak", "kategori = '$receiver'");
+                    $kontak_penerima = selectData("kontak", "kategori = '$receiver' AND status_hapus = 0");
                   }
 
                   foreach ($kontak_penerima as $row_penerima) {
@@ -273,7 +273,7 @@ if ($category_param === 'outgoing') {
                         ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
                     ];
                     $columns = 'DISTINCT produk.id_produk, produk.nama_produk';
-                    $conditions = "detail_pesanan.sisa_pesanan > 0";
+                    $conditions = "detail_pesanan.sisa_pesanan > 0 AND status_hapus = 0";
                     $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 
                     foreach ($produk as $row_produk) {
@@ -331,7 +331,7 @@ if ($category_param === 'outgoing') {
                     aria-describedby="tarif-ppn">
                     <option value="" selected disabled>-- Pilih PPN --</option>
                     <?php
-                        $ppn = selectData("ppn");
+                        $ppn = selectData("ppn", "status_hapus = 0");
                         foreach ($ppn as $row_ppn) {
                             echo '<option value="' . $row_ppn['id_ppn'] . '">' . ucwords($row_ppn['jenis_ppn']) . '</option>';
                         }
@@ -513,7 +513,7 @@ $(document).ready(function() {
           ['detail_pesanan', 'produk.id_produk = detail_pesanan.id_produk'],
       ];
       $columns = 'DISTINCT produk.id_produk, produk.nama_produk';
-      $conditions = "detail_pesanan.sisa_pesanan > 0";
+      $conditions = "detail_pesanan.sisa_pesanan > 0 AND produk.status_hapus = 0";
       $produk = selectDataJoin($mainTable, $joinTables, $columns, $conditions);
 
       foreach ($produk as $row_produk) {
@@ -607,7 +607,7 @@ $(document).ready(function() {
   function getTarifPPN(id_ppn) {
     var tarif = ''; // Inisialisasi variabel tarif
     <?php
-      $ppn = selectData("ppn");
+      $ppn = selectData("ppn", "status_hapus = 0");
       foreach ($ppn as $row_ppn) {
           echo "if (id_ppn === '{$row_ppn['id_ppn']}') {
                   tarif = '{$row_ppn['tarif']}';

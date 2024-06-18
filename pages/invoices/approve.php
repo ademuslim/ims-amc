@@ -6,11 +6,11 @@
   <div class="mb-3">
     <select class="form-select" name="status" required>
       <option value="" selected disabled>Pilih Status</option>
-      <option value="terkirim">Terkirim</option>
-      <option value="diproses">Diproses</option>
-      <option value="selesai">Selesai</option>
+      <option value="tunggu kirim">Tunggu Kirim</option>
+      <option value="belum dibayar">Belum Dibayar</option>
+      <option value="dibayar">Dibayar</option>
     </select>
   </div>
-  <input type="hidden" name="id_pesanan" value="<?= $po['id_pesanan'] ?>">
+  <input type="hidden" name="id_faktur" value="<?= $faktur['id_faktur'] ?>">
   <button type="submit" class="btn btn-primary" name="approve">Simpan</button>
 </form>

@@ -46,7 +46,7 @@ $data_log_aktivitas = selectDataLeftJoin($mainTable, $joinTables, $columns, $con
   <tbody>
     <?php if (empty($data_log_aktivitas)) : ?>
     <tr>
-      <td colspan="7">Tidak ada data</td>
+      <td colspan="6">Tidak ada data</td>
     </tr>
     <?php else: $no = 1; foreach ($data_log_aktivitas as $log): ?>
     <tr>

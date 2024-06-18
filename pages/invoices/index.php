@@ -15,7 +15,7 @@ $joinTables = [
 ];
 
 $columns = 'faktur.*, pengirim.nama_kontak AS nama_pengirim, penerima.nama_kontak AS nama_penerima, ppn.jenis_ppn';
-$conditions = "faktur.kategori = '$category'";
+$conditions = "faktur.kategori = '$category' AND faktur.status_hapus = 0";
 $orderBy = 'faktur.tanggal DESC';
 
 $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $orderBy);
@@ -103,6 +103,9 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
 
       <td>
         <div class="btn-group">
+          <button type="button" class="btn-act btn-approve bg-transparent" data-bs-toggle="modal"
+            data-bs-target="#approveModal<?= $faktur['id_faktur']; ?>" title="Perbarui Status"></button>
+
           <a href="<?= base_url("pages/invoices/detail/$category_param/{$faktur['id_faktur']}") ?>"
             class="btn-act btn-view" title="Lihat Detail"></a>
 
@@ -114,6 +117,24 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
         </div>
       </td>
     </tr>
+
+    <!-- Modal Approve -->
+    <div class="modal fade" id="approveModal<?= $faktur['id_faktur']; ?>" data-bs-backdrop="static" tabindex="-1"
+      aria-labelledby="approveModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Invoice</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <?php include 'approve.php'; ?>
+            <!-- Include file approve.php untuk konten modal persetujuan -->
+          </div>
+        </div>
+      </div>
+    </div>
+
     <?php $no++; endforeach; endif; ?>
   </tbody>
 </table>

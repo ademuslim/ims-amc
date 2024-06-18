@@ -4,8 +4,7 @@
   <input type="hidden" name="kategori" value="<?= htmlspecialchars($category) ?>">
 
   <div class="mb-3">
-    <label for="status" class="form-label">Status:</label>
-    <select class="form-select" id="status" name="status" required>
+    <select class="form-select" name="status" required>
       <option value="" selected disabled>Pilih Status</option>
       <option value="disetujui">Disetujui</option>
       <option class="text-danger" value="ditolak">Ditolak</option>

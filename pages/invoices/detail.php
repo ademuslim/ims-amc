@@ -105,8 +105,11 @@ if ($error_message): ?>
 <?php if (!empty($data_faktur)): ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 mb-4">Detail Invoice</h1>
-  <!-- Tombol untuk memicu cetak -->
-  <button onclick="printContent()">Cetak Dokumen</button>
+  <div>
+    <a href="<?= base_url("pages/quotation/$category_param") ?>" class="btn-act btn-back" title="Kembali"></a>
+
+    <button class="ms-3" onclick="printContent()">Cetak Dokumen</button>
+  </div>
 </div>
 
 <div class="paper-wrapper">

@@ -457,10 +457,10 @@ if (isset($_POST['add'])) {
     }
     
     $logData = [
-      'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
-      'aktivitas' => 'Ubah Data Invoice',
-      'tabel' => 'faktur',
-      'keterangan' => $changeDescription,
+        'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'aktivitas' => 'Ubah Data Invoice',
+        'tabel' => 'faktur',
+        'keterangan' => $changeDescription,
     ];
 
     insertData('log_aktivitas', $logData);
@@ -565,12 +565,48 @@ if (isset($_POST['add'])) {
         }
     }
 
-    // echo "Operasi tambah dan ubah data selesai.";
     $_SESSION['success_message'] = "Invoice berhasil diupdate.";
     // Redirect ke halaman detail setelah proses edit selesai
     header("Location: " . base_url("pages/invoices/detail/$category_param/$id_faktur"));
     exit();
 
+} elseif (isset($_POST['approve'])) {
+    $id_faktur = $_POST['id_faktur'];
+    $status = $_POST['status'];
+    $kategori = $_POST['kategori'];
+    // Tentukan $category_param berdasarkan nilai $kategori
+    $category_param = $kategori === "keluar" ? "outgoing" : ($kategori === "masuk" ? "incoming" : die("Invalid category"));
+
+    // Ambil data lama sebelum status diubah
+    $oldDataInv = selectData('faktur', 'id_faktur = ?', '', '', [['type' => 's', 'value' => $id_faktur]]);
+
+    $data = [
+        'status' => $status
+    ];
+
+    $conditions = "id_faktur = '$id_faktur'";
+    $result = updateData('faktur', $data, $conditions);
+    $newDataInv = selectData('faktur', 'id_faktur = ?', '', '', [['type' => 's', 'value' => $id_faktur]]);
+
+    // Ambil status sebelum dan sesudah perubahan
+    $status_before = $oldDataInv[0]['status']; // Ambil status sebelum perubahan
+    $status_after = $newDataInv[0]['status']; // Ambil status setelah perubahan
+
+    // Keterangan perubahan
+    $changeDescription = "Perubahan status faktur dengan ID $id_faktur: \"status\" diubah dari \"$status_before\" menjadi \"$status_after\".";
+    
+    // Catat aktivitas
+    $logData = [
+        'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'aktivitas' => 'Berhasil ubah status invoice',
+        'tabel' => 'Faktur',
+        'keterangan' => $changeDescription,
+    ];
+    insertData('log_aktivitas', $logData);
+
+    $_SESSION['success_message'] = "Berhasil memperbarui status invoice.";
+    header("Location: " . base_url("pages/invoices/$category_param"));
+    exit();
 } else {
     // Jika tidak ada data yang diterima, arahkan ke index.php
     header("Location: " . base_url("pages/invoices/$category_param"));

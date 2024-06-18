@@ -512,13 +512,11 @@ if (isset($_POST['add'])) {
         updateData('detail_pesanan', $data, "id_detail_pesanan = '{$detail['id_detail_pesanan']}'");
     }
 
-    // echo "Operasi tambah dan ubah data selesai.";
     $_SESSION['success_message'] = "PO berhasil diupdate.";
     // Redirect ke halaman detail setelah proses edit selesai
     header("Location: " . base_url("pages/purchase-orders/detail/$category_param/$id_pesanan"));
     exit();
 } elseif (isset($_POST['approve'])) {
-    // Ambil data dari form
     $id_pesanan = $_POST['id_pesanan'];
     $status = $_POST['status'];
     $kategori = $_POST['kategori'];
@@ -533,38 +531,29 @@ if (isset($_POST['add'])) {
     ];
 
     $conditions = "id_pesanan = '$id_pesanan'";
-
     $result = updateData('pesanan_pembelian', $data, $conditions);
-
     $newDataPO = selectData('pesanan_pembelian', 'id_pesanan = ?', '', '', [['type' => 's', 'value' => $id_pesanan]]);
 
-    // Data sebelum dan sesudah perubahan untuk log
-    $before = $oldDataPO[0]; // Ambil baris pertama dari hasil query
-    $after = $newDataPO[0]; // Ambil baris pertama dari hasil query
+    // Ambil status sebelum dan sesudah perubahan
+    $status_before = $oldDataPO[0]['status']; // Ambil status sebelum perubahan
+    $status_after = $newDataPO[0]['status']; // Ambil status setelah perubahan
 
     // Keterangan perubahan
-    $changeDescription = "Perubahan status pesanan pembelian dengan ID $id_pesanan: | ";
-
-    foreach ($before as $column => $value) {
-        if ($value !== $after[$column]) {
-            $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
-        }
-    }
+    $changeDescription = "Perubahan status pesanan pembelian dengan ID $id_pesanan: \"status\" diubah dari \"$status_before\" menjadi \"$status_after\".";
     
     // Catat aktivitas
     $logData = [
-        'id_pengguna' => $id_pengguna, // pastikan ini sesuai dengan session atau cara penyimpanan ID pengguna di aplikasi kamu
+        'id_pengguna' => $id_pengguna,
         'aktivitas' => 'Berhasil ubah status PO',
         'tabel' => 'Pesanan Pembelian',
         'keterangan' => $changeDescription,
     ];
-
     insertData('log_aktivitas', $logData);
 
     $_SESSION['success_message'] = "Berhasil memperbarui status purchase order.";
     header("Location: " . base_url("pages/purchase-orders/$category_param"));
     exit();
-}else {
+} else {
     // Jika tidak ada data yang diterima, arahkan ke index.php
     header("Location: " . base_url("pages/purchase-orders/$category_param"));
     exit();
