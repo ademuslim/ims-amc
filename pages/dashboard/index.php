@@ -99,8 +99,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/invoices/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/invoices/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/invoices/list-detail/outgoing'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -123,8 +123,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/invoices/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/invoices/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/invoices/list-detail/outgoing/waiting'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -147,8 +147,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/invoices/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/invoices/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/invoices/list-detail/outgoing/sending'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -171,8 +171,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/invoices/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/invoices/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/invoices/list-detail/outgoing/paid'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -195,8 +195,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/invoices/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/invoices/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/invoices/list-detail/outgoing/unpaid'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -216,7 +216,7 @@ include 'quotationInfo.php';
           <div class="card-header card-header-sticky">
             Status Invoice
           </div>
-          <div class="card-body" style="height:400px; overflow-y:scroll; font-size:.9rem;">
+          <div class="card-body" style="height:400px; overflow-y:auto; font-size:.9rem;">
             <table class="table table-bordered">
               <thead class="thead-sticky fw-bolder">
                 <tr>
@@ -265,7 +265,7 @@ include 'quotationInfo.php';
                       if ($inv['status'] == 'draft') {
                           $status_class = 'text-bg-warning';
                       } elseif ($inv['status'] == 'belum dibayar') {
-                          $status_class = 'text-bg-info';
+                          $status_class = 'text-bg-danger';
                       } elseif ($inv['status'] == 'dibayar') {
                           $status_class = 'text-bg-success';
                       }
@@ -661,6 +661,12 @@ include 'quotationInfo.php';
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+  var formattedData = [
+    <?= implode(',', array_map(function($value) {
+      return '"' . $value . '"';
+    }, $invoice_info['formatted_monthly_revenue'])); ?>
+  ];
+
   // Data untuk grafik
   var data = {
     labels: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
@@ -684,7 +690,26 @@ document.addEventListener("DOMContentLoaded", function() {
     options: {
       scales: {
         y: {
-          beginAtZero: true
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+          }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              var label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              label += 'Rp ' + context.raw.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+              return label;
+            }
+          }
         }
       }
     }

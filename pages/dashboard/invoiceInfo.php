@@ -67,6 +67,9 @@ for ($month = 1; $month <= 12; $month++) {
     $monthly_revenue[$month - 1] = $subtotalPerMonth;
 }
 
+// Format data pendapatan per bulan ke Rupiah
+$formatted_monthly_revenue = array_map('formatRp', $monthly_revenue);
+
 // Simpan data invoice dalam variabel untuk di-include di index.php
 $invoice_info = [
   'total_inv_outgoing_curent_year' => $total_inv_outgoing_curent_year,
@@ -74,5 +77,6 @@ $invoice_info = [
   'total_paid_inv_outgoing_curent_year' => $total_paid_inv_outgoing_curent_year,
   'total_unpaid_inv_outgoing_curent_year' => $total_unpaid_inv_outgoing_curent_year,
   'total_sending_inv_outgoing_curent_year' => $total_sending_inv_outgoing_curent_year,
-  'monthly_revenue' => $monthly_revenue
+  'monthly_revenue' => $monthly_revenue,
+  'formatted_monthly_revenue' => $formatted_monthly_revenue,
 ];

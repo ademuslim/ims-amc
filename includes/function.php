@@ -684,9 +684,9 @@ function handleLogoUpload($file, $allowed_types, $max_file_size, $upload_path)
     }
 }
 
-// function formatRupiah($number) {
-//     return 'Rp ' . number_format($number, 0, ',', '.');
-// }
+function formatRp($angka) {
+    return 'Rp ' . number_format($angka, 0, ',', '.');
+}
 
 function formatRupiah($number) {
     return '<div class="d-flex justify-content-between"><span>Rp.</span><span>' . number_format($number, 0, ',', '.') . '</span></div>';

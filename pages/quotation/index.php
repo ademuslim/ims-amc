@@ -146,7 +146,7 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
   </tbody>
 </table>
 
-<!-- <script>
+<script>
 $(document).ready(function() {
   // Tangkap klik pada setiap tombol di dalam .btn-group
   $('.btn-group').on('click', function(event) {
@@ -154,6 +154,6 @@ $(document).ready(function() {
     event.stopPropagation();
   });
 });
-</script> -->
+</script>
 
 <?php require '../../includes/footer.php'; ?>

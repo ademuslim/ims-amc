@@ -77,7 +77,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
         if ($faktur['status'] == 'tunggu kirim') {
             $status_class = 'text-bg-warning';
         } elseif ($faktur['status'] == 'belum dibayar') {
-            $status_class = 'text-bg-info';
+            $status_class = 'text-bg-danger';
         } elseif ($faktur['status'] == 'dibayar') {
             $status_class = 'text-bg-success';
         }

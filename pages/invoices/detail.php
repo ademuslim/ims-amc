@@ -106,7 +106,7 @@ if ($error_message): ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 mb-4">Detail Invoice</h1>
   <div>
-    <a href="<?= base_url("pages/quotation/$category_param") ?>" class="btn-act btn-back" title="Kembali"></a>
+    <a href="<?= base_url("pages/invoices/$category_param") ?>" class="btn-act btn-back" title="Kembali"></a>
 
     <button class="ms-3" onclick="printContent()">Cetak Dokumen</button>
   </div>
