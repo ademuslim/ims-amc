@@ -82,7 +82,7 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
             $status_class = 'text-bg-success';
         }
         ?>
-        <span class="badge <?= $status_class ?>"><?= strtoupper($po['status']) ?></span>
+        <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($po['status']) ?></span>
       </td>
 
       <td><?= formatRupiah($po['total']); ?></td>

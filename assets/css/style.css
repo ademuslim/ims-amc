@@ -459,3 +459,38 @@ body.dt-print-view table td {
   overflow-wrap: break-word !important;
   white-space: wrap !important;
 }
+
+/* Input Signature Confirm */
+/* Sembunyikan input file */
+.custom-file-input {
+  display: none;
+}
+
+/* Gaya label agar terlihat seperti tombol */
+.custom-file-label {
+  display: inline-block;
+  padding: 3px 6px;
+  cursor: pointer;
+  background-color: #eee;
+  color: #007bff;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.8rem;
+  transition: background-color 0.3s, color 0.3s; /* Transisi untuk smooth effect */
+}
+
+/* Warna default ikon SVG */
+.custom-file-label svg {
+  fill: #007bff;
+  transition: fill 0.3s; /* Transisi untuk smooth effect */
+}
+
+/* Ubah warna SVG dan latar belakang saat label dihover */
+.custom-file-label:hover {
+  background-color: #0056b3;
+  color: #eee;
+}
+
+.custom-file-label:hover svg {
+  fill: #eee;
+}

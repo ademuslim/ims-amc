@@ -82,7 +82,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
             $status_class = 'text-bg-success';
         }
         ?>
-        <span class="badge <?= $status_class ?>"><?= strtoupper($faktur['status']) ?></span>
+        <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($faktur['status']) ?></span>
       </td>
 
       <td><?= formatRupiah($faktur['total']); ?></td>

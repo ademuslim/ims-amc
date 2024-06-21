@@ -90,7 +90,7 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
             $status_class = 'text-bg-success';
         }
         ?>
-        <span class="badge <?= $status_class ?>"><?= ucfirst($ph['status']) ?></span>
+        <span class="badge rounded-pill <?= $status_class ?>"><?= ucfirst($ph['status']) ?></span>
       </td>
       <td><?= formatRupiah($ph['total']); ?></td>
       <td>

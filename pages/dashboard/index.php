@@ -76,12 +76,12 @@ include 'quotationInfo.php';
       <button class="nav-link" id="nav-ph-tab" data-bs-toggle="tab" data-bs-target="#nav-ph" type="button" role="tab"
         aria-controls="nav-ph" aria-selected="false">Penawaran Harga</button>
 
-      <!-- <button class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled" type="button"
-        role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Disabled</button> -->
     </div>
   </nav>
   <div class="col-auto fw-bolder"><?= dateID(date('Y-m-d')) ?></div>
 </div>
+
+<span id="dynamic-title" class="badge rounded-pill text-bg-info mb-4"></span>
 
 <div class="tab-content" id="nav-tabContent">
   <!-- Data Invoice -->
@@ -210,7 +210,7 @@ include 'quotationInfo.php';
     </div>
 
     <!-- Detail Invoice -->
-    <div class="row">
+    <div class="row mb-4 mb-4">
       <div class="col">
         <div class="card card-sticky p-0">
           <div class="card-header card-header-sticky">
@@ -270,7 +270,7 @@ include 'quotationInfo.php';
                           $status_class = 'text-bg-success';
                       }
                       ?>
-                    <span class="badge <?= $status_class ?>"><?= strtoupper($inv['status']) ?></span>
+                    <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($inv['status']) ?></span>
                   </td>
                   <td rowspan="<?= count($data_detail_inv); ?>"><?= formatRupiah($inv['total']); ?></td>
                   <?php endif; ?>
@@ -291,7 +291,7 @@ include 'quotationInfo.php';
     </div>
 
     <!-- Grafik Pendapatan Bulanan -->
-    <div class="row mb-4">
+    <div class="row mb-4 mb-4">
       <div class="col">
         <canvas id="revenueChart" width="400" height="200"></canvas>
       </div>
@@ -312,8 +312,8 @@ include 'quotationInfo.php';
               <h6 class="card-subtitle"></h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/purchase-orders/index.php?category=incoming'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/purchase-orders/index.php?category=incoming'); ?>">
+            <a href="<?= base_url('pages/purchase-orders/list-detail/incoming'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -336,8 +336,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/purchase-orders/index.php?category=incoming'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/purchase-orders/index.php?category=incoming'); ?>">
+            <a href="<?= base_url('pages/purchase-orders/list-detail/incoming/new'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -360,8 +360,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/purchase-orders/index.php?category=incoming'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/purchase-orders/index.php?category=incoming'); ?>">
+            <a href="<?= base_url('pages/purchase-orders/list-detail/incoming/processed'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -384,8 +384,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/purchase-orders/index.php?category=incoming'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/purchase-orders/index.php?category=incoming'); ?>">
+            <a href="<?= base_url('pages/purchase-orders/list-detail/incoming/closed'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -399,7 +399,7 @@ include 'quotationInfo.php';
     </div>
 
     <!-- Detail PO -->
-    <div class="row">
+    <div class="row mb-4">
       <div class="col">
         <div class="card card-sticky p-0">
           <div class="card-header card-header-sticky">
@@ -467,7 +467,7 @@ include 'quotationInfo.php';
     </div>
 
     <!-- Grafik Pendapatan Bulanan -->
-    <div class="row mb-4">
+    <div class="row">
       <div class="col">
         <canvas id="sisaPesananChart" width="400" height="200"></canvas>
       </div>
@@ -488,8 +488,8 @@ include 'quotationInfo.php';
               <h6 class="card-subtitle"></h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/quotation/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/quotation/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/quotation/list-detail/outgoing'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -512,8 +512,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/quotation/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/quotation/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/quotation/list-detail/outgoing/waiting'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -536,8 +536,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/quotation/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/quotation/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/quotation/list-detail/outgoing/approved'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -560,8 +560,8 @@ include 'quotationInfo.php';
             </h6>
           </div>
           <div class="card-footer">
-            <a href="<?= base_url('pages/quotation/index.php?category=outgoing'); ?>"
-              class="card-link link-underline link-underline-opacity-0 <?= setActivePage('pages/quotation/index.php?category=outgoing'); ?>">
+            <a href="<?= base_url('pages/quotation/list-detail/outgoing/rejected'); ?>"
+              class="card-link link-underline link-underline-opacity-0">
               Lihat Data
               <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px"
                 fill="#0077b6">
@@ -630,12 +630,12 @@ include 'quotationInfo.php';
                       if ($ph['status'] == 'draft') {
                           $status_class = 'text-bg-warning';
                       } elseif ($ph['status'] == 'ditolak') {
-                          $status_class = 'text-bg-info';
+                          $status_class = 'text-bg-danger';
                       } elseif ($ph['status'] == 'disetujui') {
                           $status_class = 'text-bg-success';
                       }
                       ?>
-                    <span class="badge <?= $status_class ?>"><?= strtoupper($ph['status']) ?></span>
+                    <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($ph['status']) ?></span>
                   </td>
                   <?php endif; ?>
                   <td><?= ucwords($detail['nama_produk']); ?></td>
@@ -655,38 +655,55 @@ include 'quotationInfo.php';
       </div>
     </div>
   </div>
-  <!-- <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab" tabindex="0">...
-    </div> -->
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  var formattedData = [
-    <?= implode(',', array_map(function($value) {
-      return '"' . $value . '"';
-    }, $invoice_info['formatted_monthly_revenue'])); ?>
-  ];
+document.addEventListener('DOMContentLoaded', function() {
+  const titleSpan = document.getElementById('dynamic-title');
 
-  // Data untuk grafik
-  var data = {
-    labels: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober",
-      "November", "Desember"
-    ],
-    datasets: [{
-      label: 'Pendapatan Sebelum PPN',
-      data: [
-        <?= implode(',', $invoice_info['monthly_revenue']); ?>
-      ],
-      backgroundColor: 'rgba(54, 162, 235, 0.2)',
-      borderColor: 'rgba(54, 162, 235, 1)',
-      borderWidth: 1
-    }]
-  };
+  const buttons = document.querySelectorAll('.nav-link');
+  buttons.forEach(button => {
+    button.addEventListener('click', function() {
+      const tabId = button.getAttribute('id');
+      switch (tabId) {
+        case 'nav-invoice-tab':
+          titleSpan.textContent = 'Data Invoice Keluar Tahun Ini';
+          break;
+        case 'nav-po-tab':
+          titleSpan.textContent = 'Data Purchase Order Masuk Tahun Ini';
+          break;
+        case 'nav-ph-tab':
+          titleSpan.textContent = 'Data Penawaran Harga Keluar Tahun Ini';
+          break;
+        default:
+          titleSpan.textContent = 'Data Invoice Keluar Tahun Ini';
+      }
+    });
+  });
 
-  // Konfigurasi untuk grafik
-  var config = {
+  // Set initial title based on active tab
+  const activeButton = document.querySelector('.nav-link.active');
+  if (activeButton) {
+    // Update title without triggering click event
+    activeButton.dispatchEvent(new Event('click'));
+  }
+
+  // Grafik Pendapatan
+  var ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+  var revenueChart = new Chart(ctxRevenue, {
     type: 'bar',
-    data: data,
+    data: {
+      labels: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September",
+        "Oktober", "November", "Desember"
+      ],
+      datasets: [{
+        label: 'Pendapatan Sebelum PPN',
+        data: [<?= implode(',', $invoice_info['monthly_revenue']); ?>],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
     options: {
       scales: {
         y: {
@@ -713,16 +730,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       }
     }
-  };
+  });
 
-  // Render grafik
-  var ctx = document.getElementById('revenueChart').getContext('2d');
-  var revenueChart = new Chart(ctx, config);
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-  var ctx = document.getElementById('sisaPesananChart').getContext('2d');
-  var sisaPesananChart = new Chart(ctx, {
+  // Grafik Sisa Pesanan
+  var ctxSisaPesanan = document.getElementById('sisaPesananChart').getContext('2d');
+  var sisaPesananChart = new Chart(ctxSisaPesanan, {
     type: 'bar',
     data: {
       labels: <?= json_encode($po_info['labels']); ?>,

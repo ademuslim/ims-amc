@@ -35,7 +35,6 @@ RewriteRule ^pages/purchase-orders/outgoing/?$ pages/purchase-orders/index.php?c
 # Ubah /pages/invoices/outgoing menjadi /pages/invoices/index.php?category=outgoing
 RewriteRule ^pages/invoices/outgoing/?$ pages/invoices/index.php?category=outgoing [L]
 
-
 # Ubah /pages/delivery-order/outgoing menjadi /pages/delivery-order/index.php?category=outgoing
 RewriteRule ^pages/delivery-order/outgoing/?$ pages/delivery-order/index.php?category=outgoing [L]
 
@@ -62,15 +61,17 @@ RewriteRule ^auth/logout/?$ auth/logout.php [L]
 
 # Quotation
 RewriteRule ^pages/quotation/add/([a-z]+)$ pages/quotation/add.php?category=$1 [NC,L]
-RewriteRule ^pages/quotation/list-detail/([a-z]+)$ pages/quotation/list-detail.php?category=$1 [NC,L]
 RewriteRule ^pages/quotation/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/quotation/edit.php?category=$1&id=$2 [NC,L]
 RewriteRule ^pages/quotation/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/quotation/detail.php?category=$1&id=$2 [NC,L]
+RewriteRule ^pages/quotation/list-detail/([a-z]+)$ pages/quotation/list-detail.php?category=$1 [NC,L]
+RewriteRule ^pages/quotation/list-detail/([a-z]+)/([a-z]+)$ pages/quotation/list-detail.php?category=$1&status=$2 [NC,L]
 
 # Purchase Order
 RewriteRule ^pages/purchase-orders/add/([a-z]+)$ pages/purchase-orders/add.php?category=$1 [NC,L]
-RewriteRule ^pages/purchase-orders/list-detail/([a-z]+)$ pages/purchase-orders/list-detail.php?category=$1 [NC,L]
 RewriteRule ^pages/purchase-orders/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/purchase-orders/edit.php?category=$1&id=$2 [NC,L]
 RewriteRule ^pages/purchase-orders/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/purchase-orders/detail.php?category=$1&id=$2 [NC,L]
+RewriteRule ^pages/purchase-orders/list-detail/([a-z]+)$ pages/purchase-orders/list-detail.php?category=$1 [NC,L]
+RewriteRule ^pages/purchase-orders/list-detail/([a-z]+)/([a-z]+)$ pages/purchase-orders/list-detail.php?category=$1&status=$2 [NC,L]
 
 # Invoices
 RewriteRule ^pages/invoices/add/([a-z]+)$ pages/invoices/add.php?category=$1 [NC,L]
@@ -80,6 +81,5 @@ RewriteRule ^pages/invoices/list-detail/([a-z]+)$ pages/invoices/list-detail.php
 RewriteRule ^pages/invoices/list-detail/([a-z]+)/([a-z]+)$ pages/invoices/list-detail.php?category=$1&status=$2 [NC,L]
 
 # Delivery Order
-RewriteRule ^pages/delivery-order/add/([a-z]+)$ pages/delivery-order/add.php?category=$1 [NC,L]
-RewriteRule ^pages/delivery-order/edit/([a-z]+)/([a-zA-Z0-9-]+)$ pages/delivery-order/edit.php?category=$1&id=$2 [NC,L]
 RewriteRule ^pages/delivery-order/detail/([a-z]+)/([a-zA-Z0-9-]+)$ pages/delivery-order/detail.php?category=$1&id=$2 [NC,L]
+#RewriteRule ^pages/delivery-order/process$ pages/delivery-order/process.php [L]

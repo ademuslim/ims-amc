@@ -4,27 +4,25 @@ $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $status_param = isset($_GET['status']) ? $_GET['status'] : 'all';
 
 // Menentukan judul halaman (tab browser) berdasarkan kategori
-$category_title_en = $category_param === 'outgoing' ? 'Invoice Outgoing' : 'Invoice Incoming';
+$category_title_en = $category_param === 'outgoing' ? 'PO Outgoing' : 'PO Incoming';
 
 // Menentukan judul tabel berdasarkan kategori
-$content_title_base_id = $category_param === 'outgoing' ? 'Invoice Keluar' : 'Invoice Masuk';
+$content_title_base_id = $category_param === 'outgoing' ? 'PO Keluar' : 'PO Masuk';
 
 // Menentukan judul status dalam bahasa Inggris untuk page_title
 $status_map_en = [
-    'waiting' => 'Waiting',
-    'sending' => 'Sending',
-    'paid' => 'Paid',
-    'unpaid' => 'Unpaid',
-    'all' => 'All Invoices'
+    'new' => 'New',
+    'processed' => 'Processed',
+    'closed' => 'Closed',
+    'all' => 'All PO'
 ];
 
 // Menentukan judul status dalam bahasa Indonesia untuk content_title
 $status_map_id = [
-    'waiting' => 'Tunggu Kirim',
-    'sending' => 'Terkirim',
-    'paid' => 'Dibayar',
-    'unpaid' => 'Belum Dibayar',
-    'all' => 'Semua Invoice'
+    'new' => 'Baru',
+    'processed' => 'Dikerjakan',
+    'closed' => 'Close',
+    'all' => 'Semua PO'
 ];
 
 $actual_status_title_en = isset($status_map_en[$status_param]) ? $status_map_en[$status_param] : 'Unknown Status';
@@ -42,47 +40,46 @@ $current_year = date('Y');
 
 // Mapping status ke nilai database
 $status_db_map = [
-    'waiting' => 'tunggu kirim',
-    'sending' => ['dibayar', 'belum dibayar'],
-    'paid' => 'dibayar',
-    'unpaid' => 'belum dibayar'
+    'new' => 'draft',
+    'processed' => 'diproses',
+    'closed' => 'selesai',
 ];
 
 $actual_status = isset($status_db_map[$status_param]) ? $status_db_map[$status_param] : 'all';
 
 // Membuat kondisi pencarian berdasarkan kategori dan status
-$conditionsInv = "kategori = '$category' AND YEAR(tanggal) = ? AND status_hapus = 0";
-$bind_paramsInv = array(
+$conditionsPO = "kategori = '$category' AND YEAR(tanggal) = ? AND status_hapus = 0";
+$bind_paramsPO = array(
     array('type' => 'i', 'value' => $current_year)
 );
 
 if ($actual_status !== 'all') {
     if (is_array($actual_status)) {
         $placeholders = implode(',', array_fill(0, count($actual_status), '?'));
-        $conditionsInv .= " AND status IN ($placeholders)";
+        $conditionsPO .= " AND status IN ($placeholders)";
         foreach ($actual_status as $status) {
-            $bind_paramsInv[] = array('type' => 's', 'value' => $status);
+            $bind_paramsPO[] = array('type' => 's', 'value' => $status);
         }
     } else {
-        $conditionsInv .= " AND status = ?";
-        $bind_paramsInv[] = array('type' => 's', 'value' => $actual_status);
+        $conditionsPO .= " AND status = ?";
+        $bind_paramsPO[] = array('type' => 's', 'value' => $actual_status);
     }
 } else {
-    $conditionsInv .= " AND status IN ('tunggu kirim', 'belum dibayar', 'dibayar')";
+    $conditionsPO .= " AND status IN ('draft', 'terkirim', 'diproses', 'selesai')";
 }
 
-$data_inv = selectData('faktur', $conditionsInv, "tanggal DESC", "", $bind_paramsInv);
+$data_po = selectData('pesanan_pembelian', $conditionsPO, "tanggal DESC", "", $bind_paramsPO);
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="fs-5 mb-4">Detail Invoice</h1>
+  <h1 class="fs-5 mb-4">Detail Purchase Order</h1>
   <div>
     <a href="<?= base_url("pages/dashboard") ?>" class="btn-act btn-back" title="Kembali"></a>
     <a href="#" class="btn-act btn-print ms-4" onclick="printContent()" title="Cetak Data"></a>
   </div>
 </div>
 
-<!-- Detail Invoice -->
+<!-- Detail PO -->
 <div class="row">
   <div class="col">
     <div class="card p-0">
@@ -95,79 +92,79 @@ $data_inv = selectData('faktur', $conditionsInv, "tanggal DESC", "", $bind_param
           <thead class="thead-sticky fw-bolder">
             <tr>
               <th>No.</th>
-              <th>No. Invoice</th>
+              <th>No. Purchase Order</th>
               <th>Tanggal</th>
               <th>Status</th>
-              <th>Penerima</th>
+              <th>Pengirim</th>
               <th>Total</th>
               <th>PPN</th>
               <th>Diskon</th>
-              <th>Pengirim</th>
-              <th>No. Pengiriman</th>
+              <th>Penerima</th>
               <th>Produk / Jasa</th>
               <th>Kuantitas</th>
               <th>Harga Satuan</th>
-              <th>No. Purchase Order</th>
+              <th>Dikirim</th>
+              <th>Sisa</th>
+              <th>No. Penawaran</th>
             </tr>
           </thead>
           <tbody>
-            <?php if (empty($data_inv)) : ?>
+            <?php if (empty($data_po)) : ?>
             <tr>
-              <td colspan="14">Tidak ada data Invoice</td>
+              <td colspan="15">Tidak ada data PO</td>
             </tr>
-            <?php else : $no = 1; foreach ($data_inv as $inv) : ?>
+            <?php else : $no = 1; foreach ($data_po as $po) : ?>
             <?php
-              $id_faktur = $inv['id_faktur'];
-              $mainDetailTable = 'detail_faktur';
+              $id_pesanan = $po['id_pesanan'];
+              $mainDetailTable = 'detail_pesanan';
               $joinDetailTables = [
-                  ['faktur', 'detail_faktur.id_faktur = faktur.id_faktur'],
-                  ['pesanan_pembelian', 'detail_faktur.id_pesanan = pesanan_pembelian.id_pesanan'],
-                  ['produk', 'detail_faktur.id_produk = produk.id_produk'],
-                  ['kontak as penerima', 'faktur.id_penerima = penerima.id_kontak'],
-                  ['ppn', 'faktur.id_ppn = ppn.id_ppn'],
-                  ['kontak as pengirim', 'faktur.id_pengirim = pengirim.id_kontak']
+                  ['pesanan_pembelian', 'detail_pesanan.id_pesanan = pesanan_pembelian.id_pesanan'],
+                  ['penawaran_harga', 'detail_pesanan.id_penawaran = penawaran_harga.id_penawaran'],
+                  ['produk', 'detail_pesanan.id_produk = produk.id_produk'],
+                  ['kontak as penerima', 'pesanan_pembelian.id_penerima = penerima.id_kontak'],
+                  ['ppn', 'pesanan_pembelian.id_ppn = ppn.id_ppn'],
+                  ['kontak as pengirim', 'pesanan_pembelian.id_pengirim = pengirim.id_kontak']
               ];
-              $columns = 'detail_faktur.*, produk.nama_produk, produk.satuan, penerima.nama_kontak as nama_penerima, ppn.jenis_ppn, pengirim.nama_kontak as nama_pengirim, pesanan_pembelian.no_pesanan';
-              $conditions = "detail_faktur.id_faktur = '$id_faktur'";
+              $columns = 'detail_pesanan.*, produk.nama_produk, produk.satuan, penerima.nama_kontak as nama_penerima, ppn.jenis_ppn, pengirim.nama_kontak as nama_pengirim, penawaran_harga.no_penawaran';
+              $conditions = "detail_pesanan.id_pesanan = '$id_pesanan'";
 
-              $data_detail_inv = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
+              $data_detail_po = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
             ?>
 
-            <?php if (!empty($data_detail_inv)): ?>
-            <?php foreach ($data_detail_inv as $index => $detail): ?>
+            <?php if (!empty($data_detail_po)): ?>
+            <?php foreach ($data_detail_po as $index => $detail): ?>
             <tr>
               <?php if ($index === 0): ?>
-              <td class="text-start" rowspan="<?= count($data_detail_inv); ?>"><?= $no; ?></td>
-              <td class="text-primary" rowspan="<?= count($data_detail_inv); ?>"><?= strtoupper($inv['no_faktur']); ?>
+              <td class="text-start" rowspan="<?= count($data_detail_po); ?>"><?= $no; ?></td>
+              <td class="text-primary" rowspan="<?= count($data_detail_po); ?>"><?= strtoupper($po['no_pesanan']); ?>
               </td>
-              <td rowspan="<?= count($data_detail_inv); ?>"><?= dateID($inv['tanggal']); ?></td>
-              <td rowspan="<?= count($data_detail_inv); ?>">
+              <td rowspan="<?= count($data_detail_po); ?>"><?= dateID($po['tanggal']); ?></td>
+              <td rowspan="<?= count($data_detail_po); ?>">
                 <?php
                   $status_class = '';
-                  if ($inv['status'] == 'tunggu kirim') {
+                  if ($po['status'] == 'terkirim') {
                       $status_class = 'text-bg-warning';
-                  } elseif ($inv['status'] == 'belum dibayar') {
+                  } elseif ($po['status'] == 'draft') {
                       $status_class = 'text-bg-danger';
-                  } elseif ($inv['status'] == 'dibayar') {
+                  } elseif ($po['status'] == 'diproses' || $po['status'] == 'selesai') {
                       $status_class = 'text-bg-success';
                   }
                 ?>
-                <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($inv['status']) ?></span>
+                <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($po['status']) ?></span>
               </td>
-              <td rowspan="<?= count($data_detail_inv); ?>">
-                <?= htmlspecialchars(strtoupper($detail['nama_penerima'])); ?></td>
-              <td rowspan="<?= count($data_detail_inv); ?>"><?= formatRupiah($inv['total']); ?></td>
-              <td rowspan="<?= count($data_detail_inv); ?>">
-                <?= ucwords($detail['jenis_ppn']); ?>
-              </td>
-              <td rowspan="<?= count($data_detail_inv); ?>">
-                <?= $inv['diskon']; ?>
-              </td>
-              <td rowspan="<?= count($data_detail_inv); ?>">
+              <td rowspan="<?= count($data_detail_po); ?>">
                 <?= htmlspecialchars(strtoupper($detail['nama_pengirim'])); ?>
               </td>
+              <td rowspan="<?= count($data_detail_po); ?>"><?= formatRupiah($po['total']); ?></td>
+              <td rowspan="<?= count($data_detail_po); ?>">
+                <?= ucwords($detail['jenis_ppn']); ?>
+              </td>
+              <td rowspan="<?= count($data_detail_po); ?>">
+                <?= $po['diskon']; ?>
+              </td>
+              <td rowspan="<?= count($data_detail_po); ?>">
+                <?= htmlspecialchars(strtoupper($detail['nama_penerima'])); ?></td>
               <?php endif; ?>
-              <td><?= strtoupper($detail['no_pengiriman_barang']); ?></td>
               <td><?= strtoupper($detail['nama_produk']); ?></td>
               <td class="text-end no-wrap">
                 <?= number_format($detail['jumlah'], 0, ',', '.') . ' ' . strtoupper($detail['satuan']); ?>
@@ -175,7 +172,13 @@ $data_inv = selectData('faktur', $conditionsInv, "tanggal DESC", "", $bind_param
               <td class="text-end no-wrap">
                 <?= formatRp($detail['harga_satuan']); ?>
               </td>
-              <td><?= strtoupper($detail['no_pesanan']); ?></td>
+              <td class="text-end no-wrap">
+                <?= number_format($detail['jumlah_dikirim'], 0, ',', '.') . ' ' . strtoupper($detail['satuan']); ?>
+              </td>
+              <td class="text-end no-wrap">
+                <?= number_format($detail['sisa_pesanan'], 0, ',', '.') . ' ' . strtoupper($detail['satuan']); ?>
+              </td>
+              <td><?= strtoupper($detail['no_penawaran']); ?></td>
             </tr>
             <?php endforeach; ?>
             <?php endif; ?>
@@ -214,7 +217,7 @@ function printContent() {
     printWindow.document.write('</table>');
   } else {
     // Tampilkan pesan jika tidak ada tabel
-    printWindow.document.write('<p>Tidak ada data Invoice</p>');
+    printWindow.document.write('<p>Tidak ada data PO</p>');
   }
 
   printWindow.document.write('</body></html>');

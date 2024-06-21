@@ -138,7 +138,7 @@ if ($error_message): ?>
                 $status_class = 'text-bg-success';
             }
             ?>
-            <span class="badge <?= $status_class ?>"><?= strtoupper($data['status']) ?></span>
+            <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($data['status']) ?></span>
           </div>
         </div>
       </div>
