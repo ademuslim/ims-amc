@@ -175,42 +175,42 @@ if ($error_message): ?>
     <div class="row">
       <!-- Approved Signature -->
       <div class="col-md-4 d-flex flex-column align-items-center text-center border p-2">
-        <span class="fw-bold">Diterima Oleh</span>
+        <span class="mb-3 fw-bold">Diterima Oleh</span>
         <?php if (!empty($signatureConfirmDetails['Approved Path'])) { ?>
         <!-- Tampilkan gambar jika ada -->
         <img class="img-fluid mb-2" src="<?= base_url($signatureConfirmDetails['Approved Path']) ?>"
           alt="Preview Signature" style="max-height: 100px;">
         <?php } else { ?>
         <!-- Placeholder untuk gambar -->
-        <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #ccc;"></div>
+        <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #eee;"></div>
         <?php } ?>
         <span><?= isset($signatureConfirmDetails['Approved Name']) ? ucfirst($signatureConfirmDetails['Approved Name']) : '' ?></span>
       </div>
 
       <!-- Checked Signature -->
       <div class="col-md-4 d-flex flex-column align-items-center text-center border p-2">
-        <span class="fw-bold">Mengetahui</span>
+        <span class="mb-3 fw-bold">Mengetahui</span>
         <?php if (!empty($signatureConfirmDetails['Checked Path'])) { ?>
         <!-- Tampilkan gambar jika ada -->
         <img class="img-fluid mb-2" src="<?= base_url($signatureConfirmDetails['Checked Path']) ?>"
           alt="Preview Signature" style="max-height: 100px;">
         <?php } else { ?>
         <!-- Placeholder untuk gambar -->
-        <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #ccc;"></div>
+        <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #eee;"></div>
         <?php } ?>
         <span><?= isset($signatureConfirmDetails['Checked Name']) ? ucfirst($signatureConfirmDetails['Checked Name']) : '' ?></span>
       </div>
 
       <!-- Issued Signature -->
       <div class="col-md-4 d-flex flex-column align-items-center text-center border p-2">
-        <span class="fw-bold">Dibuat</span>
+        <span class="mb-3 fw-bold">Dibuat</span>
         <?php if (!empty($signatureConfirmDetails['Issued Path'])) { ?>
         <!-- Tampilkan gambar jika ada -->
         <img class="img-fluid mb-2" src="<?= base_url($signatureConfirmDetails['Issued Path']) ?>"
           alt="Preview Signature" style="max-height: 100px;">
         <?php } else { ?>
         <!-- Placeholder untuk gambar -->
-        <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #ccc;"></div>
+        <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #eee;"></div>
         <?php } ?>
         <span><?= isset($signatureConfirmDetails['Issued Name']) ? ucfirst($signatureConfirmDetails['Issued Name']) : '' ?></span>
       </div>
@@ -242,61 +242,76 @@ if ($error_message): ?>
                   <div class="col-md border p-2">
                     <label class="mb-2" for="approved-name">Diterima Oleh</label>
 
-                    <label class="mt-3 custom-file-label" for="approved-signature">
+                    <label class="mb-3 p-3 custom-file-label" for="approved-signature">
                       <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
                         <path
                           d="M440-320v-326L336-542l-56-58 200-200 200 200-56 58-104-104v326h-80ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z" />
                       </svg>
-                      Unggah Signature</label>
-                    <input type="file" class="custom-file-input form-control form-control-sm" id="approved-signature"
-                      name="approved_signature" accept="image/*">
-                    <?php if (!empty($signatureConfirmDetails['Approved Path'])) { ?>
-                    <img class="img-fluid m-2" src="<?= base_url($signatureConfirmDetails['Approved Path']) ?>"
-                      alt="Preview Signature" style="max-height: 100px;">
-                    <?php } ?>
+                      Unggah Signature
+                      <input type="file" class="mt-3 form-control form-control-sm" id="approved-signature"
+                        name="approved_signature" accept="image/*">
+                      <?php if (!empty($signatureConfirmDetails['Approved Path'])) { ?>
+                      <img class="img-fluid m-2" src="<?= base_url($signatureConfirmDetails['Approved Path']) ?>"
+                        alt="Preview Signature" style="max-height: 100px;">
+                      <?php } ?>
+                    </label>
 
                     <input type="text" class="form-control form-control-sm" id="approved-name" name="approved_name"
+                      placeholder="Nama penerima"
                       value="<?= isset($signatureConfirmDetails['Approved Name']) ? ucfirst($signatureConfirmDetails['Approved Name']) : '' ?>">
+
+                    <input type="hidden" name="existing_approved_path"
+                      value="<?= htmlspecialchars($signatureConfirmDetails['Approved Path'] ?? '') ?>">
                   </div>
 
                   <div class="col-md border p-2">
                     <label class="mb-2" for="checked-name">Mengetahui</label>
 
-                    <label class="mt-3 custom-file-label" for="checked-signature">
+                    <label class="mb-3 p-3 custom-file-label" for="checked-signature">
                       <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
                         <path
                           d="M440-320v-326L336-542l-56-58 200-200 200 200-56 58-104-104v326h-80ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z" />
                       </svg>
-                      Unggah Signature</label>
-                    <input type="file" class="custom-file-input form-control form-control-sm" id="checked-signature"
-                      name="checked_signature" accept="image/*">
-                    <?php if (!empty($signatureConfirmDetails['Checked Path'])) { ?>
-                    <img class="img-fluid m-2" src="<?= base_url($signatureConfirmDetails['Checked Path']) ?>"
-                      alt="Preview Signature" style="max-height: 100px;">
-                    <?php } ?>
+                      Unggah Signature
+                      <input type="file" class="mt-3 form-control form-control-sm" id="checked-signature"
+                        name="checked_signature" accept="image/*">
+                      <?php if (!empty($signatureConfirmDetails['Checked Path'])) { ?>
+                      <img class="img-fluid m-2" src="<?= base_url($signatureConfirmDetails['Checked Path']) ?>"
+                        alt="Preview Signature" style="max-height: 100px;">
+                      <?php } ?>
+                    </label>
 
                     <input type="text" class="form-control form-control-sm" id="checked-name" name="checked_name"
+                      placeholder="Nama pengirim"
                       value="<?= isset($signatureConfirmDetails['Checked Name']) ? ucfirst($signatureConfirmDetails['Checked Name']) : '' ?>">
+
+                    <input type="hidden" name="existing_checked_path"
+                      value="<?= htmlspecialchars($signatureConfirmDetails['Checked Path'] ?? '') ?>">
                   </div>
 
                   <div class="col-md border p-2">
                     <label class="mb-2" for="issued-name">Dibuat</label><br>
 
-                    <label class="mt-3 custom-file-label" for="issued-signature">
+                    <label class="mb-3 p-3 custom-file-label" for="issued-signature">
                       <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 -960 960 960" width="18">
                         <path
                           d="M440-320v-326L336-542l-56-58 200-200 200 200-56 58-104-104v326h-80ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z" />
                       </svg>
-                      Unggah Signature</label>
-                    <input type="file" class="custom-file-input form-control form-control-sm" id="issued-signature"
-                      name="issued_signature" accept="image/*">
-                    <?php if (!empty($signatureConfirmDetails['Issued Path'])) { ?>
-                    <img class="img-fluid m-2" src="<?= base_url($signatureConfirmDetails['Issued Path']) ?>"
-                      alt="Preview Signature" style="max-height: 100px;">
-                    <?php } ?>
+                      Unggah Signature
+                      <input type="file" class="mt-3 form-control form-control-sm" id="issued-signature"
+                        name="issued_signature" accept="image/*">
+                      <?php if (!empty($signatureConfirmDetails['Issued Path'])) { ?>
+                      <img class="img-fluid m-2" src="<?= base_url($signatureConfirmDetails['Issued Path']) ?>"
+                        alt="Preview Signature" style="max-height: 100px;">
+                      <?php } ?>
+                    </label>
 
                     <input type="text" class="form-control form-control-sm" id="issued-name" name="issued_name"
+                      placeholder="Nama pembuat"
                       value="<?= isset($signatureConfirmDetails['Issued Name']) ? ucfirst($signatureConfirmDetails['Issued Name']) : '' ?>">
+
+                    <input type="hidden" name="existing_issued_path"
+                      value="<?= htmlspecialchars($signatureConfirmDetails['Issued Path'] ?? '') ?>">
                   </div>
                 </div>
 
@@ -317,6 +332,7 @@ if ($error_message): ?>
     </div>
   </div>
 </div>
+
 <?php
 require '../../includes/footer.php';
 ?>

@@ -59,9 +59,19 @@ if (isset($_POST['approve'])) {
         return null;
     }
 
-    $approved_signature = uploadSignature('approved_signature', $uploadDir, $maxFileSize, 'approved');
-    $checked_signature = uploadSignature('checked_signature', $uploadDir, $maxFileSize, 'checked');
-    $issued_signature = uploadSignature('issued_signature', $uploadDir, $maxFileSize, 'issued');
+    // Fungsi untuk mendapatkan nama file dari path yang ada
+    function normalizePath($path, $uploadDir) {
+        if (empty($path)) {
+            return null;
+        }
+        // Mengambil nama file dari path yang ada
+        return basename($path);
+    }
+
+    // Unggah file tanda tangan atau gunakan path yang sudah ada jika tidak ada file yang diunggah
+    $approved_signature = uploadSignature('approved_signature', $uploadDir, $maxFileSize, 'approved') ?? normalizePath($_POST['existing_approved_path'] ?? '', $uploadDir);
+    $checked_signature = uploadSignature('checked_signature', $uploadDir, $maxFileSize, 'checked') ?? normalizePath($_POST['existing_checked_path'] ?? '', $uploadDir);
+    $issued_signature = uploadSignature('issued_signature', $uploadDir, $maxFileSize, 'issued') ?? normalizePath($_POST['existing_issued_path'] ?? '', $uploadDir);
     
     // Ambil data lama sebelum status diubah
     $oldDataDetailInv = selectData('detail_faktur', 'id_detail_faktur = ?', '', '', [['type' => 's', 'value' => $id_detail_faktur]]);
@@ -73,7 +83,7 @@ if (isset($_POST['approve'])) {
     if ($approved_name || $approved_signature) {
         $signature_confirm .= "Approved Name: $approved_name";
         if ($approved_signature) {
-            $signature_confirm .= ", Approved Path: ../../assets/image/uploads/signature/$approved_signature";
+            $signature_confirm .= ", Approved Path: $uploadDir$approved_signature";
         }
     }
 
@@ -84,7 +94,7 @@ if (isset($_POST['approve'])) {
         }
         $signature_confirm .= "Checked Name: $checked_name";
         if ($checked_signature) {
-            $signature_confirm .= ", Checked Path: ../../assets/image/uploads/signature/$checked_signature";
+            $signature_confirm .= ", Checked Path: $uploadDir$checked_signature";
         }
     }
 
@@ -95,7 +105,7 @@ if (isset($_POST['approve'])) {
         }
         $signature_confirm .= "Issued Name: $issued_name";
         if ($issued_signature) {
-            $signature_confirm .= ", Issued Path: ../../assets/image/uploads/signature/$issued_signature";
+            $signature_confirm .= ", Issued Path: $uploadDir$issued_signature";
         }
     }
 
