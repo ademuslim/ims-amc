@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $joinTables = [
         ['produk', 'detail_pesanan.id_produk = produk.id_produk']
     ];
-    $columns = 'produk.nama_produk, detail_pesanan.jumlah, detail_pesanan.sisa_pesanan';
+    $columns = 'produk.nama_produk, detail_pesanan.jumlah, detail_pesanan.harga_satuan, detail_pesanan.sisa_pesanan';
     $conditions = "detail_pesanan.id_pesanan = '$id_pesanan'";
 
     // Tambahkan kondisi jika $id_produk juga diperlukan
@@ -32,6 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $infoContent .= '<li class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">';
         $infoContent .= 'Sisa: <span class="badge bg-primary rounded-pill">' . $item['sisa_pesanan'] . '</span>';
+        $infoContent .= '</li>';
+
+        $infoContent .= '<li class="list-group-item list-group-item-warning d-flex justify-content-between align-items-center">';
+        $infoContent .= 'Harga Satuan: <span class="badge bg-primary rounded-pill">' . formatRp($item['harga_satuan']) . '</span>';
         $infoContent .= '</li>';
         $infoContent .= '</ul>';
 

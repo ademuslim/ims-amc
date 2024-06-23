@@ -35,7 +35,7 @@ $data_produk = selectData('produk', 'status_hapus = 0');
     <tr>
       <td class="text-start"><?= $no; ?></td>
       <td class="text-primary"><?= strtoupper($produk['no_produk']); ?></td>
-      <td><?= ucwords($produk['nama_produk']); ?></td>
+      <td><?= strtoupper($produk['nama_produk']); ?></td>
       <td class="text-center">
         <?php
         // Tentukan kelas bootstrap berdasarkan nilai status
@@ -50,7 +50,7 @@ $data_produk = selectData('produk', 'status_hapus = 0');
             $status_class = 'text-bg-success';
         }
         ?>
-        <span class="badge <?= $status_class ?>"><?= ucwords($produk['status']); ?></span>
+        <span class="badge <?= $status_class ?>"><?= strtoupper($produk['status']); ?></span>
       </td>
       <td><?= formatRupiah($produk['harga']); ?></td>
       <td><?= strtoupper($produk['satuan']); ?></td>
@@ -82,9 +82,10 @@ $data_produk = selectData('produk', 'status_hapus = 0');
         </div>
       </div>
     </div>
-    <?php $no++; ?>
-    <?php endforeach; ?>
-    <?php endif; ?>
+    <?php 
+    $no++;
+    endforeach; 
+    endif; ?>
   </tbody>
 </table>
 

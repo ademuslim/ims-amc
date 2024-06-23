@@ -4610,7 +4610,7 @@ fieldset:disabled .btn {
   --bs-pagination-padding-y: 2px;
   --bs-pagination-font-size: 1rem;
   --bs-pagination-color: var(--bs-link-color);
-  --bs-pagination-bg: var(--bs-body-bg);
+  --bs-pagination-bg: transparent;
   --bs-pagination-border-width: 0px;
   --bs-pagination-border-color: var(--bs-border-color);
   --bs-pagination-border-radius: var(--bs-border-radius);

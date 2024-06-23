@@ -33,7 +33,7 @@ include 'quotationInfo.php';
 ?>
 
 <div class="row mb-4">
-  <!-- Greeting -->
+  <!-- Salam -->
   <div class="col">
     <div class="card custom-card d-flex flex-column h-100">
       <div class="card-body">
@@ -75,10 +75,10 @@ include 'quotationInfo.php';
 
       <button class="nav-link" id="nav-ph-tab" data-bs-toggle="tab" data-bs-target="#nav-ph" type="button" role="tab"
         aria-controls="nav-ph" aria-selected="false">Penawaran Harga</button>
-
     </div>
   </nav>
-  <div class="col-auto fw-bolder"><?= dateID(date('Y-m-d')) ?></div>
+  <!-- Tanggal saat ini -->
+  <div class="col-auto fw-bolder pt-2"><?= dateID(date('Y-m-d')) ?></div>
 </div>
 
 <span id="dynamic-title" class="badge rounded-pill text-bg-info mb-4"></span>
@@ -405,7 +405,7 @@ include 'quotationInfo.php';
           <div class="card-header card-header-sticky">
             Info PO Open
           </div>
-          <div class="card-body" style="height:400px;overflow-y:scroll; font-size:.9rem;">
+          <div class="card-body" style="height:400px; overflow-y:auto; font-size:.9rem;">
             <table class="table table-bordered">
               <thead class="thead-sticky fw-bolder">
                 <tr>
@@ -466,7 +466,7 @@ include 'quotationInfo.php';
       </div>
     </div>
 
-    <!-- Grafik Pendapatan Bulanan -->
+    <!-- Grafik PO Open -->
     <div class="row">
       <div class="col">
         <canvas id="sisaPesananChart" width="400" height="200"></canvas>
@@ -581,7 +581,7 @@ include 'quotationInfo.php';
           <div class="card-header card-header-sticky">
             Status Penawaran Harga
           </div>
-          <div class="card-body" style="height:400px;overflow-y:scroll; font-size:.9rem;">
+          <div class="card-body" style="height:400px; overflow-y:auto; font-size:.9rem;">
             <table class="table table-bordered">
               <thead class="thead-sticky fw-bolder">
                 <tr>

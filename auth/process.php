@@ -45,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $user_id = $user['id_pengguna'];
                 setcookie("ingat_user_id", $user_id, time() + $expiry_time, "/"); // Cookie berlaku selama waktu yang ditentukan
                 setcookie("nama_pengguna", $user['nama_pengguna'], time() + $expiry_time, "/"); // Cookie berlaku selama waktu yang ditentukan
+                setcookie("nama_lengkap", $user['nama_lengkap'], time() + $expiry_time, "/"); // Cookie berlaku selama waktu yang ditentukan
             } else {
                 // Jika tidak "ingat akun", hapus cookie "ingat akun" jika ada
                 if (isset($_COOKIE['ingat_user_id'])) {

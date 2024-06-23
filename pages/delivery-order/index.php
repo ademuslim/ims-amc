@@ -32,22 +32,13 @@ $bind_paramsInv = [
 $data_inv = selectData('faktur', $conditionsInv, "tanggal DESC", "", $bind_paramsInv);
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="fs-5 mb-4">Data Delivery Order</h1>
-  <div>
-    <a href="<?= base_url("pages/dashboard") ?>" class="btn-act btn-back" title="Kembali"></a>
-    <a href="#" class="btn-act btn-print ms-4" onclick="printContent()" title="Cetak Data"></a>
-  </div>
-</div>
+<h1 class="fs-5 mb-3">Data Delivery Order</h1>
+<span class="badge rounded-pill text-bg-info mb-5"><?= htmlspecialchars($content_title); ?></span>
 
 <!-- Detail Invoice -->
 <div class="row">
   <div class="col">
     <div class="card p-0">
-      <div class="card-header card-header-sticky">
-        <!-- Menggunakan judul tabel dalam bahasa Indonesia -->
-        <?= htmlspecialchars($content_title); ?>
-      </div>
       <div class="card-body" style="overflow-y:auto; font-size:.9rem;">
         <table class="table table-bordered table-primary">
           <thead class="thead-sticky fw-bolder">
@@ -140,7 +131,7 @@ function printContent() {
   printWindow.document.write('body { font-family: Arial, sans-serif; }');
   printWindow.document.write('table { border-collapse: collapse; width: 100%; }');
   printWindow.document.write(
-    'th, td { border: 1px solid #469bf7; padding: 8px; text-align: left; vertical-align: top; }');
+    'th, td { border: 1px solid lightgrey; padding: 8px; text-align: left; vertical-align: top; }');
   printWindow.document.write('h1 { text-align: center; }');
   printWindow.document.write('</style>');
   printWindow.document.write('</head><body>');

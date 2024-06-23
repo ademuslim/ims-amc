@@ -55,7 +55,7 @@ if ($category_param === 'outgoing') {
 ?>
 
 <h1 class="fs-5 mb-4">Buat Purchase Order Baru</h1>
-<div class="paper-wrapper">
+<div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/purchase-orders/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>
 
@@ -95,11 +95,11 @@ if ($category_param === 'outgoing') {
 
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Purchase Order</p>
+          <p class="fs-2 text-end">PURCHASE ORDER</p>
           <p class="fs-5 text-end text-info">[ OUTGOING ]</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Purchase Order</p>
+        <p class="fs-2 p-0">PURCHASE ORDER</p>
         <p class="fs-5 text-info p-0">[ INCOMING ]</p>
         <?php } ?>
       </div>
@@ -432,9 +432,7 @@ if ($category_param === 'outgoing') {
         </div>
 
         <div class="col-auto">
-          <a href="index.php?category=<?= $category_param ?>">
-            <button type="button" class="btn btn-secondary btn-lg">Batal</button>
-          </a>
+          <a href="<?= base_url("pages/purchase-orders/$category_param") ?>" class="btn btn-secondary btn-lg">Batal</a>
         </div>
       </div>
     </div>

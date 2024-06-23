@@ -41,17 +41,19 @@ if (isset($_SESSION['error_message'])) {
   <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css'); ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/dataTables.bootstrap5.css'); ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/responsive.bootstrap5.css'); ?>">
+
   <!-- DataTables Button CSS-->
   <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.css'); ?>">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/print.css'); ?>">
   <!-- SweetAlert2 CSS -->
   <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2.min.css'); ?>">
   <!-- SweetAlert2 JS -->
   <script src="<?= base_url('assets/js/sweetalert2.all.min.js'); ?>"></script>
   <!-- ChartJS -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="<?= base_url('assets/js/chart.js'); ?>"></script>
+  <script src="<?= base_url('assets/js/chartjs-plugin-datalabels.js'); ?>"></script>
 
   <style>
   .show-immediate {
@@ -118,7 +120,7 @@ if (isset($_SESSION['error_message'])) {
 </head>
 
 <body>
-  <div class="sb-cover">
+  <div class="sb-cover d-print-none">
     <div class="sidebar">
       <div class="resizer"></div>
       <div class="sidebar-top">

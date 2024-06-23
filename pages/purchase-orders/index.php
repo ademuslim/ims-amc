@@ -120,13 +120,14 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
     <!-- Modal Approve -->
     <div class="modal fade" id="approveModal<?= $po['id_pesanan']; ?>" data-bs-backdrop="static" tabindex="-1"
       aria-labelledby="approveModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-sm">
+      <div class="modal-dialog modal-md">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Purchase Order</h1>
+            <h3 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Purchase Order</h3>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <p><?= "No: " . strtoupper($po['no_pesanan']) ?></p>
             <?php include 'approve.php'; ?>
             <!-- Include file approve.php untuk konten modal persetujuan -->
           </div>

@@ -59,7 +59,7 @@ if ($category_param === 'outgoing') {
 ?>
 
 <h1 class="fs-5 mb-4">Buat Invoice Baru</h1>
-<div class="paper-wrapper">
+<div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/invoices/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>
     <!-- Input kategori -->
@@ -98,10 +98,12 @@ if ($category_param === 'outgoing') {
 
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Invoice</p>
+          <p class="fs-2 text-end">INVOICE</p>
+          <p class="fs-5 text-end text-info">[ OUTGOING ]</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Invoice Incoming</p>
+        <p class="fs-2 p-0">INVOICE</p>
+        <p class="fs-5 text-info p-0">[ INCOMING ]</p>
         <?php } ?>
       </div>
 
@@ -230,7 +232,9 @@ if ($category_param === 'outgoing') {
               <td>Kuantitas<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
                   data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
                   data-bs-title="Masukan kuantitas tidak melebihi kuantitas PO">*</a></td>
-              <td>Harga</td>
+              <td>Harga Satuan<a href="#" class="link-danger link-offset-2 link-underline-opacity-0"
+                  data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip"
+                  data-bs-title="Masukan harga sesuai PO">*</a></td>
               <td colspan="2">Jumlah</td>
             </tr>
           </thead>
@@ -428,9 +432,7 @@ if ($category_param === 'outgoing') {
         </div>
 
         <div class="col-auto">
-          <a href="index.php?category=<?= $category_param ?>">
-            <button type="button" class="btn btn-secondary btn-lg">Batal</button>
-          </a>
+          <a href="<?= base_url("pages/invoices/$category_param") ?>" class="btn btn-secondary btn-lg">Batal</a>
         </div>
       </div>
     </div>

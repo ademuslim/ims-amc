@@ -1,0 +1,65 @@
+@media print {
+  body,
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    box-sizing: border-box; /* Pastikan padding dan border termasuk dalam ukuran elemen */
+  }
+  .rs-content,
+  .paper-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background-color: transparent;
+  }
+  .rs-content {
+    flex-grow: 0;
+  }
+  .paper-wrapper {
+    box-sizing: border-box;
+    box-shadow: none !important;
+    position: static !important;
+    border: none !important;
+  }
+  table.table-striped,
+  table.dataTable {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+  table.table-striped,
+  table.table-striped th,
+  table.table-striped td,
+  table.dataTable,
+  table.dataTable th,
+  table.dataTable td {
+    border: 1px solid lightgrey !important;
+    padding: 5px !important;
+  }
+  table.table-striped td.bg-transparent {
+    border: 1px solid transparent !important;
+    border-right: 1px solid lightgrey !important;
+  }
+  table.table-striped td.no-border-right {
+    border-right: none !important;
+  }
+  table.table-striped td.no-border-left {
+    border-left: none !important;
+  }
+  table.no-border-print,
+  table.no-border-print th,
+  table.no-border-print td {
+    border: none !important;
+  }
+  /* Hilangkan margin pada elemen .badge saat cetak */
+  .badge {
+    margin: 0 !important;
+  }
+
+  .approved-signature .col {
+    border: none !important;
+  }
+}

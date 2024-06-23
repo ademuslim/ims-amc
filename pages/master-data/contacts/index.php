@@ -58,10 +58,10 @@ $data_kontak = selectData('kontak', $conditions);
     <tr>
       <td class="text-start"><?= $no; ?></td>
       <td class="text-primary"><?= ucwords($kontak['nama_kontak']); ?></td>
-      <td><?= $kontak['email']; ?></td>
-      <td><?= $kontak['telepon']; ?></td>
+      <td><?= !empty($kontak['email']) ? $kontak['email'] : '_'; ?></td>
+      <td><?= !empty($kontak['telepon']) ? $kontak['telepon'] : '_'; ?></td>
       <td><?= ucwords($kontak['alamat']); ?></td>
-      <td><?= ucwords($kontak['keterangan']); ?></td>
+      <td><?= !empty($kontak['keterangan']) ? ucwords($kontak['keterangan']) : '_'; ?></td>
       <td>
         <div class="btn-group">
           <button type="button" class="btn-act btn-edit bg-transparent" data-bs-toggle="modal"

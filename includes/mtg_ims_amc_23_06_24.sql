@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Waktu pembuatan: 19 Jun 2024 pada 15.46
+-- Waktu pembuatan: 23 Jun 2024 pada 15.41
 -- Versi server: 8.0.30
 -- Versi PHP: 8.3.6
 
@@ -34,18 +34,18 @@ CREATE TABLE `detail_faktur` (
   `id_produk` varchar(36) NOT NULL,
   `jumlah` int NOT NULL,
   `harga_satuan` int NOT NULL,
-  `id_pesanan` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+  `id_pesanan` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `signature_confirm` longtext
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data untuk tabel `detail_faktur`
 --
 
-INSERT INTO `detail_faktur` (`id_detail_faktur`, `id_faktur`, `no_pengiriman_barang`, `id_produk`, `jumlah`, `harga_satuan`, `id_pesanan`) VALUES
-('02338dc2-4423-49a2-8ec3-70c21a52a11a', '6385fa38-bd94-4897-b9dc-11fce76a27ce', '001/spb/mtg/03/2024', '88dd7064-ccd4-4f7f-9c3d-7b1722066d4f', 161983, 2575, '2605208c-e6c0-4dbd-a212-2b0b0efb59f4'),
-('3bb237e5-368b-41e2-bb75-4d6c8c1333e7', '6385fa38-bd94-4897-b9dc-11fce76a27ce', '003/spb/mtg/03/2024', '51f151a4-ac95-4782-818f-b56d9a780123', 3500, 110, '91f91c90-cd93-4f4a-bc2e-a05ae0fc4a48'),
-('5eefc12b-1172-4974-acc1-a328299e7f28', '6385fa38-bd94-4897-b9dc-11fce76a27ce', '002/spb/mtg/03/2024', '2c3242ff-6b53-4ced-a89c-e08039ef6a77', 29919, 2575, '2605208c-e6c0-4dbd-a212-2b0b0efb59f4'),
-('6d21426a-b3de-4867-985b-f4b118e17224', 'bbe2ecf9-076b-44a6-8134-0f9163d5ca59', '001/spb/mtg/06/2024', '51f151a4-ac95-4782-818f-b56d9a780123', 500, 110, '91f91c90-cd93-4f4a-bc2e-a05ae0fc4a48');
+INSERT INTO `detail_faktur` (`id_detail_faktur`, `id_faktur`, `no_pengiriman_barang`, `id_produk`, `jumlah`, `harga_satuan`, `id_pesanan`, `signature_confirm`) VALUES
+('3def370a-df66-4d62-98db-22ec087452a7', 'a45d4f31-4070-453e-8b86-b155b63e7556', '001/spb/mtg/03/2024', '88dd7064-ccd4-4f7f-9c3d-7b1722066d4f', 161983, 2575, '426403bf-01af-47d2-be69-b2a2342bfbf9', NULL),
+('757dc3f8-bbf3-46ff-9301-f18d8bf5c3bf', 'a45d4f31-4070-453e-8b86-b155b63e7556', '003/spb/mtg/03/2024', '51f151a4-ac95-4782-818f-b56d9a780123', 3500, 110, 'b1e34522-b731-4de1-b55c-659c3f3b272a', NULL),
+('f2f559d3-2c34-4b0b-98d6-5743536d8974', 'a45d4f31-4070-453e-8b86-b155b63e7556', '002/spb/mtg/03/2024', '2c3242ff-6b53-4ced-a89c-e08039ef6a77', 29919, 2575, '426403bf-01af-47d2-be69-b2a2342bfbf9', NULL);
 
 -- --------------------------------------------------------
 
@@ -66,9 +66,9 @@ CREATE TABLE `detail_penawaran` (
 --
 
 INSERT INTO `detail_penawaran` (`id_detail_penawaran`, `id_penawaran`, `id_produk`, `jumlah`, `harga_satuan`) VALUES
-('061e4827-3e3b-4158-9f0f-ec9863afb919', '1dccfe5a-9050-4070-887c-41340aaa3f9a', '2c3242ff-6b53-4ced-a89c-e08039ef6a77', 1, 2575),
-('1d39c611-d0f7-49e7-91b9-cc5a6a05ebce', '9e3dac37-d8e3-404b-9e63-2603244c81fb', '88dd7064-ccd4-4f7f-9c3d-7b1722066d4f', 1, 2575),
-('3c0db790-e462-4bd5-8799-224ebd9e189e', '0119b7a6-454a-4113-a273-0612b7b3b5c1', '51f151a4-ac95-4782-818f-b56d9a780123', 1, 110);
+('332467a4-87f5-498f-b446-7a821a69a480', '4db33884-68f2-4406-aefd-194fb825b94d', '88dd7064-ccd4-4f7f-9c3d-7b1722066d4f', 1, 2575),
+('8983f913-8c13-4528-9643-00942d86a65d', '94d5cd5d-9019-4cb8-b688-107a41d2f826', '2c3242ff-6b53-4ced-a89c-e08039ef6a77', 1, 2575),
+('c2258d5b-6cb7-4f9b-9c9f-76536ffc8020', '08c31f22-b80e-478f-a84f-2c1df3918887', '51f151a4-ac95-4782-818f-b56d9a780123', 1, 110);
 
 -- --------------------------------------------------------
 
@@ -92,9 +92,9 @@ CREATE TABLE `detail_pesanan` (
 --
 
 INSERT INTO `detail_pesanan` (`id_detail_pesanan`, `id_pesanan`, `id_produk`, `jumlah`, `jumlah_dikirim`, `sisa_pesanan`, `harga_satuan`, `id_penawaran`) VALUES
-('0d29e1d1-fb2b-4488-981a-b671af424aa5', '91f91c90-cd93-4f4a-bc2e-a05ae0fc4a48', '51f151a4-ac95-4782-818f-b56d9a780123', 20000, 3500, 16500, 110, '0119b7a6-454a-4113-a273-0612b7b3b5c1'),
-('b43616ac-405c-4231-a855-aaa481cf9d39', '2605208c-e6c0-4dbd-a212-2b0b0efb59f4', '2c3242ff-6b53-4ced-a89c-e08039ef6a77', 30000, 29919, 81, 2575, '1dccfe5a-9050-4070-887c-41340aaa3f9a'),
-('c5ba0537-a9f0-4609-888d-a995352d6618', '2605208c-e6c0-4dbd-a212-2b0b0efb59f4', '88dd7064-ccd4-4f7f-9c3d-7b1722066d4f', 200000, 161983, 38017, 2575, '9e3dac37-d8e3-404b-9e63-2603244c81fb');
+('a4d70274-6ee9-4597-be8d-b3fe826cd15f', '426403bf-01af-47d2-be69-b2a2342bfbf9', '2c3242ff-6b53-4ced-a89c-e08039ef6a77', 30000, 29919, 81, 2575, '94d5cd5d-9019-4cb8-b688-107a41d2f826'),
+('d22b6fd2-04a0-4298-b071-07249eb147dd', 'b1e34522-b731-4de1-b55c-659c3f3b272a', '51f151a4-ac95-4782-818f-b56d9a780123', 20000, 3500, 16500, 110, '08c31f22-b80e-478f-a84f-2c1df3918887'),
+('ffa273d0-89ba-4eff-bf53-8aa212204360', '426403bf-01af-47d2-be69-b2a2342bfbf9', '88dd7064-ccd4-4f7f-9c3d-7b1722066d4f', 200000, 161983, 38017, 2575, '4db33884-68f2-4406-aefd-194fb825b94d');
 
 -- --------------------------------------------------------
 
@@ -111,7 +111,7 @@ CREATE TABLE `faktur` (
   `catatan` text,
   `id_penerima` varchar(36) NOT NULL,
   `diskon` int DEFAULT NULL,
-  `id_ppn` varchar(36) DEFAULT NULL,
+  `id_ppn` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `logo` varchar(100) DEFAULT NULL,
   `signature_info` longtext,
   `kategori` enum('keluar','masuk') NOT NULL,
@@ -124,8 +124,7 @@ CREATE TABLE `faktur` (
 --
 
 INSERT INTO `faktur` (`id_faktur`, `id_pengirim`, `no_faktur`, `tanggal`, `total`, `catatan`, `id_penerima`, `diskon`, `id_ppn`, `logo`, `signature_info`, `kategori`, `status`, `status_hapus`) VALUES
-('6385fa38-bd94-4897-b9dc-11fce76a27ce', '31c50f21-12b9-4826-9345-52c604ec4ee2', '001/inv/mtg/03/2024', '2024-03-30 00:00:00', 548931242, '', '5c091a0a-9796-4d5d-b009-526830bd6386', 0, 'e502e6a9-e463-4bb0-9a78-0e30dc229722', '../../assets/image/uploads/logo/6671b6f4e9299_20240618.jpeg', 'Location: cikarang pusat, Date: 2024-03-30, Name: supriyadi, Position: direktur, Path: ', 'keluar', 'belum dibayar', 0),
-('bbe2ecf9-076b-44a6-8134-0f9163d5ca59', '31c50f21-12b9-4826-9345-52c604ec4ee2', '002/inv/mtg/06/2024', '2024-06-19 21:50:00', 61050, '', '5c091a0a-9796-4d5d-b009-526830bd6386', 0, 'e502e6a9-e463-4bb0-9a78-0e30dc229722', '../../assets/image/uploads/logo/6671b6f4e9299_20240618.jpeg', 'Location: bekasi, Date: 2024-06-19, Name: supriyadi, Position: direktur, Path: ', 'keluar', 'tunggu kirim', 1);
+('a45d4f31-4070-453e-8b86-b155b63e7556', '31c50f21-12b9-4826-9345-52c604ec4ee2', '001/inv/mtg/03/2024', '2024-03-30 00:00:00', 548931242, 'lima ratus empat puluh delapan juta sembilan ratus tiga puluh satu ribu dua ratus empat puluh dua rupiah', '5c091a0a-9796-4d5d-b009-526830bd6386', 0, 'e502e6a9-e463-4bb0-9a78-0e30dc229722', '../../assets/image/uploads/logo/66782f4ae81fa_20240623.jpeg', 'Location: cikarang, Date: 2024-03-30, Name: supriyadi, Position: direktur, Path: ../../assets/image/uploads/signature/66782f109b2cb_20240623.png', 'keluar', 'dibayar', 0);
 
 -- --------------------------------------------------------
 
@@ -149,7 +148,7 @@ CREATE TABLE `kontak` (
 --
 
 INSERT INTO `kontak` (`id_kontak`, `nama_kontak`, `kategori`, `alamat`, `telepon`, `email`, `keterangan`, `status_hapus`) VALUES
-('31c50f21-12b9-4826-9345-52c604ec4ee2', 'pt. mitra tekno gemilang', 'internal', 'office : jl. rawa banteng rt.01 rw.02 kel. jaya mukti kec. cikarang pusat - bekasi', '02129481360', 'mitra_teknogemilang@yahoo.co.id', 'kontak utama perusahaan.', 0),
+('31c50f21-12b9-4826-9345-52c604ec4ee2', 'pt. mitra tehno gemilang', 'internal', 'office:  jl. rawa banteng rt.01 rw.02 kel. jaya mukti kec. cikarang pusat - bekasi', '02129481360', 'mitra_tehnogemilang@yahoo.co.id', 'kontak utama perusahaan.', 0),
 ('5c091a0a-9796-4d5d-b009-526830bd6386', 'pt. yamaha motor parts mfg. indonesia', 'customer', 'jl. permata raya lot f2& f6 po box. 157 kiic. karawang - jawa barat', '', '', 'kontak utama ypmi', 0),
 ('66fe9784-7a4f-4097-b25c-57872b4bd101', 'pt. stilmetindo prima', 'supplier', 'jl. marina indah golf,rukan eksklusive blok i no 6-7 bgm pikrt.004 rw.003 kamal muara,penjaringan,jakarta utara 14470', '02155965878', '', '-', 0),
 ('7bf7dcf6-e4d2-48fe-bc45-c5b590b8aa73', 'pt. tritama teknik indo', 'supplier', 'deltamas', '', 'mail@m', 'tes', 0),
@@ -179,32 +178,20 @@ CREATE TABLE `log_aktivitas` (
 --
 
 INSERT INTO `log_aktivitas` (`id_log`, `id_pengguna`, `aktivitas`, `tabel`, `keterangan`, `tanggal`, `status_hapus`) VALUES
-(161, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Login berhasil', 'Pengguna', 'Pengguna dengan username s_admin berhasil login.', '2024-06-18 16:27:38', 0),
-(162, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PH', 'Penawaran Harga', 'Berhasil membuat penawaran harga baru dengan ID 0119b7a6-454a-4113-a273-0612b7b3b5c1', '2024-06-18 16:33:57', 0),
-(163, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 0119b7a6-454a-4113-a273-0612b7b3b5c1: | 1. no_penawaran: &quot;001/ph/mtg/10/2018&quot; diubah menjadi &quot;002/ph/mtg/10/2018&quot; | ', '2024-06-18 16:55:56', 0),
-(164, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status PH', 'Penawaran Harga', 'Perubahan status penawaran harga dengan ID 0119b7a6-454a-4113-a273-0612b7b3b5c1: | . status: &quot;draft&quot; diubah menjadi &quot;disetujui&quot; | ', '2024-06-18 16:56:05', 0),
-(165, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PH', 'Penawaran Harga', 'Berhasil membuat penawaran harga baru dengan ID 9e3dac37-d8e3-404b-9e63-2603244c81fb', '2024-06-18 16:58:15', 0),
-(166, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 9e3dac37-d8e3-404b-9e63-2603244c81fb: | 1. no_penawaran: &quot;001/ph/mtg/12/2023&quot; diubah menjadi &quot;018/ph/mtg/12/2023&quot; | 2. status: &quot;draft&quot; diubah menjadi &quot;disetujui&quot; | ', '2024-06-18 16:58:43', 0),
-(167, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PH', 'Penawaran Harga', 'Berhasil membuat penawaran harga baru dengan ID 1dccfe5a-9050-4070-887c-41340aaa3f9a', '2024-06-18 17:00:26', 0),
-(168, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 1dccfe5a-9050-4070-887c-41340aaa3f9a: | 1. no_penawaran: &quot;001/ph/mtg/12/2024&quot; diubah menjadi &quot;019/ph/mtg/12/2024&quot; | 2. status: &quot;draft&quot; diubah menjadi &quot;disetujui&quot; | ', '2024-06-18 17:00:45', 0),
-(169, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PO', 'Pesanan Pembelian', 'Berhasil membuat pesanan pembelian baru dengan ID 91f91c90-cd93-4f4a-bc2e-a05ae0fc4a48', '2024-06-18 17:04:31', 0),
-(170, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status PO', 'Pesanan Pembelian', 'Perubahan status pesanan pembelian dengan ID 91f91c90-cd93-4f4a-bc2e-a05ae0fc4a48: &quot;status&quot; diubah dari &quot;draft&quot; menjadi &quot;diproses&quot;.', '2024-06-18 17:04:50', 0),
-(171, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PO', 'Pesanan Pembelian', 'Berhasil membuat pesanan pembelian baru dengan ID 2605208c-e6c0-4dbd-a212-2b0b0efb59f4', '2024-06-18 17:07:56', 0),
-(172, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status PO', 'Pesanan Pembelian', 'Perubahan status pesanan pembelian dengan ID 2605208c-e6c0-4dbd-a212-2b0b0efb59f4: &quot;status&quot; diubah dari &quot;draft&quot; menjadi &quot;diproses&quot;.', '2024-06-18 17:08:09', 0),
-(173, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat invoice baru', 'faktur', 'Pengguna dengan ID 9167ed40-435e-4e18-a4d0-59676a89c511 berhasil membuat invoice baru dengan ID 6385fa38-bd94-4897-b9dc-11fce76a27ce', '2024-06-18 17:14:42', 0),
-(174, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID 6385fa38-bd94-4897-b9dc-11fce76a27ce: &quot;status&quot; diubah dari &quot;tunggu kirim&quot; menjadi &quot;dibayar&quot;.', '2024-06-18 17:15:15', 0),
-(175, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 1dccfe5a-9050-4070-887c-41340aaa3f9a: | 1. no_penawaran: &quot;019/ph/mtg/12/2024&quot; diubah menjadi &quot;019/ph/mtg/12/2023&quot; | 2. tanggal: &quot;2024-12-06 00:00:00&quot; diubah menjadi &quot;2023-12-06 00:00:00&quot; | ', '2024-06-18 17:20:33', 0),
-(176, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Login berhasil', 'Pengguna', 'Pengguna dengan username s_admin berhasil login.', '2024-06-19 11:17:40', 0),
-(177, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID 6385fa38-bd94-4897-b9dc-11fce76a27ce: &quot;status&quot; diubah dari &quot;dibayar&quot; menjadi &quot;tunggu kirim&quot;.', '2024-06-19 12:26:01', 0),
-(178, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID 6385fa38-bd94-4897-b9dc-11fce76a27ce: &quot;status&quot; diubah dari &quot;tunggu kirim&quot; menjadi &quot;dibayar&quot;.', '2024-06-19 12:28:46', 0),
-(179, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID 6385fa38-bd94-4897-b9dc-11fce76a27ce: &quot;status&quot; diubah dari &quot;dibayar&quot; menjadi &quot;tunggu kirim&quot;.', '2024-06-19 12:33:21', 0),
-(180, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID 6385fa38-bd94-4897-b9dc-11fce76a27ce: &quot;status&quot; diubah dari &quot;tunggu kirim&quot; menjadi &quot;belum dibayar&quot;.', '2024-06-19 13:20:51', 0),
-(181, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat invoice baru', 'faktur', 'Pengguna dengan ID 9167ed40-435e-4e18-a4d0-59676a89c511 berhasil membuat invoice baru dengan ID bbe2ecf9-076b-44a6-8134-0f9163d5ca59', '2024-06-19 14:52:14', 0),
-(182, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID bbe2ecf9-076b-44a6-8134-0f9163d5ca59: &quot;status&quot; diubah dari &quot;tunggu kirim&quot; menjadi &quot;belum dibayar&quot;.', '2024-06-19 14:52:30', 0),
-(183, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID bbe2ecf9-076b-44a6-8134-0f9163d5ca59: &quot;status&quot; diubah dari &quot;belum dibayar&quot; menjadi &quot;tunggu kirim&quot;.', '2024-06-19 15:11:26', 0),
-(184, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID bbe2ecf9-076b-44a6-8134-0f9163d5ca59: &quot;status&quot; diubah dari &quot;tunggu kirim&quot; menjadi &quot;belum dibayar&quot;.', '2024-06-19 15:11:32', 0),
-(185, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID bbe2ecf9-076b-44a6-8134-0f9163d5ca59: &quot;status&quot; diubah dari &quot;belum dibayar&quot; menjadi &quot;tunggu kirim&quot;.', '2024-06-19 15:22:52', 0),
-(186, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil hapus data', 'Faktur', 'Berhasil hapus invoice dengan ID bbe2ecf9-076b-44a6-8134-0f9163d5ca59 (soft delete).', '2024-06-19 15:22:56', 0);
+(271, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PH', 'Penawaran Harga', 'Berhasil membuat penawaran harga baru dengan ID 08c31f22-b80e-478f-a84f-2c1df3918887', '2024-06-23 14:20:00', 0),
+(272, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 08c31f22-b80e-478f-a84f-2c1df3918887: | 1. logo: &quot;&quot; diubah menjadi &quot;../../assets/image/uploads/logo/66782f4ae81fa_20240623.jpeg&quot; | ', '2024-06-23 14:20:58', 0),
+(273, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 08c31f22-b80e-478f-a84f-2c1df3918887: | 1. no_penawaran: &quot;001/ph/mtg/10/2018&quot; diubah menjadi &quot;002/ph/mtg/10/2018&quot; | ', '2024-06-23 14:21:22', 0),
+(274, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status PH', 'Penawaran Harga', 'Perubahan status penawaran harga dengan ID 08c31f22-b80e-478f-a84f-2c1df3918887: | . status: &quot;draft&quot; diubah menjadi &quot;disetujui&quot; | ', '2024-06-23 14:23:23', 0),
+(275, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PH', 'Penawaran Harga', 'Berhasil membuat penawaran harga baru dengan ID 4db33884-68f2-4406-aefd-194fb825b94d', '2024-06-23 14:26:29', 0),
+(276, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 4db33884-68f2-4406-aefd-194fb825b94d: | 1. no_penawaran: &quot;001/ph/mtg/12/2023&quot; diubah menjadi &quot;018/ph/mtg/12/2023&quot; | 2. status: &quot;draft&quot; diubah menjadi &quot;disetujui&quot; | ', '2024-06-23 14:26:54', 0),
+(277, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PH', 'Penawaran Harga', 'Berhasil membuat penawaran harga baru dengan ID 94d5cd5d-9019-4cb8-b688-107a41d2f826', '2024-06-23 14:28:37', 0),
+(278, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah PH', 'Penawaran Harga', 'Perubahan data penawaran harga dengan ID 94d5cd5d-9019-4cb8-b688-107a41d2f826: | 1. status: &quot;draft&quot; diubah menjadi &quot;disetujui&quot; | ', '2024-06-23 14:28:52', 0),
+(279, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PO', 'Pesanan Pembelian', 'Berhasil membuat pesanan pembelian baru dengan ID b1e34522-b731-4de1-b55c-659c3f3b272a', '2024-06-23 14:31:18', 0),
+(280, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status PO', 'Pesanan Pembelian', 'Perubahan status pesanan pembelian dengan ID b1e34522-b731-4de1-b55c-659c3f3b272a: &quot;status&quot; diubah dari &quot;draft&quot; menjadi &quot;diproses&quot;.', '2024-06-23 14:32:29', 0),
+(281, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat PO', 'Pesanan Pembelian', 'Berhasil membuat pesanan pembelian baru dengan ID 426403bf-01af-47d2-be69-b2a2342bfbf9', '2024-06-23 14:34:28', 0),
+(282, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status PO', 'Pesanan Pembelian', 'Perubahan status pesanan pembelian dengan ID 426403bf-01af-47d2-be69-b2a2342bfbf9: &quot;status&quot; diubah dari &quot;draft&quot; menjadi &quot;diproses&quot;.', '2024-06-23 14:34:40', 0),
+(283, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil membuat invoice baru', 'faktur', 'Pengguna dengan ID 9167ed40-435e-4e18-a4d0-59676a89c511 berhasil membuat invoice baru dengan ID a45d4f31-4070-453e-8b86-b155b63e7556', '2024-06-23 14:40:28', 0),
+(284, '9167ed40-435e-4e18-a4d0-59676a89c511', 'Berhasil ubah status invoice', 'Faktur', 'Perubahan status faktur dengan ID a45d4f31-4070-453e-8b86-b155b63e7556: &quot;status&quot; diubah dari &quot;tunggu kirim&quot; menjadi &quot;dibayar&quot;.', '2024-06-23 14:40:49', 0);
 
 -- --------------------------------------------------------
 
@@ -235,9 +222,9 @@ CREATE TABLE `penawaran_harga` (
 --
 
 INSERT INTO `penawaran_harga` (`id_penawaran`, `id_pengirim`, `no_penawaran`, `tanggal`, `total`, `catatan`, `id_penerima`, `up`, `id_ppn`, `diskon`, `logo`, `signature_info`, `kategori`, `status`, `status_hapus`) VALUES
-('0119b7a6-454a-4113-a273-0612b7b3b5c1', '31c50f21-12b9-4826-9345-52c604ec4ee2', '002/ph/mtg/10/2018', '2018-10-05 00:00:00', 110, 'harga belum termasuk ppn 11%, penawaran harga di update dan telah di approve kembali tgl 04 maret 2024.', '5c091a0a-9796-4d5d-b009-526830bd6386', 'bpk. rudi rusminarno', '3395fb1f-a551-4bfd-a9ff-8ce407a108bc', 0, '../../assets/image/uploads/logo/6671b6f4e9299_20240618.jpeg', 'Location: cikarang pusat, Date: 2024-05-04, Name: supriyadi, Position: direktur, Path: ', 'keluar', 'disetujui', 0),
-('1dccfe5a-9050-4070-887c-41340aaa3f9a', '31c50f21-12b9-4826-9345-52c604ec4ee2', '019/ph/mtg/12/2023', '2023-12-06 00:00:00', 2575, 'harga belum termasuk ppn 11%', '5c091a0a-9796-4d5d-b009-526830bd6386', 'bpk rudi rusminarno', '3395fb1f-a551-4bfd-a9ff-8ce407a108bc', 0, '../../assets/image/uploads/logo/6671b6f4e9299_20240618.jpeg', 'Location: cikarang pusat, Date: 2024-12-06, Name: supriyadi, Position: direktur, Path: ', 'keluar', 'disetujui', 0),
-('9e3dac37-d8e3-404b-9e63-2603244c81fb', '31c50f21-12b9-4826-9345-52c604ec4ee2', '018/ph/mtg/12/2023', '2023-12-06 00:00:00', 2575, 'harga belum termasuk ppn 11%.', '5c091a0a-9796-4d5d-b009-526830bd6386', 'bpk. rudi rusminarno', '3395fb1f-a551-4bfd-a9ff-8ce407a108bc', 0, '../../assets/image/uploads/logo/6671b6f4e9299_20240618.jpeg', 'Location: cikarang pusat, Date: 2024-12-06, Name: supriyadi, Position: direktur, Path: ', 'keluar', 'disetujui', 0);
+('08c31f22-b80e-478f-a84f-2c1df3918887', '31c50f21-12b9-4826-9345-52c604ec4ee2', '002/ph/mtg/10/2018', '2018-10-05 00:00:00', 110, 'harga belum termasuk ppn 11%, penawaran harga telah di approve kembali 05 maret 2024 (bu nurlaili rahma).', '5c091a0a-9796-4d5d-b009-526830bd6386', 'bpk. rudi rusminarno', '3395fb1f-a551-4bfd-a9ff-8ce407a108bc', 0, '../../assets/image/uploads/logo/66782f4ae81fa_20240623.jpeg', 'Location: cikarang pusat, Date: 2018-10-05, Name: supriyadi, Position: direktur, Path: ../../assets/image/uploads/signature/66782f109b2cb_20240623.png', 'keluar', 'disetujui', 0),
+('4db33884-68f2-4406-aefd-194fb825b94d', '31c50f21-12b9-4826-9345-52c604ec4ee2', '018/ph/mtg/12/2023', '2023-12-06 00:00:00', 2575, 'harga belum termasuk ppn 11%.', '5c091a0a-9796-4d5d-b009-526830bd6386', 'bpk. rudi rusminarno', '3395fb1f-a551-4bfd-a9ff-8ce407a108bc', 0, '../../assets/image/uploads/logo/66782f4ae81fa_20240623.jpeg', 'Location: cikarang, Date: 2023-12-06, Name: supriyadi, Position: direktur, Path: ../../assets/image/uploads/signature/66782f109b2cb_20240623.png', 'keluar', 'disetujui', 0),
+('94d5cd5d-9019-4cb8-b688-107a41d2f826', '31c50f21-12b9-4826-9345-52c604ec4ee2', '019/ph/mtg/12/2023', '2023-12-06 00:00:00', 2575, 'harga belum termasuk ppn 11%.', '5c091a0a-9796-4d5d-b009-526830bd6386', 'bpk. rudi rusminarno', '3395fb1f-a551-4bfd-a9ff-8ce407a108bc', 0, '../../assets/image/uploads/logo/66782f4ae81fa_20240623.jpeg', 'Location: cikarang, Date: 2024-12-06, Name: supriyadi, Position: direktur, Path: ../../assets/image/uploads/signature/66782f109b2cb_20240623.png', 'keluar', 'disetujui', 0);
 
 -- --------------------------------------------------------
 
@@ -259,7 +246,7 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id_pengguna`, `nama_lengkap`, `nama_pengguna`, `password`, `tipe_pengguna`, `status_hapus`) VALUES
-('5f8e47d7-7fea-4a8d-8641-a071007f59da', 'ayu lestari', 'staff_1', '$2y$10$688ccUtC2sV68aLU1TYSyeYecVLjtZRtckDcztq4cFkg6.vvL3qI.', 'staff', 0),
+('5f8e47d7-7fea-4a8d-8641-a071007f59da', 'dinda silvia', 'staff_1', '$2y$10$688ccUtC2sV68aLU1TYSyeYecVLjtZRtckDcztq4cFkg6.vvL3qI.', 'staff', 0),
 ('9167ed40-435e-4e18-a4d0-59676a89c511', 'ade muslim', 's_admin', '$2y$10$GmXtGEBcCEe5x89dksFw0uOUrVErfX7EwHjffm3ujhd9Fxc1i4rxm', 'superadmin', 0),
 ('c8f7e282-b9ec-478f-a479-8219a9d5c85a', 'supriyadi', 'direktur', '$2y$10$KP/AxDH4mLaqCxT.SHgOaexoMfFQRrcfUSPzesJ74NWd5OsJsQv2y', 'kepala_perusahaan', 0);
 
@@ -292,8 +279,8 @@ CREATE TABLE `pesanan_pembelian` (
 --
 
 INSERT INTO `pesanan_pembelian` (`id_pesanan`, `id_pengirim`, `no_pesanan`, `tanggal`, `total`, `catatan`, `id_penerima`, `up`, `diskon`, `id_ppn`, `logo`, `signature_info`, `kategori`, `status`, `status_hapus`) VALUES
-('2605208c-e6c0-4dbd-a212-2b0b0efb59f4', '5c091a0a-9796-4d5d-b009-526830bd6386', 'te/wh2/ypmi/mpo/2024/03/38971', '2024-03-25 00:00:00', 657397500, '', '31c50f21-12b9-4826-9345-52c604ec4ee2', '', 0, 'e502e6a9-e463-4bb0-9a78-0e30dc229722', '', 'Location: ypmi, Date: 2024-03-25, Name: yamada yoshio, Position: gm purchasing, Path: ', 'masuk', 'diproses', 0),
-('91f91c90-cd93-4f4a-bc2e-a05ae0fc4a48', '5c091a0a-9796-4d5d-b009-526830bd6386', 'te/wh2/ypmi/mpo/2024/03/38970', '2024-03-25 00:00:00', 2442000, '', '31c50f21-12b9-4826-9345-52c604ec4ee2', '', 0, 'e502e6a9-e463-4bb0-9a78-0e30dc229722', '', 'Location: ypmi, Date: 2024-03-25, Name: yamada yoshio, Position: gm purchasing, Path: ', 'masuk', 'diproses', 0);
+('426403bf-01af-47d2-be69-b2a2342bfbf9', '5c091a0a-9796-4d5d-b009-526830bd6386', 'te/wh2/ypmi/mpo/2024/03/38971', '2024-03-25 00:00:00', 657397500, '', '31c50f21-12b9-4826-9345-52c604ec4ee2', '', 0, 'e502e6a9-e463-4bb0-9a78-0e30dc229722', '', 'Location: ypmi kiic, Date: 2024-03-25, Name: yamada yoshio, Position: gm purchasing, Path: ', 'masuk', 'diproses', 0),
+('b1e34522-b731-4de1-b55c-659c3f3b272a', '5c091a0a-9796-4d5d-b009-526830bd6386', 'te/wh2/ypmi/mpo/2024/03/38970', '2024-03-25 00:00:00', 2442000, '', '31c50f21-12b9-4826-9345-52c604ec4ee2', '', 0, 'e502e6a9-e463-4bb0-9a78-0e30dc229722', '', 'Location: ypmi kiic, Date: 2024-03-25, Name: yamada yoshio, Position: gm purchasing, Path: ', 'masuk', 'diproses', 0);
 
 -- --------------------------------------------------------
 
@@ -448,7 +435,7 @@ ALTER TABLE `produk`
 -- AUTO_INCREMENT untuk tabel `log_aktivitas`
 --
 ALTER TABLE `log_aktivitas`
-  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
+  MODIFY `id_log` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=285;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)

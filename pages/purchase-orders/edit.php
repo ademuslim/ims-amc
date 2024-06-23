@@ -69,10 +69,10 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
     // Panggil fungsi selectDataJoin dengan ORDER BY
     $data_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
   } else {
-      echo "PO tidak ditemukan.";
+      $error_message = "PO tidak ditemukan.";
   }
 } else {
-echo "ID PO tidak ditemukan.";
+    $error_message = "ID PO tidak ditemukan.";
 }
 
 if ($error_message): ?>
@@ -81,7 +81,7 @@ if ($error_message): ?>
 <?php if (!empty($data)): ?>
 
 <h1 class="fs-5 mb-4">Ubah Purchase Order</h1>
-<div class="paper-wrapper">
+<div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/purchase-orders/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>
     <div class="container">
@@ -122,10 +122,12 @@ if ($error_message): ?>
 
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Purchase Order</p>
+          <p class="fs-2 text-end">PURCHASE ORDER</p>
+          <p class="fs-5 text-end text-info">[ OUTGOING ]</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Purchase Order Incoming</p>
+        <p class="fs-2 p-0">PURCHASE ORDER</p>
+        <p class="fs-5 text-info p-0">[ INCOMING ]</p>
         <?php } ?>
       </div>
 

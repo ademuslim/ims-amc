@@ -4,6 +4,7 @@ $page_title = $category_param === 'outgoing' ? 'Invoice Outgoing' : 'Invoice Inc
 $content_title = $category_param === 'outgoing' ? 'Keluar' : 'Masuk';
 require '../../includes/header.php';
 
+// Kategori dokumen
 $category = ($category_param === 'outgoing') ? 'keluar' : (($category_param === 'incoming') ? 'masuk' : die("Kategori tidak valid"));
 
 
@@ -124,10 +125,11 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Invoice</h1>
+            <h3 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Invoice</h3>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <p><?= "No: " . strtoupper($faktur['no_faktur']) ?></p>
             <?php include 'approve.php'; ?>
             <!-- Include file approve.php untuk konten modal persetujuan -->
           </div>

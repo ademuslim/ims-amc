@@ -64,6 +64,14 @@ $(document).ready(function () {
           columns: ":not(:last-child)",
         },
         text: "Cetak",
+        customize: function (win) {
+          // Apply custom CSS during print
+          $(win.document.body).css("font-size", "10pt");
+          $(win.document.body)
+            .find("table")
+            .addClass("compact")
+            .css("border", "1px solid black");
+        },
       },
     ],
     language: {
@@ -105,23 +113,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-
-// Print Paper Wrapper
-function printContent() {
-  // Ambil isi dari elemen dengan kelas paper-wrapper
-  var content = document.querySelector(".paper-wrapper").innerHTML;
-
-  // Simpan konten dalam sebuah jendela pop-up
-  var printWindow = window.open("", "_blank");
-
-  // Tulis konten ke dalam jendela pop-up
-  printWindow.document.write(
-    "<html><head><title>Cetak Dokumen</title></head><body>"
-  );
-  printWindow.document.write(content);
-  printWindow.document.write("</body></html>");
-
-  // Tutup pop-up setelah pencetakan selesai
-  printWindow.document.close();
-  printWindow.print();
-}

@@ -110,7 +110,8 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
       <td>
         <div class="btn-group">
           <button type="button" class="btn-act btn-approve bg-transparent" data-bs-toggle="modal"
-            data-bs-target="#approveModal<?= $ph['id_penawaran']; ?>" title="Perbarui Status"></button>
+            data-bs-target="#approveModal<?= $ph['id_penawaran']; ?>" title="Perbarui Status"
+            data-status="<?= $ph['status']; ?>"></button>
 
           <a href="<?= base_url("pages/quotation/detail/$category_param/{$ph['id_penawaran']}") ?>"
             class="btn-act btn-view" title="Lihat Detail"></a>
@@ -128,13 +129,14 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
     <!-- Modal Approve -->
     <div class="modal fade" id="approveModal<?= $ph['id_penawaran']; ?>" data-bs-backdrop="static" tabindex="-1"
       aria-labelledby="approveModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-sm">
+      <div class="modal-dialog modal-md">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Penawaran Harga</h1>
+            <h3 class="modal-title fs-5" id="approveModalLabel">Perbarui Status Penawaran Harga</h3>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <p><?= "No: " . strtoupper($ph['no_penawaran']) ?></p>
             <?php include 'approve.php'; ?>
             <!-- Include file approve.php untuk konten modal persetujuan -->
           </div>

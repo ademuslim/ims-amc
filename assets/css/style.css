@@ -73,7 +73,7 @@ body {
   min-width: 50px;
   max-width: 400px;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
   /* background-image: url("../image/sidebar-bg.jpg");
   background-size: cover;
@@ -161,7 +161,6 @@ body {
 }
 /* Main CSS */
 .paper-wrapper {
-  padding: 2rem;
   color: #555;
   width: 100%;
   box-shadow: 2px 3px 26px 0px #c2dbed;
@@ -248,8 +247,16 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23dc3545'%3E%3Cpath d='M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z'/%3E%3C/svg%3E");
 }
 .image {
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: auto;
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+p {
+  font-size: 16px !important; /* Approximate 12pt equivalent */
 }
 
 /* Dashboard */
@@ -417,6 +424,7 @@ td .btn-group {
   transition: background 0.5s ease;
 }
 .btn-print {
+  cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23666666'%3E%3Cpath d='M640-640v-120H320v120h-80v-200h480v200h-80Zm-480 80h640-640Zm560 100q17 0 28.5-11.5T760-500q0-17-11.5-28.5T720-540q-17 0-28.5 11.5T680-500q0 17 11.5 28.5T720-460Zm-80 260v-160H320v160h320Zm80 80H240v-160H80v-240q0-51 35-85.5t85-34.5h560q51 0 85.5 34.5T880-520v240H720v160Zm80-240v-160q0-17-11.5-28.5T760-560H200q-17 0-28.5 11.5T160-520v160h80v-80h480v80h80Z'/%3E%3C/svg%3E");
   transition: background 0.5s ease;
 }
@@ -492,4 +500,25 @@ body.dt-print-view table td {
 
 .custom-file-label:hover svg {
   fill: #eee;
+}
+
+.fix-width-col-md {
+  min-width: 220px;
+}
+
+/* Mengatur tinggi sel pada tbody untuk tabel dengan kelas 'special-table' */
+.special-table tbody td {
+  height: 160px;
+  vertical-align: top;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Mengatur tinggi baris pada tbody untuk tabel dengan kelas 'special-table' */
+.special-table tbody tr {
+  height: 160px;
+}
+
+.dummy-dt {
+  color: transparent !important;
 }

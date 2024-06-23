@@ -68,19 +68,18 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
     // Panggil fungsi selectDataJoin dengan ORDER BY
     $data_detail = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions);
   } else {
-      echo "Faktur tidak ditemukan.";
+      $error_message = "Faktur tidak ditemukan.";
   }
 } else {
-echo "ID faktur tidak ditemukan.";
+    $error_message = "ID faktur tidak ditemukan.";
 }
 
 if ($error_message): ?>
 <p><?php echo $error_message; ?></p>
 <?php else: ?>
 <?php if (!empty($data)): ?>
-
 <h1 class="fs-5 mb-4">Ubah Faktur</h1>
-<div class="paper-wrapper">
+<div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/invoices/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>
     <div class="container">
@@ -121,10 +120,10 @@ if ($error_message): ?>
 
         <!-- Judul Dokumen -->
         <div class="col-md-6 p-0">
-          <p class="fs-2 text-end">Purchase Order</p>
+          <p class="fs-2 text-end">INVOICE</p>
         </div>
         <?php } else { ?>
-        <p class="fs-2 p-0">Purchase Order Incoming</p>
+        <p class="fs-2 p-0">INVOICE INCOMING</p>
         <?php } ?>
       </div>
 
