@@ -54,12 +54,11 @@
   table.no-border-print td {
     border: none !important;
   }
-  /* Hilangkan margin pada elemen .badge saat cetak */
   .badge {
     margin: 0 !important;
   }
-
-  .approved-signature .col {
+  .approved-signature .col,
+  .signature-placeholder {
     border: none !important;
   }
 }

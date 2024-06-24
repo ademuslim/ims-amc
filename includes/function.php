@@ -741,3 +741,84 @@ function updateDetailPesanan($id_produk, $id_pesanan, $jumlah_perubahan) {
         mysqli_query($conn, $query);
     }
 }
+
+// Fungsi terbilang harga
+function terbilang($angka) {
+    $angka = abs($angka);
+    $baca = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+    $result = "";
+
+    if ($angka < 12) {
+        $result = $baca[$angka];
+    } elseif ($angka < 20) {
+        $result = terbilang($angka - 10) . " belas";
+    } elseif ($angka < 100) {
+        $result = terbilang(floor($angka / 10)) . " puluh " . terbilang($angka % 10);
+    } elseif ($angka < 200) {
+        $result = "seratus " . terbilang($angka - 100);
+    } elseif ($angka < 1000) {
+        $result = terbilang(floor($angka / 100)) . " ratus " . terbilang($angka % 100);
+    } elseif ($angka < 2000) {
+        $result = "seribu " . terbilang($angka - 1000);
+    } elseif ($angka < 1000000) {
+        $result = terbilang(floor($angka / 1000)) . " ribu " . terbilang($angka % 1000);
+    } elseif ($angka < 1000000000) {
+        $result = terbilang(floor($angka / 1000000)) . " juta " . terbilang($angka % 1000000);
+    } elseif ($angka < 1000000000000) {
+        $result = terbilang(floor($angka / 1000000000)) . " milyar " . terbilang(fmod($angka, 1000000000));
+    } elseif ($angka < 1000000000000000) {
+        $result = terbilang(floor($angka / 1000000000000)) . " triliun " . terbilang(fmod($angka, 1000000000000));
+    }
+
+    return trim($result);
+}
+
+// Fungsi format terbilang
+function bagiTerbilang($angka) {
+    $angka = round($angka);
+    $jutaan = floor($angka / 1000000);
+    $sisa = $angka % 1000000;
+    $ribuan = floor($sisa / 1000);
+    $ratusan = $sisa % 1000;
+
+    $jutaan_terbilang = $jutaan > 0 ? trim(terbilang($jutaan) . " juta") : "";
+    $ribuan_terbilang = $ribuan > 0 ? trim(terbilang($ribuan) . " ribu") : "";
+    $ratusan_terbilang = $ratusan > 0 ? trim(terbilang($ratusan)) : "";
+
+    // Tambahkan kata "rupiah" hanya pada bagian yang terakhir kali muncul
+    if (!empty($ratusan_terbilang)) {
+        $ratusan_terbilang .= " rupiah";
+    } elseif (!empty($ribuan_terbilang)) {
+        $ribuan_terbilang .= " rupiah";
+    } elseif (!empty($jutaan_terbilang)) {
+        $jutaan_terbilang .= " rupiah";
+    }
+
+    return [
+        'jutaan' => $jutaan_terbilang,
+        'ribuan' => $ribuan_terbilang,
+        'ratusan' => $ratusan_terbilang
+    ];
+}
+
+// Fungsi untuk memperbarui status pesanan_pembelian menjadi "selesai" jika semua sisa_pesanan adalah 0
+function updateOrderStatusIfCompleted($id_pesanan) {
+    // Ambil semua detail_pesanan terkait dengan id_pesanan ini
+    $detail_pesanan = selectData('detail_pesanan', "id_pesanan = '$id_pesanan'");
+
+    $all_zero = true; // Inisialisasi flag untuk mengecek apakah semua sisa_pesanan adalah 0
+
+    // Periksa setiap detail pesanan
+    foreach ($detail_pesanan as $detail) {
+        if ($detail['sisa_pesanan'] > 0) {
+            $all_zero = false; // Jika ada sisa_pesanan yang lebih dari 0, set flag ke false
+            break;
+        }
+    }
+
+    // Jika semua sisa_pesanan adalah 0, update status pesanan_pembelian menjadi "selesai"
+    if ($all_zero) {
+        $update_data = ['status' => 'selesai'];
+        updateData('pesanan_pembelian', $update_data, "id_pesanan = '$id_pesanan'");
+    }
+}

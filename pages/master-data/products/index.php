@@ -50,7 +50,7 @@ $data_produk = selectData('produk', 'status_hapus = 0');
             $status_class = 'text-bg-success';
         }
         ?>
-        <span class="badge <?= $status_class ?>"><?= strtoupper($produk['status']); ?></span>
+        <span class="badge <?= $status_class ?>"><?= ucfirst($produk['status']); ?></span>
       </td>
       <td><?= formatRupiah($produk['harga']); ?></td>
       <td><?= strtoupper($produk['satuan']); ?></td>

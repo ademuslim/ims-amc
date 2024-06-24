@@ -254,6 +254,36 @@ if (isset($_POST['add'])) {
             }
         }
 
+        // Ambil semua detail pesanan pembelian berdasarkan id faktur dari detail faktur yang sudah diinsert
+        $id_pesanan_all = array_unique(array_column($detail_faktur, 'id_pesanan'));
+
+        foreach ($id_pesanan_all as $id_pesanan) {
+            // Ambil semua detail pesanan pembelian berdasarkan id pesanan
+            $detail_pesanan = selectData('detail_pesanan', "id_pesanan = '$id_pesanan'");
+            
+            $semua_detail_selesai = true; // Asumsikan semua detail sudah selesai
+            
+            foreach ($detail_pesanan as $detail) {
+                $sisa_pesanan = $detail['sisa_pesanan'];
+
+                // Jika ada satu detail yang sisa pesanannya tidak nol, set semua_detail_selesai menjadi false
+                if ($sisa_pesanan != 0) {
+                    $semua_detail_selesai = false;
+                    break; // Keluar dari loop jika ada detail yang sisa pesanannya tidak nol
+                }
+            }
+
+            // Jika semua detail pesanan sudah selesai (semua sisa pesanannya nol), update status pesanan_pembelian menjadi "selesai"
+            if ($semua_detail_selesai) {
+                $update_status = [
+                    'status' => 'selesai'
+                ];
+
+                // Update menggunakan fungsi updateData dari library Anda
+                updateData('pesanan_pembelian', $update_status, "id_pesanan = '$id_pesanan'");
+            }
+        }
+
         // Pencatatan log aktivitas
         $aktivitas = 'Berhasil membuat invoice baru';
         $tabel = 'faktur';

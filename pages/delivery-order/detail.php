@@ -205,8 +205,8 @@ if ($error_message) : ?>
       <img class="img-fluid mb-2" src="<?= base_url($signatureConfirmDetails['Approved Path']) ?>"
         alt="Preview Signature" style="max-height: 100px;">
       <?php } else { ?>
-      <!-- Placeholder untuk gambar -->
-      <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #eee;"></div>
+      <!-- Placeholder untuk tandatangan -->
+      <div class="mb-2 border signature-placeholder" style="width: 100px; height: 100px;"></div>
       <?php } ?>
       <span><?= isset($signatureConfirmDetails['Approved Name']) ? ucfirst($signatureConfirmDetails['Approved Name']) : '' ?></span>
     </div>
@@ -219,8 +219,8 @@ if ($error_message) : ?>
       <img class="img-fluid mb-2" src="<?= base_url($signatureConfirmDetails['Checked Path']) ?>"
         alt="Preview Signature" style="max-height: 100px;">
       <?php } else { ?>
-      <!-- Placeholder untuk gambar -->
-      <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #eee;"></div>
+      <!-- Placeholder untuk tandatangan -->
+      <div class="mb-2 border signature-placeholder" style="width: 100px; height: 100px;"></div>
       <?php } ?>
       <span><?= isset($signatureConfirmDetails['Checked Name']) ? ucfirst($signatureConfirmDetails['Checked Name']) : '' ?></span>
     </div>
@@ -233,8 +233,8 @@ if ($error_message) : ?>
       <img class="img-fluid mb-2" src="<?= base_url($signatureConfirmDetails['Issued Path']) ?>" alt="Preview Signature"
         style="max-height: 100px;">
       <?php } else { ?>
-      <!-- Placeholder untuk gambar -->
-      <div class="mb-2" style="width: 100px; height: 100px; border: 1px solid #eee;"></div>
+      <!-- Placeholder untuk tandatangan -->
+      <div class="mb-2 border signature-placeholder" style="width: 100px; height: 100px;"></div>
       <?php } ?>
       <span><?= isset($signatureConfirmDetails['Issued Name']) ? ucfirst($signatureConfirmDetails['Issued Name']) : '' ?></span>
     </div>

@@ -205,7 +205,7 @@ if ($error_message): ?>
   </div>
 
   <!-- Detail produk -->
-  <div class="row ps-3 pe-3">
+  <div class="row ps-3 pe-3 mb-4">
     <table class="table table-light table-striped">
       <thead>
         <tr class="fw-bolder">
@@ -251,6 +251,9 @@ if ($error_message): ?>
             // Hitung total setelah PPN
             $total_setelah_ppn = $subtotal_setelah_diskon + $nilai_ppn;
             $tampil_subtotal = ($diskon > 0 || $tarif_ppn > 0);
+
+            // Hitung terbilang
+            $terbilang_total = bagiTerbilang($total_setelah_ppn);
           ?>
         <?php if ($tampil_subtotal): ?>
         <tr>
@@ -285,11 +288,27 @@ if ($error_message): ?>
     </table>
   </div>
 
-  <div class="row mb-1">
-    <p>Terbilang :</p>
-  </div>
+  <div class="row justify-content-between">
+    <div class="col-auto text-center">
+      <table class="table table-striped no-border-print">
+        <?php if (!empty($terbilang_total['jutaan'])): ?>
+        <tr>
+          <td><?= strtoupper($terbilang_total['jutaan']); ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if (!empty($terbilang_total['ribuan'])): ?>
+        <tr>
+          <td><?= strtoupper($terbilang_total['ribuan']); ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if (!empty($terbilang_total['ratusan'])): ?>
+        <tr>
+          <td><?= strtoupper($terbilang_total['ratusan']); ?></td>
+        </tr>
+        <?php endif; ?>
+      </table>
+    </div>
 
-  <div class="row justify-content-end">
     <div class="col-auto text-center">
       <?php if ($category_param === 'outgoing') : ?>
       <p>
