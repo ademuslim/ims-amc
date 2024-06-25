@@ -149,6 +149,25 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
 </table>
 
 <script>
+function confirmDelete(url, message) {
+  console.log(url); // Tambahkan ini untuk debugging
+  Swal.fire({
+    title: 'Konfirmasi',
+    text: message,
+    position: "top",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, Hapus!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = url;
+    }
+  });
+}
+
 $(document).ready(function() {
   // Tangkap klik pada setiap tombol di dalam .btn-group
   $('.btn-group').on('click', function(event) {

@@ -1,4 +1,6 @@
 <?php
+require '../../includes/function.php';
+
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'Detail Invoice Outgoing' : 'Detail Invoice Incoming';
 $content_title = $category_param === 'outgoing' ? 'Keluar' : 'Masuk';

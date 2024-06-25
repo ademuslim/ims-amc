@@ -75,20 +75,20 @@ $data_po = selectData('pesanan_pembelian', $conditionsPO, "tanggal DESC", "", $b
   <h1 class="fs-5 mb-4">Detail Purchase Order</h1>
   <div>
     <a href="<?= base_url("pages/dashboard") ?>" class="btn-act btn-back" title="Kembali"></a>
-    <a href="#" class="btn-act btn-print ms-4" onclick="printContent()" title="Cetak Data"></a>
+    <a class="btn-act btn-print ms-4" onclick="printContent()" title="Cetak Data"></a>
   </div>
 </div>
 
 <!-- Detail PO -->
 <div class="row">
   <div class="col">
-    <div class="card p-0">
+    <div class="card card-sticky p-0">
       <div class="card-header card-header-sticky">
         <!-- Menggunakan judul tabel dalam bahasa Indonesia -->
         <?= htmlspecialchars($content_title); ?>
       </div>
-      <div class="card-body" style="overflow-y:auto; font-size:.9rem;">
-        <table class="table table-bordered table-primary">
+      <div class="card-body fix-card-body">
+        <table class="table table-bordered">
           <thead class="thead-sticky fw-bolder">
             <tr>
               <th>No.</th>
@@ -193,35 +193,3 @@ $data_po = selectData('pesanan_pembelian', $conditionsPO, "tanggal DESC", "", $b
 </div>
 
 <?php require '../../includes/footer.php'; ?>
-<script>
-function printContent() {
-  var printWindow = window.open('', '', 'height=600,width=800');
-  printWindow.document.write('<html><head><title>IMS By AMC</title>');
-  printWindow.document.write('<style>');
-  printWindow.document.write('@page { size: A4 landscape; margin: 1cm; }');
-  printWindow.document.write('body { font-family: Arial, sans-serif; }');
-  printWindow.document.write('table { border-collapse: collapse; width: 100%; }');
-  printWindow.document.write(
-    'th, td { border: 1px solid #469bf7; padding: 8px; text-align: left; vertical-align: top; }');
-  printWindow.document.write('h1 { text-align: center; }');
-  printWindow.document.write('</style>');
-  printWindow.document.write('</head><body>');
-  printWindow.document.write('<h1><?= $content_title ?></h1>');
-
-  // Ambil tabel dari halaman utama
-  var table = document.querySelector('.card-body table');
-  if (table) {
-    // Salin tabel ke dokumen cetak
-    printWindow.document.write('<table>');
-    printWindow.document.write(table.innerHTML);
-    printWindow.document.write('</table>');
-  } else {
-    // Tampilkan pesan jika tidak ada tabel
-    printWindow.document.write('<p>Tidak ada data PO</p>');
-  }
-
-  printWindow.document.write('</body></html>');
-  printWindow.document.close();
-  printWindow.print();
-}
-</script>

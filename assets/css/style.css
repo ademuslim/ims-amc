@@ -31,6 +31,7 @@ body {
 /* Custom scrollbar browser WebKit (Chrome, Safari, Opera) */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -263,15 +264,6 @@ p {
 .card-sticky {
   position: relative;
 }
-.card-sticky::after {
-  position: absolute;
-  content: "";
-  bottom: 0;
-  left: 6px;
-  width: calc(100% - 6px);
-  height: 16px;
-  background-color: #fff;
-}
 .card-header-sticky {
   position: relative;
 }
@@ -287,7 +279,7 @@ p {
 .thead-sticky th {
   position: sticky;
   top: 0;
-  background: white;
+  background: #f8f9fa;
   z-index: 1;
   border: none;
 }
@@ -298,6 +290,11 @@ p {
 }
 .card-body {
   padding: 8px;
+}
+.fix-card-body {
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  font-size: 0.9rem;
 }
 .card-footer {
   padding: 4px 8px;
