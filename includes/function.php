@@ -822,3 +822,25 @@ function updateOrderStatusIfCompleted($id_pesanan) {
         updateData('pesanan_pembelian', $update_data, "id_pesanan = '$id_pesanan'");
     }
 }
+
+// Fungsi untuk menjalankan query SQL kustom dengan koneksi global $conn
+function selectDataCustomQuery($query) {
+    global $conn;
+
+    // Lakukan query ke database
+    $result = mysqli_query($conn, $query);
+
+    // Inisialisasi array untuk menyimpan hasil query
+    $rows = [];
+
+    // Jika query berhasil dieksekusi
+    if ($result) {
+        // Ambil hasil query satu per satu
+        while ($row = mysqli_fetch_assoc($result)) {
+            $rows[] = $row;
+        }
+    }
+
+    // Mengembalikan hasil query dalam bentuk array
+    return $rows;
+}

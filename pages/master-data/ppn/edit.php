@@ -1,6 +1,6 @@
 <!-- master-data/ppn/edit -->
 
-<!-- Form untuk mengedit ppn -->
+<!-- Form edit ppn -->
 <form action="process.php" method="POST">
   <div class="row mb-3">
     <label for="jenis_ppn" class="col-sm-3 col-form-label">Jenis PPN:</label>

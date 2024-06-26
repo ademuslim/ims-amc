@@ -17,6 +17,7 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
   $mainTable = 'faktur';
   $joinTables = [
     ["kontak pengirim", "faktur.id_pengirim = pengirim.id_kontak"], 
+    ["rekening_kontak", "pengirim.id_kontak = rekening_kontak.id_kontak"], 
     ["kontak penerima", "faktur.id_penerima = penerima.id_kontak"],
     ['ppn', 'faktur.id_ppn = ppn.id_ppn']
   ];
@@ -26,7 +27,8 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
               pengirim.telepon AS telepon_pengirim, 
               pengirim.email AS email_pengirim, 
               penerima.nama_kontak AS nama_penerima, 
-              penerima.alamat AS alamat_penerima, 
+              penerima.alamat AS alamat_penerima,
+              rekening_kontak.*,
               ppn.*';
 
   $conditions = "faktur.id_faktur = '$id_faktur'";
@@ -291,8 +293,8 @@ if ($error_message): ?>
   </div>
 
   <div class="row justify-content-between">
-    <div class="col-auto text-center">
-      <table class="table table-striped no-border-print">
+    <div class="col-auto">
+      <table class="table table-striped mb-5 text-center no-border-print">
         <?php if (!empty($terbilang_total['jutaan'])): ?>
         <tr>
           <td><?= strtoupper($terbilang_total['jutaan']); ?></td>
@@ -308,6 +310,25 @@ if ($error_message): ?>
           <td><?= strtoupper($terbilang_total['ratusan']); ?></td>
         </tr>
         <?php endif; ?>
+      </table>
+
+      <p>PLACE, PAYMENT REMIT TO :</p>
+      <table class="table table-striped">
+        <!-- Informasi rekening kontak pengirim -->
+        <tr>
+          <th>ACCOUNT.</th>
+          <td><?= ": " . strtoupper($data['pemegang_rekening']); ?></td>
+        </tr>
+        <tr>
+          <th>BANK</th>
+          <td><?= ": " . strtoupper($data['nama_bank']); ?>
+            <?= !empty(strtoupper($data['cabang_bank'])) ? '(' . $data['cabang_bank'] . ')' : ''; ?>
+          </td>
+        </tr>
+        <tr>
+          <th>ACC NO.</th>
+          <td><?= ": " . $data['nomor_rekening']; ?></td>
+        </tr>
       </table>
     </div>
 

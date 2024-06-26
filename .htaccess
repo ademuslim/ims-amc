@@ -17,6 +17,9 @@ RewriteRule ^pages/master-data/products$ pages/master-data/products/index.php [L
 # Ubah /pages/master-data/ppn menjadi /pages/master-data/ppn/index.php
 RewriteRule ^pages/master-data/ppn/?$ pages/master-data/ppn/index.php [L]
 
+# Ubah /pages/master-data/contact-bank-accounts menjadi /pages/master-data/contact-bank-accounts/index.php
+RewriteRule ^pages/master-data/contact-bank-accounts/?$ pages/master-data/contact-bank-accounts/index.php [L]
+
 # Ubah /pages/master-data/contacts/supplier menjadi /pages/master-data/contacts/index.php?category=supplier
 RewriteRule ^pages/master-data/contacts/supplier/?$ pages/master-data/contacts/index.php?category=supplier [L]
 

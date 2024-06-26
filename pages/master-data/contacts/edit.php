@@ -1,4 +1,4 @@
-<!-- Form untuk mengedit produk -->
+<!-- Form edit produk -->
 <form action="process.php" method="POST">
   <div class="row mb-3">
     <label for="nama_kontak" class="col-sm-3 col-form-label">Nama:</label>

@@ -6,12 +6,10 @@ require '../../../includes/vendor/autoload.php';
 $id_pengguna = $_SESSION['id_pengguna'] ?? $_COOKIE['ingat_user_id'] ?? '';
 
 if (isset($_POST['add'])) {
-  // Ambil nilai-nlai langsung dari $_POST
   $jenis_ppn = strtolower($_POST['jenis_ppn']);
   $tarif = $_POST['tarif'];
   $keterangan = strtolower($_POST['keterangan']);
 
-  // Periksa apakah nomor ppn sudah ada
   if (isValueExists('ppn', 'jenis_ppn', $jenis_ppn)) {
     $_SESSION['error_message'] = "Jenis PPN sudah ada dalam database.";
     header("Location: index.php");
@@ -34,7 +32,6 @@ if (isset($_POST['add'])) {
 
   // Periksa apakah data berhasil ditambahkan
   if ($result > 0) {
-      // Jika berhasil, simpan pesan sukses ke dalam session
       $_SESSION['success_message'] = "PPN berhasil ditambahkan!";
 
       // Pencatatan log aktivitas
