@@ -5,12 +5,14 @@ require '../../includes/header.php';
 
 // Set kategori halaman (Outgoing / Incoming)
 if ($category_param === 'outgoing') {
+  $sub_title = 'Buat Purchase Order Baru';
   $category = 'keluar';
   $sender = 'internal';
   $receiver1 = 'customer';
   $receiver2 = 'supplier';
   $category_ph = 'masuk';
 } elseif ($category_param === 'incoming') {
+  $sub_title = 'Terima Purchase Order Baru';
   $category = 'masuk';
   $sender1 = 'customer';
   $sender2 = 'supplier';
@@ -54,7 +56,7 @@ if ($category_param === 'outgoing') {
 }
 ?>
 
-<h1 class="fs-5 mb-4">Buat Purchase Order Baru</h1>
+<h1 class="fs-5 mb-4"><?= $sub_title ?></h1>
 <div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/purchase-orders/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>

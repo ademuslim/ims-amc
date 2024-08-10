@@ -1,26 +1,18 @@
 <!-- <footer>
-  <p>&copy; 2024 Invoice Management System | AMC</p>
+  <p>&copy; 2024 Finance Information System | AMC</p>
 </footer> -->
 </div>
 
-<!-- DataTables Responsive Bootstrap5 JS -->
-<script src="<?= base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/dataTables.js') ?>"></script>
-<script src="<?= base_url('assets/js/dataTables.bootstrap5.js') ?>"></script>
-<script src="<?= base_url('assets/js/dataTables.responsive.js') ?>"></script>
-<script src="<?= base_url('assets/js/responsive.bootstrap5.js') ?>"></script>
-<!-- DataTables Button JS -->
-<script src="<?= base_url('assets/js/dataTables.buttons.js') ?>"></script>
-<script src="<?= base_url('assets/js/buttons.dataTables.js') ?>"></script>
-<script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
-<script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/buttons.colVis.min.js') ?>"></script>
-
-<script src="<?= base_url('assets/js/script.js'); ?>"></script>
 <script>
+// Bootstrap Tooltip
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+});
+
+// Sidebar
 document.addEventListener('DOMContentLoaded', function() {
   // Retrieve the last opened accordion status from localStorage
   var openAccordion = localStorage.getItem("openAccordion");
@@ -147,7 +139,26 @@ function checkSidebarWidth() {
     localStorage.removeItem('openAccordion'); // Hapus status accordion dari localStorage
   }
 }
+</script>
 
+<!-- DataTables Responsive Bootstrap5 JS -->
+<script src="<?= base_url('assets/js/bootstrap.bundle.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/dataTables.js') ?>"></script>
+<script src="<?= base_url('assets/js/dataTables.bootstrap5.js') ?>"></script>
+<script src="<?= base_url('assets/js/dataTables.responsive.js') ?>"></script>
+<script src="<?= base_url('assets/js/responsive.bootstrap5.js') ?>"></script>
+<!-- DataTables Button JS -->
+<script src="<?= base_url('assets/js/dataTables.buttons.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.dataTables.js') ?>"></script>
+<script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.colVis.min.js') ?>"></script>
+
+<script src="<?= base_url('assets/js/script.js'); ?>"></script>
+<script>
 function confirmDelete(url, message) {
   console.log(url); // Tambahkan ini untuk debugging
   Swal.fire({
@@ -217,14 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
       showCloseButton: true,
     });
   }
-});
-
-// Bootstrap Tooltip
-document.addEventListener('DOMContentLoaded', function() {
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
 });
 
 function printContent() {

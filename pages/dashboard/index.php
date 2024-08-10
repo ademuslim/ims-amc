@@ -38,7 +38,7 @@ include 'quotationInfo.php';
     <div class="card custom-card d-flex flex-column h-100">
       <div class="card-body">
         <h5 class="card-title">Selamat Datang, <?= ucwords($nama_lengkap); ?></h5>
-        <h6 class="card-subtitle">Invoice Management System, PT. MTG</h6>
+        <h6 class="card-subtitle">Finance Information Management, PT. MTG</h6>
       </div>
     </div>
   </div>
@@ -270,7 +270,7 @@ include 'quotationInfo.php';
                           $status_class = 'text-bg-success';
                       }
                       ?>
-                    <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($inv['status']) ?></span>
+                    <span class="badge rounded-pill <?= $status_class ?>"><?= ucwords($inv['status']) ?></span>
                   </td>
                   <td rowspan="<?= count($data_detail_inv); ?>"><?= formatRupiah($inv['total']); ?></td>
                   <?php endif; ?>

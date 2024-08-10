@@ -5,6 +5,7 @@ $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 // Atur judul halaman berdasarkan kategori
 $page_title = $category_param === 'outgoing' ? 'Quotation Outgoing' : 'Quotation Incoming';
 $content_title = $category_param === 'outgoing' ? 'Keluar' : 'Masuk';
+$button_add = $category_param === 'outgoing' ? 'Buat Penawaran Harga' : 'Terima Penawaran Harga';
 
 require '../../includes/header.php';
 
@@ -30,9 +31,8 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Penawaran Harga <?= $content_title ?></h1>
-  <a href="<?= base_url("pages/quotation/add/$category_param") ?>" class="btn btn-primary btn-lg btn-icon btn-add">Buat
-    Penawaran
-    harga</a>
+  <a href="<?= base_url("pages/quotation/add/$category_param") ?>"
+    class="btn btn-primary btn-lg btn-icon btn-add"><?= $button_add ?></a>
 </div>
 <table id="example" class="table nowrap table-hover" style="width:100%">
   <thead>
@@ -71,9 +71,9 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
       <td><?= dateID($ph['tanggal']); ?></td>
 
       <?php if ($category_param == 'outgoing') { ?>
-      <td class="text-wrap"><?= ucwords($ph['nama_penerima']); ?></td>
+      <td class="text-wrap"><?= strtoupper($ph['nama_penerima']); ?></td>
       <?php } elseif ($category_param == 'incoming') { ?>
-      <td class="text-wrap"><?= ucwords($ph['nama_pengirim']); ?></td>
+      <td class="text-wrap"><?= strtoupper($ph['nama_pengirim']); ?></td>
       <?php } ?>
 
       <td>
@@ -100,9 +100,9 @@ $data_penawaran_harga = selectDataJoin($mainTable, $joinTables, $columns, $condi
           endif; 
       
           if ($category_param == 'outgoing') { 
-            echo ucwords($ph['nama_pengirim']);
+            echo strtoupper($ph['nama_pengirim']);
           } elseif ($category_param == 'incoming') {
-            echo ucwords($ph['nama_penerima']); 
+            echo strtoupper($ph['nama_penerima']); 
           } 
         ?>
       </td>

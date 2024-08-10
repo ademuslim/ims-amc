@@ -47,6 +47,6 @@
   <input type="hidden" name="category" value="<?php echo $kontak['kategori']; ?>">
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
     <button type="submit" class="btn btn-primary" name="edit">Simpan Perubahan</button>
 </form>

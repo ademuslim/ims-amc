@@ -2,6 +2,7 @@
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'Invoice Outgoing' : 'Invoice Incoming';
 $content_title = $category_param === 'outgoing' ? 'Keluar' : 'Masuk';
+
 require '../../includes/header.php';
 
 // Kategori dokumen
@@ -18,6 +19,8 @@ $conditions = "faktur.kategori = '$category' AND faktur.status_hapus = 0 AND fak
 $orderBy = 'faktur.tanggal DESC, detail_faktur.no_pengiriman_barang ASC';
 
 $data_detail_inv = selectDataJoin($mainDetailTable, $joinDetailTables, $columns, $conditions, $orderBy);
+
+// var_dump($data_detail_inv);
 ?>
 
 <h1 class="fs-5 mb-3">Data Delivery Order <?= $content_title ?></h1>

@@ -35,7 +35,7 @@ if (isset($_SESSION['error_message'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= isset($page_title) ? "$page_title | IMS By AMC" : 'IMS By AMC' ?></title>
+  <title><?= isset($page_title) ? "$page_title | FIM By AMC" : 'FIM By AMC' ?></title>
   <script src="<?= base_url('assets/js/jquery.js'); ?>"></script>
   <!-- DataTables Responsive Bootstrap5 CSS-->
   <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css'); ?>">
@@ -131,7 +131,7 @@ if (isset($_SESSION['error_message'])) {
                 d="M120-120v-80l80-80v160h-80Zm160 0v-240l80-80v320h-80Zm160 0v-320l80 81v239h-80Zm160 0v-239l80-80v319h-80Zm160 0v-400l80-80v480h-80ZM120-327v-113l280-280 160 160 280-280v113L560-447 400-607 120-327Z" />
             </svg>
             <span class="text-link">
-              MTG IMS
+              MTG FIM
             </span>
           </a>
         </div>
@@ -247,7 +247,7 @@ if (isset($_SESSION['error_message'])) {
                         </a>
                       </li>
 
-                      <?php if ($peran_pengguna === 'superadmin'): ?>
+                      <?php if ($peran_pengguna === 'superadmin' || $peran_pengguna === 'staff'): ?>
                       <li>
                         <a href="<?= base_url('pages/master-data/users'); ?>"
                           class="nav-link <?= setActivePage('pages/master-data/users'); ?>">

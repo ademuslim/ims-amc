@@ -30,7 +30,7 @@ if (isset($_POST['add'])) {
   // Periksa apakah nama_pengguna sudah ada
   if (isValueExists('pengguna', 'nama_pengguna', $nama_pengguna)) {
     $_SESSION['error_message'] = "Username sudah terdaftar.";
-    header("Location: index.php");
+    header("Location: " . base_url('pages/master-data/users'));
     exit();
   }
 
@@ -60,34 +60,97 @@ if (isset($_POST['add'])) {
           'keterangan' => $keterangan
       ];
       insertData('log_aktivitas', $log_data);
+      header("Location: " . base_url('pages/master-data/users'));
+      exit();
   } else {
       // Jika gagal, simpan pesan error ke dalam session
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan pengguna.";
+      header("Location: " . base_url('pages/master-data/users'));
+      exit();
   }
-}elseif (isset($_POST['edit'])) {
+} elseif (isset($_POST['edit'])) {
   // Ambil nilai-nilai dari form edit
   $id_pengguna = $_POST['id_pengguna'];
   $nama_lengkap = strtolower($_POST['nama_lengkap']);
   $nama_pengguna = strtolower($_POST['nama_pengguna']);
-  $password = $_POST['password'];
-  $tipe_pengguna = $_POST['tipe_pengguna'];
+  $password_saat_ini = $_POST['password_saat_ini'];
 
-  // Periksa apakah email sudah ada (kecuali untuk pengguna yang sedang diedit)
-  if (isValueExists('pengguna', 'nama_pengguna', $nama_pengguna, $id_pengguna, 'id_pengguna')) {
-    $_SESSION['error_message'] = "Username sudah terdaftar.";
-    header("Location: index.php");
+  // Ambil data pengguna saat ini dari database
+  $userData = selectData('pengguna', 'id_pengguna = ?', '', '', [['type' => 's', 'value' => $id_pengguna]]);
+  $userData = $userData[0]; // Ambil baris pertama dari hasil query
+
+   // Verifikasi password saat ini
+  if (password_verify($password_saat_ini, $userData['password'])) {
+    // Data yang akan diupdate di tabel pengguna
+    $data = [
+        'nama_lengkap' => $nama_lengkap,
+        'nama_pengguna' => $nama_pengguna
+    ];
+
+    // Kondisi untuk menentukan pengguna mana yang akan diupdate
+    $conditions = "id_pengguna = '$id_pengguna'";
+
+    // Panggil fungsi updateData untuk mengupdate data di tabel pengguna
+    $result = updateData('pengguna', $data, $conditions);
+
+    // Periksa apakah data berhasil diupdate
+    if ($result > 0) {
+        $_SESSION['success_message'] = "Pengguna berhasil diupdate!";
+
+        // Catat aktivitas
+        $logData = [
+            'id_pengguna' => $_SESSION['id_pengguna'],
+            'aktivitas' => 'Berhasil ubah data',
+            'tabel' => 'pengguna',
+            'keterangan' => 'Pengguna berhasil mengubah data',
+        ];
+
+        insertData('log_aktivitas', $logData);
+        header("Location: " . base_url('pages/master-data/users'));
+        exit();
+    } else {
+        // Jika gagal, simpan pesan error ke dalam session
+        $_SESSION['error_message'] = "Terjadi kesalahan saat mengupdate pengguna.";
+        header("Location: " . base_url('pages/master-data/users'));
+        exit();
+    }
+  } else {
+      // Jika password salah, simpan pesan error ke dalam session
+      $_SESSION['error_message'] = "Password tidak valid.";
+      header("Location: " . base_url('pages/master-data/users'));
+      exit();
+  }
+} elseif (isset($_POST['change_password'])) {
+  // Ambil nilai-nilai dari form change password
+  $id_pengguna = $_POST['id_pengguna'];
+  $password_lama = $_POST['password_lama'];
+  $password_baru = $_POST['password_baru'];
+  $ulangi_password = $_POST['ulangi_password'];
+
+  // Ambil data pengguna saat ini dari database
+  $userData = selectData('pengguna', 'id_pengguna = ?', '', '', [['type' => 's', 'value' => $id_pengguna]]);
+  $userData = $userData[0]; // Ambil baris pertama dari hasil query
+
+  // Periksa apakah password lama benar
+  if (!password_verify($password_lama, $userData['password'])) {
+    $_SESSION['error_message'] = "Password lama salah.";
+    header("Location: " . base_url('pages/master-data/users'));
     exit();
   }
 
-  // Ambil data lama sebelum diubah
-  $oldData = selectData('pengguna', 'id_pengguna = ?', '', '', [['type' => 's', 'value' => $id_pengguna]]);
+  // Periksa apakah password baru cocok dengan ulangi password
+  if ($password_baru !== $ulangi_password) {
+    $_SESSION['error_message'] = "Password baru dan ulangi password tidak cocok.";
+    header("Location: " . base_url('pages/master-data/users'));
+    exit();
+  }
+
+  // Hash password baru
+  $password_baru_hashed = password_hash($password_baru, PASSWORD_DEFAULT);
 
   // Data yang akan diupdate di tabel pengguna
   $data = [
-    'nama_lengkap' => $nama_lengkap,
-    'nama_pengguna' => $nama_pengguna,
-    'password' => $password,
-    'tipe_pengguna' => $tipe_pengguna
+    'password' => $password_baru_hashed,
   ];
 
   // Kondisi untuk menentukan pengguna mana yang akan diupdate
@@ -98,51 +161,31 @@ if (isset($_POST['add'])) {
 
   // Periksa apakah data berhasil diupdate
   if ($result > 0) {
-      // Jika berhasil, simpan pesan sukses ke dalam session
-      $_SESSION['success_message'] = "Pengguna berhasil diupdate!";
+    $_SESSION['success_message'] = "Password berhasil diubah!";
 
-      // Ambil data setelah diubah
-      $newData = selectData('pengguna', 'id_pengguna = ?', '', '', [['type' => 's', 'value' => $id_pengguna]]);
+    // Catat aktivitas
+    $logData = [
+      'id_pengguna' => $_SESSION['id_pengguna'],
+      'aktivitas' => 'Berhasil ubah password',
+      'tabel' => 'pengguna',
+      'keterangan' => 'Pengguna berhasil mengubah password',
+    ];
 
-      // Data sebelum dan sesudah perubahan untuk log
-      $before = $oldData[0]; // Ambil baris pertama dari hasil query
-      $after = $newData[0]; // Ambil baris pertama dari hasil query
-
-      // Keterangan perubahan
-      $changeDescription = "Perubahan data pengguna: | ";
-
-      // Nomor urut untuk tanda "-"
-      $counter = 1;
-
-      // Periksa setiap kolom untuk menemukan perubahan
-      foreach ($before as $column => $value) {
-          if ($value !== $after[$column]) {
-              $changeDescription .= "$counter. $column: \"$value\" diubah menjadi \"$after[$column]\" | ";
-              $counter++;
-          }
-      }
-      
-      // Catat aktivitas
-      $logData = [
-        'id_pengguna' => $_SESSION['id_pengguna'],
-        'aktivitas' => 'Berhasil ubah data',
-        'tabel' => 'pengguna',
-        'keterangan' => $changeDescription,
-      ];
-
-      insertData('log_aktivitas', $logData);
+    insertData('log_aktivitas', $logData);
   } else {
-      // Jika gagal, simpan pesan error ke dalam session
-      $_SESSION['error_message'] = "Terjadi kesalahan saat mengupdate pengguna.";
+    // Jika gagal, simpan pesan error ke dalam session
+    $_SESSION['error_message'] = "Terjadi kesalahan saat mengubah password.";
+    header("Location: " . base_url('pages/master-data/users'));
+    exit();
   }
 } else {
-  // Jika tidak ada permintaan tambah atau edit, simpan pesan error ke dalam session
+  // Jika tidak ada permintaan tambah, edit, atau ubah password, simpan pesan error ke dalam session
   $_SESSION['error_message'] = "Permintaan tidak valid!";
 }
 
 // Tutup koneksi ke database
 mysqli_close($conn);
 
-// Redirect kembali ke index.php setelah proses selesai
-header("Location: index.php");
+// Redirect kembali ke halaman pengguna setelah proses selesai
+header("Location: " . base_url('pages/master-data/users'));
 exit();

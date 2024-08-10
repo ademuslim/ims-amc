@@ -5,10 +5,12 @@ require '../../includes/header.php';
 
 // Set kategori halaman (Outgoing / Incoming)
 if ($category_param === 'outgoing') {
+  $sub_title = 'Ubah Penawaran Harga Keluar';
   $category = 'keluar';
   $sender = 'internal';
   $receiver = 'customer';
 } elseif ($category_param === 'incoming') {
+  $sub_title = 'Ubah Penawaran Harga Masuk';
   $category = 'masuk';
   $sender = 'customer';
   $receiver = 'internal';
@@ -87,7 +89,7 @@ if ($error_message) : ?>
 <?php else: ?>
 <?php if (!empty($data)): ?>
 
-<h1 class="fs-5 mb-4">Ubah Penawaran Harga</h1>
+<h1 class="fs-5 mb-4"><?= $sub_title ?></h1>
 <div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/quotation/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>

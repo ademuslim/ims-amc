@@ -5,11 +5,13 @@ require '../../includes/header.php';
 
 // Set kategori halaman (Outgoing / Incoming)
 if ($category_param === 'outgoing') {
+  $sub_title = 'Buat Penawaran Harga Baru';
   $category = 'keluar';
   $sender = 'internal';
   $receiver1 = 'customer';
   $receiver2 = 'supplier';
 } elseif ($category_param === 'incoming') {
+  $sub_title = 'Terima Penawaran Harga Baru';
   $category = 'masuk';
   $sender1 = 'customer';
   $sender2 = 'supplier';
@@ -21,7 +23,7 @@ if ($category_param === 'outgoing') {
 // Khusus Outgoing
 if ($category_param === 'outgoing') {
   $default_logo_path = "assets/image/uploads/logo/no_logo.png";
-  $default_signature_path = "assets/image/uploads/signature/no_signature.png";
+  $default_signature_path = "assets/image/uploads/signature/no_sign.png";
   
   // Ambil path logo dan path signature terbaru dari tabel penawaran_harga (Kategori = keluar)
   $data = selectData("penawaran_harga", "kategori = 'keluar' AND logo IS NOT NULL AND logo != ''", "tanggal DESC", "1");
@@ -52,7 +54,7 @@ if ($category_param === 'outgoing') {
 }
 ?>
 
-<h1 class="fs-5 mb-4">Buat Penawaran Harga Baru</h1>
+<h1 class="fs-5 mb-4"><?= $sub_title ?></h1>
 <div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/quotation/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>

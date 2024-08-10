@@ -27,6 +27,6 @@
   <!-- Tambahkan input hidden untuk mengirim ID ppn yang akan diubah -->
   <input type="hidden" name="id_ppn" value="<?= $ppn['id_ppn']; ?>">
   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
     <button type="submit" class="btn btn-primary" name="edit">Simpan Perubahan</button>
 </form>

@@ -2,6 +2,8 @@
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'PO Outgoing' : 'PO Incoming';
 $content_title = $category_param === 'outgoing' ? 'Keluar' : 'Masuk';
+$button_add = $category_param === 'outgoing' ? 'Buat Purchase Order' : 'Terima Purchase Order';
+
 require '../../includes/header.php';
 
 $category = ($category_param === 'outgoing') ? 'keluar' : (($category_param === 'incoming') ? 'masuk' : die("Kategori tidak valid"));
@@ -23,9 +25,7 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Purchase Order <?= $content_title ?></h1>
   <a href="<?= base_url("pages/purchase-orders/add/$category_param") ?>"
-    class="btn btn-primary btn-lg btn-icon btn-add">
-    <?= $category_param === 'incoming' ? 'Tambah Purchase Order' : 'Buat Purchase Order' ?>
-  </a>
+    class="btn btn-primary btn-lg btn-icon btn-add"><?= $button_add ?></a>
 </div>
 
 <table id="example" class="table nowrap table-hover" style="width: 100%;">
@@ -82,7 +82,7 @@ $data_pesanan_pembelian = selectDataJoin($mainTable, $joinTables, $columns, $con
             $status_class = 'text-bg-success';
         }
         ?>
-        <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($po['status']) ?></span>
+        <span class="badge rounded-pill <?= $status_class ?>"><?= ucwords($po['status']) ?></span>
       </td>
 
       <td><?= formatRupiah($po['total']); ?></td>

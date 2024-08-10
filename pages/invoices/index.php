@@ -2,11 +2,12 @@
 $category_param = isset($_GET['category']) ? $_GET['category'] : '';
 $page_title = $category_param === 'outgoing' ? 'Invoice Outgoing' : 'Invoice Incoming';
 $content_title = $category_param === 'outgoing' ? 'Keluar' : 'Masuk';
+$button_add = $category_param === 'outgoing' ? 'Buat Invoice' : 'Terima Invoice';
+
 require '../../includes/header.php';
 
 // Kategori dokumen
 $category = ($category_param === 'outgoing') ? 'keluar' : (($category_param === 'incoming') ? 'masuk' : die("Kategori tidak valid"));
-
 
 $mainTable = 'faktur';
 $joinTables = [
@@ -24,9 +25,8 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
 
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h1 class="fs-5 m-0">Data Invoice <?= $content_title ?></h1>
-  <a href="<?= base_url("pages/invoices/add/$category_param") ?>" class="btn btn-primary btn-lg btn-icon btn-add">
-    <?= $category_param === 'incoming' ? 'Tambah Invoice' : 'Buat Invoice' ?>
-  </a>
+  <a href="<?= base_url("pages/invoices/add/$category_param") ?>"
+    class="btn btn-primary btn-lg btn-icon btn-add"><?= $button_add ?></a>
 </div>
 
 <table id="example" class="table nowrap table-hover" style="width:100%">
@@ -66,9 +66,9 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
       <td><?= dateID($faktur['tanggal']); ?></td>
 
       <?php if ($category_param == 'outgoing') { ?>
-      <td class="text-wrap"><?= ucwords($faktur['nama_penerima']); ?></td>
+      <td class="text-wrap"><?= strtoupper($faktur['nama_penerima']); ?></td>
       <?php } elseif ($category_param == 'incoming') { ?>
-      <td class="text-wrap"><?= ucwords($faktur['nama_pengirim']); ?></td>
+      <td class="text-wrap"><?= strtoupper($faktur['nama_pengirim']); ?></td>
       <?php } ?>
 
       <td>
@@ -83,7 +83,7 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
             $status_class = 'text-bg-success';
         }
         ?>
-        <span class="badge rounded-pill <?= $status_class ?>"><?= strtoupper($faktur['status']) ?></span>
+        <span class="badge rounded-pill <?= $status_class ?>"><?= ucwords($faktur['status']) ?></span>
       </td>
 
       <td><?= formatRupiah($faktur['total']); ?></td>
@@ -95,9 +95,9 @@ $data_faktur = selectDataJoin($mainTable, $joinTables, $columns, $conditions, $o
           endif; 
       
           if ($category_param == 'outgoing') { 
-            echo ucwords($faktur['nama_pengirim']);
+            echo strtoupper($faktur['nama_pengirim']);
           } elseif ($category_param == 'incoming') {
-            echo ucwords($faktur['nama_penerima']); 
+            echo strtoupper($faktur['nama_penerima']); 
           } 
         ?>
       </td>

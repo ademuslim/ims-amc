@@ -23,7 +23,7 @@
   <div class="row mb-3">
     <label for="harga" class="col-sm-3 col-form-label">Harga:</label>
     <div class="col-sm-9">
-      <input type="number" class="form-control form-control-sm" id="harga" name="harga" min="0"
+      <input type="number" class="form-control form-control-sm" id="harga" name="harga" min="1"
         value="<?= $produk['harga']; ?>">
     </div>
   </div>

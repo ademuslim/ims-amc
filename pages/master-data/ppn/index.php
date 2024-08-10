@@ -89,6 +89,40 @@ function confirmDelete(url, message) {
   });
 }
 
+
+// Sweetalert
+document.addEventListener('DOMContentLoaded', function() {
+  // Tampilkan pesan sukses jika ada
+  if ('<?= $success_message ?>' !== '') {
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "success",
+      title: "Berhasil",
+      text: "<?= $success_message ?>",
+      showConfirmButton: false,
+      timer: 7000,
+      timerProgressBar: true,
+      showCloseButton: true,
+    });
+  }
+
+  // Tampilkan pesan error jika ada
+  if ('<?= $error_message ?>' !== '') {
+    Swal.fire({
+      toast: true,
+      position: "top",
+      icon: "error",
+      title: "Gagal",
+      text: "<?= $error_message ?>",
+      showConfirmButton: false,
+      timer: 7000,
+      timerProgressBar: true,
+      showCloseButton: true,
+    });
+  }
+});
+
 $(document).ready(function() {
   // Tangkap klik pada setiap tombol di dalam .btn-group
   $('.btn-group').on('click', function(event) {

@@ -28,14 +28,14 @@ if (isset($_SESSION['peran_pengguna'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | Invoice Management System</title>
+  <title>Login | Finance Information Management</title>
   <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css'); ?>">
   <script src="<?= base_url('assets/js/jquery.js'); ?>"></script>
 </head>
 
 <body class="bg-light">
   <div class="container min-vh-100 d-flex flex-column align-items-center justify-content-center  position-relative">
-    <h1 class="fs-2 fw-bold text-center mb-5" style="color: transparent; -webkit-text-stroke: 1px #666;">MTG IMS</h1>
+    <h1 class="fs-2 fw-bold text-center mb-5" style="color: transparent; -webkit-text-stroke: 1px #666;">MTG FIM</h1>
     <div class="card border border-light shadow p-4 w-50" style="min-width:350px;">
       <form method="post" action="process.php">
         <p>Silahkan masuk</p>
@@ -83,7 +83,7 @@ if (isset($_SESSION['peran_pengguna'])) {
       </form>
     </div>
 
-    <p class="fs-6 position-absolute bottom-0 end-0 mt-5 mb-3 text-body-secondary">&copy; 2024 IMS By AMC
+    <p class="fs-6 position-absolute bottom-0 end-0 mt-5 mb-3 text-body-secondary">&copy; 2024 MTG FIM By AMC
     </p>
   </div>
 

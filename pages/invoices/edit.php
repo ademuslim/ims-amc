@@ -78,7 +78,7 @@ if ($error_message): ?>
 <p><?php echo $error_message; ?></p>
 <?php else: ?>
 <?php if (!empty($data)): ?>
-<h1 class="fs-5 mb-4">Ubah Faktur</h1>
+<h1 class="fs-5 mb-4">Ubah Invoice</h1>
 <div class="paper-wrapper p-5">
   <form action="<?= base_url("pages/invoices/process.php") ?>" method="POST" class="needs-validation"
     enctype="multipart/form-data" novalidate>

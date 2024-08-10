@@ -65,6 +65,6 @@
 
   <input type="hidden" name="id_rekening" value="<?= $rek['id_rekening']; ?>">
   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
     <button type="submit" class="btn btn-primary" name="edit">Simpan Perubahan</button>
 </form>

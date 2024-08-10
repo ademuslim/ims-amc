@@ -15,7 +15,7 @@ if (isset($_POST['add'])) {
   // Periksa apakah nomor produk sudah ada
   if (isValueExists('produk', 'no_produk', $no_produk)) {
     $_SESSION['error_message'] = "Nomor produk sudah ada dalam database.";
-    header("Location: index.php");
+    header("Location: " . base_url("pages/master-data/products"));
     exit();
   }
 
@@ -52,6 +52,8 @@ if (isset($_POST['add'])) {
           'keterangan' => $keterangan
       ];
       insertData('log_aktivitas', $log_data);
+      header("Location: " . base_url("pages/master-data/products"));
+      exit();
   } else {
       // Jika gagal, simpan pesan error ke dalam session
       $_SESSION['error_message'] = "Terjadi kesalahan saat menambahkan produk.";
@@ -67,6 +69,8 @@ if (isset($_POST['add'])) {
           'keterangan' => $keterangan
       ];
       insertData('log_aktivitas', $log_data);
+      header("Location: " . base_url("pages/master-data/products"));
+      exit();
   }
 }elseif (isset($_POST['edit'])) {
   // Ambil nilai-nilai dari form edit
@@ -81,7 +85,7 @@ if (isset($_POST['add'])) {
   // Periksa apakah nomor produk sudah ada (kecuali untuk produk yang sedang diedit)
   if (isValueExists('produk', 'no_produk', $no_produk, $id_produk, 'id_produk')) {
     $_SESSION['error_message'] = "Nomor produk sudah ada dalam database.";
-    header("Location: index.php");
+    header("Location: " . base_url("pages/master-data/products"));
     exit();
   }
 
@@ -137,9 +141,13 @@ if (isset($_POST['add'])) {
       ];
 
       insertData('log_aktivitas', $logData);
+      header("Location: " . base_url("pages/master-data/products"));
+      exit();
   } else {
       // Jika gagal, simpan pesan error ke dalam session
       $_SESSION['error_message'] = "Terjadi kesalahan saat mengupdate produk.";
+      header("Location: " . base_url("pages/master-data/products"));
+      exit();
   }
 } else {
 // Jika tidak ada permintaan tambah atau edit, simpan pesan error ke dalam session
@@ -150,5 +158,5 @@ $_SESSION['error_message'] = "Permintaan tidak valid!";
 mysqli_close($conn);
 
 // Redirect kembali ke index.php setelah proses selesai
-header("Location: index.php");
+header("Location: " . base_url("pages/master-data/products"));
 exit();
