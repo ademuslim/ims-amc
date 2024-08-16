@@ -5,128 +5,130 @@
 ---
 
 # Dokumentasi Struktur Proyek
-
-| **_.htaccess**
-| **_assets**
-| | **_css**
-| | **_image**
-| | **_js**
-| | |_ **_bootstrap.bundle.min.js**
-| | |_ **_buttons.colVis.min.js**
-| | |_ **_buttons.dataTables.js**
-| | |_ **_buttons.html5.min.js**
-| | |_ **_buttons.print.min.js**
-| | |_ **_chart.js**
-| | |_ **_chartjs-plugin-datalabels.js**
-| | |_ **_dataTables.bootstrap5.js**
-| | |_ **_dataTables.buttons.js**
-| | |_ **_dataTables.js**
-| | |_ **_dataTables.responsive.js**
-| | |_ **_jquery.js**
-| | |_ **_jszip.min.js**
-| | |_ **_pdfmake.min.js**
-| | |_ **_responsive.bootstrap5.js**
-| | |_ **_script.js**
-| | |_ **_sweetalert2.all.min.js**
-| | |_ **_vfs_fonts.js**
-| **_auth**
-| | **_login.php**
-| | **_logout.php**
-| | **_process.php**
-| **_includes**
-| |_ **_composer.json**
-| |_ **_composer.lock**
-| |_ **_config.php**
-| |_ **_footer.php**
-| |_ **_function.php**
-| |_ **_header.php**
-| |_ **_mtg_ims_amc_23_06_24.sql**
-| |_ **_vendor**
-| | |_ **_composer**
-| | |_ **_ramsey**
-| | |_ **_uuid**
-| **_index.php**
-| **_pages**
-| | **_access-denied.php**
-| | |_ **_activity-log**
-| | | |_ **_del.php**
-| | | |_ **_index.php**
-| | **_dashboard**
-| | |_ **_incomeInfo.php**
-| | |_ **_index.php**
-| | |_ **_invoiceInfo.php**
-| | |_ **_purchaseOrderInfo.php**
-| | |_ **_quotationInfo.php**
-| | **_delivery-order**
-| | |_ **_detail.php**
-| | |_ **_index.php**
-| | |_ **_process.php**
-| | **_index.php**
-| | |_ **_invoices**
-| | | |_ **_add.php**
-| | | |_ **_approve.php**
-| | | |_ **_del.php**
-| | | |_ **_detail.php**
-| | | |_ **_edit.php**
-| | | |_ **_getDocumentNumber.php**
-| | | |_ **_getPesananInfo.php**
-| | | |_ **_index.php**
-| | | |_ **_list-detail.php**
-| | | |_ **_process.php**
-| | **_master-data**
-| | |_ **_contact-bank-accounts**
-| | | |_ **_add.php**
-| | | |_ **_del.php**
-| | | |_ **_edit.php**
-| | | |_ **_index.php**
-| | | |_ **_process.php**
-| | |_ **_contacts**
-| | | |_ **_add.php**
-| | | |_ **_del.php**
-| | | |_ **_edit.php**
-| | | |_ **_index.php**
-| | | |_ **_process.php**
-| | |_ **_index.php**
-| | |_ **_ppn**
-| | | |_ **_add.php**
-| | | |_ **_del.php**
-| | | |_ **_edit.php**
-| | | |_ **_index.php**
-| | | |_ **_process.php**
-| | |_ **_products**
-| | | |_ **_add.php**
-| | | |_ **_del.php**
-| | | |_ **_edit.php**
-| | | |_ **_index.php**
-| | | |_ **_process.php**
-| | |_ **_users**
-| | | |_ **_add.php**
-| | | |_ **_change_password.php**
-| | | |_ **_del.php**
-| | | |_ **_edit.php**
-| | | |_ **_index.php**
-| | | |_ **_process.php**
-| |_ **_purchase-orders**
-| | |_ **_add.php**
-| | |_ **_approve.php**
-| | |_ **_del.php**
-| | |_ **_detail.php**
-| | |_ **_edit.php**
-| | |_ **_getDocumentNumber.php**
-| | |_ **_getPenawaranInfo.php**
-| | |_ **_index.php**
-| | |_ **_list-detail.php**
-| | |_ **_process.php**
-| | **_quotation**
-| | |_ **_add.php**
-| | |_ **_approve.php**
-| | |_ **_del.php**
-| | |_ **_detail.php**
-| | |_ **_edit.php**
-| | |_ **_getDocumentNumber.php**
-| | |_ **_index.php**
-| | |_ **_list-detail.php**
-| | |_ **_process.php**
+|-- .htaccess
+|-- assets
+| |-- css
+| |-- image
+| | |-- uploads
+| | |-- logo
+| | |-- signature
+| |-- js
+| |-- bootstrap.bundle.min.js
+| |-- buttons.colVis.min.js
+| |-- buttons.dataTables.js
+| |-- buttons.html5.min.js
+| |-- buttons.print.min.js
+| |-- chart.js
+| |-- chartjs-plugin-datalabels.js
+| |-- dataTables.bootstrap5.js
+| |-- dataTables.buttons.js
+| |-- dataTables.js
+| |-- dataTables.responsive.js
+| |-- jquery.js
+| |-- jszip.min.js
+| |-- pdfmake.min.js
+| |-- responsive.bootstrap5.js
+| |-- script.js
+| |-- sweetalert2.all.min.js
+| |-- vfs_fonts.js
+|-- auth
+| |-- login.php
+| |-- logout.php
+| |-- process.php
+|-- includes
+| |-- composer.json
+| |-- composer.lock
+| |-- config.php
+| |-- footer.php
+| |-- function.php
+| |-- header.php
+| |-- mtg_ims_amc_23_06_24.sql
+| |-- vendor
+| |-- composer
+| |-- ramsey
+| |-- uuid
+|-- index.php
+|-- pages
+| |-- access-denied.php
+| |-- activity-log
+| |-- del.php
+| |-- index.php
+| |-- dashboard
+| |-- incomeInfo.php
+| |-- index.php
+| |-- invoiceInfo.php
+| |-- purchaseOrderInfo.php
+| |-- quotationInfo.php
+| |-- delivery-order
+| |-- detail.php
+| |-- index.php
+| |-- process.php
+| |-- index.php
+| |-- invoices
+| |-- add.php
+| |-- approve.php
+| |-- del.php
+| |-- detail.php
+| |-- edit.php
+| |-- getDocumentNumber.php
+| |-- getPesananInfo.php
+| |-- index.php
+| |-- list-detail.php
+| |-- process.php
+| |-- master-data
+| |-- contact-bank-accounts
+| |-- add.php
+| |-- del.php
+| |-- edit.php
+| |-- index.php
+| |-- process.php
+| |-- contacts
+| |-- add.php
+| |-- del.php
+| |-- edit.php
+| |-- index.php
+| |-- process.php
+| |-- index.php
+| |-- ppn
+| |-- add.php
+| |-- del.php
+| |-- edit.php
+| |-- index.php
+| |-- process.php
+| |-- products
+| |-- add.php
+| |-- del.php
+| |-- edit.php
+| |-- index.php
+| |-- process.php
+| |-- users
+| |-- add.php
+| |-- change_password.php
+| |-- del.php
+| |-- edit.php
+| |-- index.php
+| |-- process.php
+| |-- purchase-orders
+| |-- add.php
+| |-- approve.php
+| |-- del.php
+| |-- detail.php
+| |-- edit.php
+| |-- getDocumentNumber.php
+| |-- getPenawaranInfo.php
+| |-- index.php
+| |-- list-detail.php
+| |-- process.php
+| |-- quotation
+| |-- add.php
+| |-- approve.php
+| |-- del.php
+| |-- detail.php
+| |-- edit.php
+| |-- getDocumentNumber.php
+| |-- index.php
+| |-- list-detail.php
+| |-- process.php
 
 
 ---
