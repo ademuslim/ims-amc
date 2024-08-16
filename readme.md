@@ -6,130 +6,128 @@
 
 # Dokumentasi Struktur Proyek
 
-|**_.htaccess
-|_**assets
-| |**_css
-| |_**image
-| | |**_uploads
-| | | |_**logo
-| | | |**_signature
-| |_**js
-| | |**_bootstrap.bundle.min.js
-| | |_**buttons.colVis.min.js
-| | |**_buttons.dataTables.js
-| | |_**buttons.html5.min.js
-| | |**_buttons.print.min.js
-| | |_**chart.js
-| | |**_chartjs-plugin-datalabels.js
-| | |_**dataTables.bootstrap5.js
-| | |**_dataTables.buttons.js
-| | |_**dataTables.js
-| | |**_dataTables.responsive.js
-| | |_**jquery.js
-| | |**_jszip.min.js
-| | |_**pdfmake.min.js
-| | |**_responsive.bootstrap5.js
-| | |_**script.js
-| | |**_sweetalert2.all.min.js
-| | |_**vfs\*fonts.js
-|\*\*\_auth
-| |**\*login.php
-| |**_logout.php
-| |_**process.php
-|**_includes
-| |_**composer.json
-| |**_composer.lock
-| |_**config.php
-| |**_footer.php
-| |_**function.php
-| |**_header.php
-| |_**mtg_ims_amc_23_06_24.sql
-| |**_vendor
-| | |_**composer
-| | |**_ramsey
-| | | |_**uuid
-|**_index.php
-|_**pages
-| |**_access-denied.php
-| |_**activity-log
-| | |**_del.php
-| | |_**index.php
-| |**_dashboard
-| | |_**incomeInfo.php
-| | |**_index.php
-| | |_**invoiceInfo.php
-| | |**_purchaseOrderInfo.php
-| | |_**quotationInfo.php
-| |**_delivery-order
-| | |_**detail.php
-| | |**_index.php
-| | |_**process.php
-| |**_index.php
-| |_**invoices
-| | |**_add.php
-| | |_**approve.php
-| | |**_del.php
-| | |_**detail.php
-| | |**_edit.php
-| | |_**getDocumentNumber.php
-| | |**_getPesananInfo.php
-| | |_**index.php
-| | |**_list-detail.php
-| | |_**process.php
-| |**_master-data
-| | |_**contact-bank-accounts
-| | | |**_add.php
-| | | |_**del.php
-| | | |**_edit.php
-| | | |_**index.php
-| | | |**_process.php
-| | |_**contacts
-| | | |**_add.php
-| | | |_**del.php
-| | | |**_edit.php
-| | | |_**index.php
-| | | |**_process.php
-| | |_**index.php
-| | |**_ppn
-| | | |_**add.php
-| | | |**_del.php
-| | | |_**edit.php
-| | | |**_index.php
-| | | |_**process.php
-| | |**_products
-| | | |_**add.php
-| | | |**_del.php
-| | | |_**edit.php
-| | | |**_index.php
-| | | |_**process.php
-| | |**_users
-| | | |_**add.php
-| | | |**_change_password.php
-| | | |_**del.php
-| | | |**_edit.php
-| | | |_**index.php
-| | | |**_process.php
-| |_**purchase-orders
-| | |**_add.php
-| | |_**approve.php
-| | |**_del.php
-| | |_**detail.php
-| | |**_edit.php
-| | |_**getDocumentNumber.php
-| | |**_getPenawaranInfo.php
-| | |_**index.php
-| | |**_list-detail.php
-| | |_**process.php
-| |**_quotation
-| | |_**add.php
-| | |**_approve.php
-| | |_**del.php
-| | |**_detail.php
-| | |_**edit.php
-| | |**_getDocumentNumber.php
-| | |_**index.php
-| | |**_list-detail.php
-| | |_\*\*process.php
+| **_.htaccess**
+| **_assets**
+| | **_css**
+| | **_image**
+| | **_js**
+| | |_ **_bootstrap.bundle.min.js**
+| | |_ **_buttons.colVis.min.js**
+| | |_ **_buttons.dataTables.js**
+| | |_ **_buttons.html5.min.js**
+| | |_ **_buttons.print.min.js**
+| | |_ **_chart.js**
+| | |_ **_chartjs-plugin-datalabels.js**
+| | |_ **_dataTables.bootstrap5.js**
+| | |_ **_dataTables.buttons.js**
+| | |_ **_dataTables.js**
+| | |_ **_dataTables.responsive.js**
+| | |_ **_jquery.js**
+| | |_ **_jszip.min.js**
+| | |_ **_pdfmake.min.js**
+| | |_ **_responsive.bootstrap5.js**
+| | |_ **_script.js**
+| | |_ **_sweetalert2.all.min.js**
+| | |_ **_vfs_fonts.js**
+| **_auth**
+| | **_login.php**
+| | **_logout.php**
+| | **_process.php**
+| **_includes**
+| |_ **_composer.json**
+| |_ **_composer.lock**
+| |_ **_config.php**
+| |_ **_footer.php**
+| |_ **_function.php**
+| |_ **_header.php**
+| |_ **_mtg_ims_amc_23_06_24.sql**
+| |_ **_vendor**
+| | |_ **_composer**
+| | |_ **_ramsey**
+| | |_ **_uuid**
+| **_index.php**
+| **_pages**
+| | **_access-denied.php**
+| | |_ **_activity-log**
+| | | |_ **_del.php**
+| | | |_ **_index.php**
+| | **_dashboard**
+| | |_ **_incomeInfo.php**
+| | |_ **_index.php**
+| | |_ **_invoiceInfo.php**
+| | |_ **_purchaseOrderInfo.php**
+| | |_ **_quotationInfo.php**
+| | **_delivery-order**
+| | |_ **_detail.php**
+| | |_ **_index.php**
+| | |_ **_process.php**
+| | **_index.php**
+| | |_ **_invoices**
+| | | |_ **_add.php**
+| | | |_ **_approve.php**
+| | | |_ **_del.php**
+| | | |_ **_detail.php**
+| | | |_ **_edit.php**
+| | | |_ **_getDocumentNumber.php**
+| | | |_ **_getPesananInfo.php**
+| | | |_ **_index.php**
+| | | |_ **_list-detail.php**
+| | | |_ **_process.php**
+| | **_master-data**
+| | |_ **_contact-bank-accounts**
+| | | |_ **_add.php**
+| | | |_ **_del.php**
+| | | |_ **_edit.php**
+| | | |_ **_index.php**
+| | | |_ **_process.php**
+| | |_ **_contacts**
+| | | |_ **_add.php**
+| | | |_ **_del.php**
+| | | |_ **_edit.php**
+| | | |_ **_index.php**
+| | | |_ **_process.php**
+| | |_ **_index.php**
+| | |_ **_ppn**
+| | | |_ **_add.php**
+| | | |_ **_del.php**
+| | | |_ **_edit.php**
+| | | |_ **_index.php**
+| | | |_ **_process.php**
+| | |_ **_products**
+| | | |_ **_add.php**
+| | | |_ **_del.php**
+| | | |_ **_edit.php**
+| | | |_ **_index.php**
+| | | |_ **_process.php**
+| | |_ **_users**
+| | | |_ **_add.php**
+| | | |_ **_change_password.php**
+| | | |_ **_del.php**
+| | | |_ **_edit.php**
+| | | |_ **_index.php**
+| | | |_ **_process.php**
+| |_ **_purchase-orders**
+| | |_ **_add.php**
+| | |_ **_approve.php**
+| | |_ **_del.php**
+| | |_ **_detail.php**
+| | |_ **_edit.php**
+| | |_ **_getDocumentNumber.php**
+| | |_ **_getPenawaranInfo.php**
+| | |_ **_index.php**
+| | |_ **_list-detail.php**
+| | |_ **_process.php**
+| | **_quotation**
+| | |_ **_add.php**
+| | |_ **_approve.php**
+| | |_ **_del.php**
+| | |_ **_detail.php**
+| | |_ **_edit.php**
+| | |_ **_getDocumentNumber.php**
+| | |_ **_index.php**
+| | |_ **_list-detail.php**
+| | |_ **_process.php**
+
 
 ---
 
@@ -158,16 +156,6 @@
 #### assets/image/uploads
 
 - **Direktori untuk menyimpan gambar upload** seperti logo dan tanda tangan.
-
-##### assets/image/uploads/logo
-
-- **66782f4ae81fa_20240623.jpeg**: Logo perusahaan (file contoh).
-- **no_logo.png**: Placeholder untuk logo yang belum diunggah.
-
-##### assets/image/uploads/signature
-
-- **66782f109b2cb_20240623.png**: Tanda tangan digital (file contoh).
-- **no_sign.png**: Placeholder untuk tanda tangan yang belum diunggah.
 
 ### assets/js
 
@@ -227,29 +215,9 @@
 
 ### pages/documents
 
-- **invoice_incoming.php**: Halaman untuk mengelola invoice yang masuk.
-- **invoice_outgoing.php**: Halaman untuk mengelola invoice yang keluar.
-- **purchase_order.php**: Halaman untuk mengelola purchase order.
-- **quotation.php**: Halaman untuk mengelola penawaran harga.
-
-### pages/reports
-
-- **index.php**: Halaman utama laporan yang menampilkan berbagai laporan keuangan.
-- **invoice_report.php**: Halaman laporan untuk invoice.
-- **purchase_order_report.php**: Halaman laporan untuk purchase order.
-- **quotation_report.php**: Halaman laporan untuk penawaran harga.
-
-## uploads
-
-- **Direktori untuk file yang diunggah oleh pengguna** seperti dokumen transaksi, gambar, atau file lainnya.
-
-### uploads/documents
-
-- **Direktori untuk menyimpan dokumen-dokumen transaksi** seperti invoice, purchase order, dan penawaran harga.
-
-### uploads/signatures
-
-- **Direktori untuk menyimpan tanda tangan digital** dari pengguna yang berwenang.
+- **invoice**: Halaman untuk mengelola invoice.
+- **purchase_order**: Halaman untuk mengelola purchase order.
+- **quotation**: Halaman untuk mengelola penawaran harga.
 
 ## index.php
 
